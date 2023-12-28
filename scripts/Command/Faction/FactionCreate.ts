@@ -19,7 +19,7 @@ addSubCommand(
 	true,
 	true,
 	factionCreate,
-	[["faction", "f"], ["create", "c"]]
+	[["faction", "f"]]
 );
 
 function concatFacName(args: string[], start: number) {

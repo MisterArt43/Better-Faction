@@ -5,7 +5,7 @@ import { ChunkPermission } from "./ChunkPermission";
 import { ChunkPlayerPermission } from "./ChunkPlayerPermission";
 import { ChunkRankPermission } from "./ChunkRankPermission";
 import { Ply } from "../player/Ply";
-import { Server, hexToText, log } from "../tool/tools";
+import { Server, hexToText, log, textToHex } from "../tool/tools";
 import { factionRank } from "../faction/Faction";
 
 export let db_chunk: Map<string, Chunk> = new Map<string, Chunk>();
@@ -95,26 +95,24 @@ export class Chunk {
 							log("§cError: Mismatch data in db_chunk, try deleting the database and restarting the server. Contact the developer.");
 							return;
 						}
-						/** @type {Chunk} */
-						let chunk = JSON.parse(hexToText(db.join("")));
-
+						const chunk = JSON.parse(hexToText(db.join(""))) as Chunk;
 
 						// Update db_chunk map
 						const existingChunk = db_chunk.get(`${chunk.x},${chunk.z + chunk.dimension}`);
 
 						if (existingChunk) {
 							// Update existing chunk data
-							log(`§cDuplicate chunk found, fixing ${chunk.name}`)
+							log(`§cDuplicate chunk found, fixing ${chunk.x}, ${chunk.z}`)
 							objective.removeParticipant(score.participant);
 						} else {
-							if (chunk.x == undefined || chunk.z == undefined || chunk.dimension == undefined) {
+							if (chunk.x === undefined || chunk.z === undefined || chunk.dimension === undefined) {
 								log("§cError: Claim chunk data is undefined, Claim Leak is possible");
 								objective.removeParticipant(score.participant);
 								return;
 							}
 							db_chunk.set(`${chunk.x},${chunk.z + chunk.dimension}`, chunk);
-							let GC = db_group_chunk.get(chunk.group + chunk.faction_name);
-							if (GC == undefined) {
+							const GC = db_group_chunk.get(chunk.group + chunk.faction_name);
+							if (GC === undefined) {
 								db_group_chunk.set(chunk.group + chunk.faction_name, [chunk]);
 							}
 							else {
@@ -136,4 +134,26 @@ export class Chunk {
 			log("§7db_chunk loaded in " + ((end - start) / 1000) + " second(s)");
 		}
 	}
+	
+	static add_chunk(chunk: Chunk) {
+		if (db_chunk.has(chunk.x + "," + chunk.z)) return log(`§cDuplicate chunk found, fixing ${chunk.x}, ${chunk.z}`);
+		Server.runCommandAsync("scoreboard players set \"$db_chunk(" + textToHex(JSON.stringify(chunk)) + ")\" db_chunk 1");
+		db_chunk.set(chunk.x + "," + chunk.z + chunk.dimension, chunk); //to rework because unefficient when updating
+		log(JSON.stringify(Array.from(db_chunk.keys()), null, 2));
+	}
+
+	static remove_chunk(chunk: Chunk) {
+		if (!db_chunk.has(chunk.x + "," + chunk.z + chunk.dimension)) log(`§cERROR: try to remove a chunk that doesn't exist, ${chunk.x}, ${chunk.z}, possible duplication in the database`);
+		Server.runCommandAsync("scoreboard players reset \"$db_chunk(" + textToHex(JSON.stringify(chunk)) + ")\" db_chunk");
+		db_chunk.delete(chunk.x + "," + chunk.z + chunk.dimension);
+	}
+
+	add_to_update_chunk() {
+		Server.runCommandAsync("scoreboard players set \"$db_chunk(" + textToHex(JSON.stringify(this)) + ")\" db_chunk 1");
+	}
+
+	remove_to_update_chunk() {
+		Server.runCommandAsync("scoreboard players reset \"$db_chunk(" + textToHex(JSON.stringify(this)) + ")\" db_chunk");
+	}
+
 }
