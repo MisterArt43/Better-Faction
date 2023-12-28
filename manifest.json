@@ -1,0 +1,55 @@
+{
+	"format_version": 2,
+	"header": {
+		"description": "better faction by Mister Art43 +help",
+		"name": "§e§lBetter §6Faction §bv§a1.1.30",
+		"uuid": "34b1e49b-1512-4c92-b348-1611e82cb031",
+		"version": [
+			1,
+			1,
+			30
+		],
+		"min_engine_version": [
+			1,
+			20,
+			40
+		]
+	},
+	"modules": [
+		{
+			"description": "make it work on realm",
+			"type": "data",
+			"uuid": "11840662-5b96-4f4e-926d-ba0850644e07",
+			"version": [
+				1,
+				0,
+				0
+			]
+		},
+		{
+			"description": "Gametest Framework Needs To Be Enabled",
+			"language": "javascript",
+			"type": "script",
+			"uuid": "3a3e4c79-9c99-4aa7-8647-58796cdb18e9",
+			"version": [
+				1,
+				0,
+				0
+			],
+			"entry": "scripts/index.js"
+		}
+	],
+    "dependencies": [
+        {
+            "module_name": "@minecraft/server",
+            "version": "1.8.0-beta"
+        },
+        {
+            "module_name": "@minecraft/server-ui",
+            "version": "1.2.0-beta"
+        }
+    ],
+	"capabilities": [
+		"script_eval"
+	]
+}
