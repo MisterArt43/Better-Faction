@@ -76,36 +76,36 @@ import {ActionFormData, ModalFormData, ModalFormResponse, MessageFormData, FormC
 //  * @property {number} timePlayed in seconds
 //  */
 
-/**
- * @typedef faction_member
- * @type {object}
- * @property {string} name
- * @property {string} permission
- */
+// /**
+//  * @typedef faction_member
+//  * @type {object}
+//  * @property {string} name
+//  * @property {string} permission
+//  */
 
-/**
- * @typedef faction
- * @type {object}
- * @property {string} name
- * @property {string} description
- * @property {string} color
- * @property {string} separator
- * @property {custom_date} date2
- * @property {string} owner
- * @property {number} bank
- * @property {number} power
- * @property {Array} ally
- * @property {Array} enemy
- * @property {Array} invitList
- * @property {faction_member[]} playerList
- * @property {number} memberLimit
- * @property {boolean} isFhome
- * @property {number} x
- * @property {number} y
- * @property {number} z
- * @property {boolean} isOpen
- * @property {Vector2[]} claim
- */
+// /**
+//  * @typedef faction
+//  * @type {object}
+//  * @property {string} name
+//  * @property {string} description
+//  * @property {string} color
+//  * @property {string} separator
+//  * @property {custom_date} date2
+//  * @property {string} owner
+//  * @property {number} bank
+//  * @property {number} power
+//  * @property {Array} ally
+//  * @property {Array} enemy
+//  * @property {Array} invitList
+//  * @property {faction_member[]} playerList
+//  * @property {number} memberLimit
+//  * @property {boolean} isFhome
+//  * @property {number} x
+//  * @property {number} y
+//  * @property {number} z
+//  * @property {boolean} isOpen
+//  * @property {Vector2[]} claim
+//  */
 
 /**
  * @typedef cmd

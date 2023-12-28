@@ -138,7 +138,7 @@ export const factionRank = {
 	"Visitor": 3
 } as const;
 
-class faction_member {
+export class faction_member {
 	public name: string;
 	public permission: (typeof factionRank[keyof typeof factionRank]);
 	
