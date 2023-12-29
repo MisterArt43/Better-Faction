@@ -1,5 +1,5 @@
 import { Player } from "@minecraft/server";
-import { concatenateArgs, sleep, tellraw } from "../../Object/tool/tools";
+import { concatFacName, concatenateArgs, sleep, tellraw } from "../../Object/tool/tools";
 import { Ply } from "../../Object/player/Ply";
 import { DB } from "../../Object/database/database";
 import { translate } from "../../lang";
@@ -118,8 +118,4 @@ function broadcastRemoveInvite(playerName: string) {
         }
         if (i++ % 10 === 0) sleep(1);
     }
-}
-
-function concatFacName(args: string[], start: number) {
-    return concatenateArgs(args, start, (s) => s.replace(/"/g, "").toLowerCase().replace(/\b\w/g, c => c.toUpperCase()));
 }

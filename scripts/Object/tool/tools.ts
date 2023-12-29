@@ -107,6 +107,10 @@ export function concatenateArgs(args: string[], start?: number, func?: concatFun
     return result.trim();
 }
 
+export function concatFacName(args: string[], start: number) {
+	return concatenateArgs(args, start, (s) => s.replace(/"/g, "").toLowerCase().replace(/\b\w/g, c => c.toUpperCase()));
+}
+
 export async function runCommandDim(command: string, dimension: Dimension['id']) {
 	try {
 		return { error: false, ...await world.getDimension(dimension).runCommandAsync(command)};//to fix at the next update

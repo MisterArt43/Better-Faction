@@ -1,6 +1,6 @@
 import { Player } from "@minecraft/server";
 import { Ply } from "../../Object/player/Ply";
-import { concatenateArgs, tellraw } from "../../Object/tool/tools";
+import { concatFacName, concatenateArgs, tellraw } from "../../Object/tool/tools";
 import { translate } from "../../lang";
 import { DB } from "../../Object/database/database";
 import { Faction } from "../../Object/faction/Faction";
@@ -21,10 +21,6 @@ addSubCommand(
 	factionCreate,
 	[["faction", "f"]]
 );
-
-function concatFacName(args: string[], start: number) {
-	return concatenateArgs(args, start, (s) => s.replace(/"/g, "").toLowerCase().replace(/\b\w/g, c => c.toUpperCase()));
-}
 
 function factionCreate(args: string[], player: Player, ply: Ply) {
 	if (args.length >= 3) {
