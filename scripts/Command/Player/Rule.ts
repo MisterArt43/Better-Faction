@@ -1,11 +1,12 @@
 import { Player, system, world } from "@minecraft/server";
 import { Ply } from "../../Object/player/Ply";
 import { DB } from "../../Object/database/database";
-import { addDateZ, log, sleep } from "../../Object/tool/tools";
+import { log, sleep } from "../../Object/tool/tools";
 import { ActionFormData, FormCancelationReason, ModalFormData } from "@minecraft/server-ui";
 import { displayTypes } from "../../Object/display/Display";
 import { addSubCommand, cmd_permission } from "../CommandManager";
 import { cmd_module } from "../../Object/database/db_map";
+import { formatCreationDayTime } from "../../Object/tool/dateTools";
 
 addSubCommand(
 	"rule",
@@ -33,7 +34,7 @@ export async function display_rule(player: Player, ply: Ply, isNewPlayer: boolea
 	const Fbank = faction?.bank.toString() ?? "0";
 
 	const date = new Date(new Date().getTime() + ply.UTC * 3600000); // 60 * 60 * 1000
-	const localTime = ply.UTC + addDateZ(date.getUTCHours()) + ":" + addDateZ(date.getMinutes());
+	const localTime = formatCreationDayTime(date.getTime())
 
 	const coordX = Math.floor(player.location.x);
 	const coordY = Math.floor(player.location.y);

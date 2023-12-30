@@ -1,11 +1,12 @@
 import { EntityHealthComponent, Player, system, world } from "@minecraft/server";
-import { Server, addDateZ, findFirstTagStartWith, findTagsStartWithV2, log, tellraw, textToHex } from "../Object/tool/tools";
+import { Server, findFirstTagStartWith, findTagsStartWithV2, log, tellraw, textToHex } from "../Object/tool/tools";
 import { DB } from "../Object/database/database";
 import { Ply, Tpa } from "../Object/player/Ply";
 import { Display } from "../Object/display/Display";
 import { translate } from "../lang";
 import { Faction } from "../Object/faction/Faction";
 import { display_rule } from "../Command/Player/Rule";
+import { addDateZ, formatCreationDayTime } from "../Object/tool/dateTools";
 
 let curTick = 0;
 const START_TICK = 20; //start 0.5 secondes after a "/reload"
@@ -209,7 +210,7 @@ system.runInterval(async () => {
 								const Fcount = faction === undefined ? "none" : faction.playerList.length + "/" + faction?.memberLimit;
 								const Fbank = faction?.bank.toString() ?? "0";
 								const date = new Date(new Date().getTime() + player.UTC * 3600000); // 60 * 60 * 1000
-								const localTime = player.UTC + addDateZ(date.getUTCHours()) + ":" + addDateZ(date.getMinutes());
+								const localTime = formatCreationDayTime(date.getTime())
 
 								const coordX = Math.floor(p.location.x);
 								const coordY = Math.floor(p.location.y);
@@ -240,7 +241,6 @@ system.runInterval(async () => {
 												case "chunk": return chunk;
 												case "online": return players.length.toString();
 												case "allPlayer": return DB.db_player.size.toString();
-												//new version 1.1.10
 												case "version": return version;
 												case "prefix": return prefix;
 												case "time": return localTime;

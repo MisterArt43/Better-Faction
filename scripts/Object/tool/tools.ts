@@ -3,6 +3,11 @@ import { ModalFormData } from "@minecraft/server-ui";
 import { DB } from "../database/database";
 import { Ply } from "../player/Ply";
 
+
+// -------------------------- //
+//       WORLD TOOLS          //
+// -------------------------- //
+
 export const Server = world.getDimension("overworld");
 export const Nether = world.getDimension("nether");
 export const TheEnd = world.getDimension("the end");
@@ -16,6 +21,11 @@ export function tellraw(selector : string, text : string) {
 export function log(text : number | string) { Server.runCommandAsync(`tellraw @a[tag=log] {"rawtext":[{"text":"§7{log} §r${text.toString().replace(/"/g, "\'").replace(/\n/g, "§r\n")}"}]}`) }
 
 export function sleep(ticks: number) { return new Promise<void>(resolve => system.runTimeout(resolve, ticks)); }
+
+
+// -------------------------- //
+//       DATABASE TOOLS       //
+// -------------------------- //
 
 /**
  * Convert Hexadecimal to string
@@ -67,6 +77,11 @@ export function getMap(regexObj: RegExp): string[] {
 	throw "error";
 }
 
+
+// -------------------------- //
+//    STRING MANIPULATION     //
+// -------------------------- //
+
 /**
  * return first occurence of tag start with tag
  */
@@ -87,22 +102,14 @@ export function findTagsStartWithV2(player: Player, tag: string, tags?: string[]
 	return player.getTags().filter((aTag) => aTag.replace(/"/g, "").startsWith(tag));
 }
 
-export function addDateZ(n: number) {
-	if (n <= 9)
-		return "0" + n;
-	return n.toString();
-}
-
 type concatFunc = (str: string) => string;
 
 export function concatenateArgs(args: string[], start?: number, func?: concatFunc): string {
-	let number = start ?? 0;
+	const number = start ?? 0;
     let result = "";
+
     for (let i = number; i < args.length; i++) {
-		if (func !== undefined)
-			result += func(args[i]) + " ";
-		else 
-			result += args[i] + " ";
+		func ? result += func(args[i]) + " " : result += args[i] + " ";
     }
     return result.trim();
 }
@@ -110,6 +117,11 @@ export function concatenateArgs(args: string[], start?: number, func?: concatFun
 export function concatFacName(args: string[], start: number) {
 	return concatenateArgs(args, start, (s) => s.replace(/"/g, "").toLowerCase().replace(/\b\w/g, c => c.toUpperCase()));
 }
+
+
+// -------------------------- //
+//       COMMAND TOOLS        //
+// -------------------------- //
 
 export async function runCommandDim(command: string, dimension: Dimension['id']) {
 	try {
