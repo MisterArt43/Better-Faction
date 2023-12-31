@@ -6,7 +6,7 @@ import { ActionFormData, FormCancelationReason, ModalFormData } from "@minecraft
 import { displayTypes } from "../../Object/display/Display";
 import { addSubCommand, cmd_permission } from "../CommandManager";
 import { cmd_module } from "../../Object/database/db_map";
-import { formatCreationDayTime } from "../../Object/tool/dateTools";
+import { addDateZ, formatCreationDayTime } from "../../Object/tool/dateTools";
 
 addSubCommand(
 	"rule",
