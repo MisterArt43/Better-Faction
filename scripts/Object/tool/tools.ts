@@ -118,6 +118,10 @@ export function concatFacName(args: string[], start: number) {
 	return concatenateArgs(args, start, (s) => s.replace(/"/g, "").toLowerCase().replace(/\b\w/g, c => c.toUpperCase()));
 }
 
+export function getTypedKeys<T extends object>(obj: T): (keyof T)[] {
+    return Object.keys(obj) as (keyof T)[];
+}
+
 
 // -------------------------- //
 //       COMMAND TOOLS        //

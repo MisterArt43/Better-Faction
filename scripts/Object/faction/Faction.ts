@@ -146,4 +146,8 @@ export class faction_member {
 		this.name = name;
 		this.permission = permission;
 	}
+
+	getRankName() {
+		return Object.keys(factionRank)[this.permission];
+	}
 }

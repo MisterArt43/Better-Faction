@@ -91,6 +91,7 @@ export class Ply {
 			try {
 				const objective = world.scoreboard.getObjective(objectiveName) ?? world.scoreboard.addObjective("db_player", "");
 				const sc = objective.getScores();
+				
 				const nbParticipants = sc.length;
 				const batchSize = 61 >>> 0;
 				const batchNumber = Math.ceil(nbParticipants / batchSize);

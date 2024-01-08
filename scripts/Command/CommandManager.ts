@@ -138,36 +138,16 @@ export function addSubCommand(
 }
 
 export class Command {
-	public command : string;
-	public description : string;
-	public usage : string;
-	public permission : (typeof cmd_permission[keyof typeof cmd_permission]);
-	public aliases : string[];
-	public module : (typeof cmd_module[keyof typeof cmd_module]);
-	public isEnable : boolean;
-	public isUI : boolean;
-	public func : CommandFunction;
-
 	constructor(
-		command: string,
-		module: (typeof cmd_module[keyof typeof cmd_module]),
-		description: string,
-		usage: string,
-		permission: (typeof cmd_permission[keyof typeof cmd_permission]),
-		aliases: string[],
-		isEnable: boolean,
-		isUI: boolean,
-		func: CommandFunction) {
-		this.command = command;
-		this.module = module;
-		this.description = description;
-		this.usage = usage;
-		this.permission = permission;
-		this.aliases = aliases;
-		this.isEnable = isEnable;
-		this.isUI = isUI;
-		this.func = func;
-	}
+		public command: string,
+		public module: (typeof cmd_module[keyof typeof cmd_module]),
+		public description: string,
+		public usage: string,
+		public permission: (typeof cmd_permission[keyof typeof cmd_permission]),
+		public aliases: string[],
+		public isEnable: boolean,
+		public isUI: boolean,
+		public func: CommandFunction) {}
 }
 
 export const cmd_permission = {
