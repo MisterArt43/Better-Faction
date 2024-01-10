@@ -1,4 +1,4 @@
-import { world } from "@minecraft/server";
+import { Player, world } from "@minecraft/server";
 import { DB } from "../database/database";
 import { Server, hexToText, log, tellraw, textToHex } from "../tool/tools";
 
@@ -54,12 +54,20 @@ export class Delay {
 	}
 
 	check_time() {
-	const date = new Date();
-	if (date.getTime() >= this.time) {
-		Delay.remove_delay(this);
-		return true;
+		const date = new Date();
+		if (date.getTime() >= this.time) {
+			Delay.remove_delay(this);
+			return true;
+		}
+		return false;
 	}
-	return false;
+
+	static isTpCanceled(player: Player) {
+		if (player.hasTag("tpCanceled") && !player.hasTag(adminTag)) {
+			tellraw(player.name, "§cYou can't accept a teleportation request in this area.");
+			return true;
+		}
+		return false;
 	}
 
 	static async initDB_delay() {

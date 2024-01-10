@@ -26,8 +26,8 @@ function tpaAccept(args: string[], player: Player, ply: Ply) {
             return tellraw(ply.name, "§cYou have to wait " + (delay.time - new Date().getTime()) / 1000 + " seconds before using this command.");
     }
     if (args.length == 1) {
-        if (player.hasTag("tpCanceled") && !player.hasTag(adminTag))
-            return tellraw(player.name, "§cYou can't accept a teleportation request in this area.");
+        if (Delay.isTpCanceled(player))
+            return;
         if (ply.tpa !== null) {
             const other = DB.db_player.get(ply.tpa.name);
             const otherPlayer = [...world.getPlayers()].find((p) => p.name === other?.name);

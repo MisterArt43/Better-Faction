@@ -5,6 +5,21 @@ import { Faction, factionRank, faction_member } from "../../Object/faction/Facti
 import { concatenateArgs, getTypedKeys, tellraw } from "../../Object/tool/tools";
 import { translate } from "../../lang";
 import { ModalFormData } from "@minecraft/server-ui";
+import { addSubCommand, cmd_permission } from "../CommandManager";
+import { cmd_module } from "../../Object/database/db_map";
+
+addSubCommand(
+	"promote",
+	"promote a player",
+	`${globalThis.prefix}faction promote <player>`,
+	["promote", "p"],
+	cmd_module.faction,
+	cmd_permission.member,
+	true,
+	true,
+	Factionpromote,
+	[["faction", "f"]]
+)
 
 function Factionpromote(args: string[], player: Player, ply: Ply) {
 	const fac = DB.db_faction.get(ply.faction_name ?? "");

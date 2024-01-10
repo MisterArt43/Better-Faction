@@ -5,6 +5,7 @@ import { DB } from "../../../Object/database/database";
 import { concatenateArgs, runCommandDim, tellraw, tpsound } from "../../../Object/tool/tools";
 import { translate } from "../../../lang";
 import { addSubCommand, cmd_permission } from "../../CommandManager";
+import { Delay } from "../../../Object/player/Delay";
 
 addSubCommand(
 	"home",
@@ -19,10 +20,9 @@ addSubCommand(
 );
 
 function home(args: string[], player: Player, ply: Ply) {
-	if (!player.hasTag(adminTag) && !ply.cmd_module.includes(cmd_module.all) && !ply.cmd_module.includes(cmd_module.home)) return tellraw(player.name, "§cThis Module is disabled.");
 	if (DB.db_delay.has(ply.name)) if (!DB.db_delay.get(ply.name)?.check_time()) return tellraw(ply.name, "§cYou have to wait " + ((DB.db_delay.get(ply.name)?.time ?? 0 - new Date().getTime()) / 1000) + " seconds before using this command.");
+	if (Delay.isTpCanceled(player)) return;
 	if (args.length >= 2) {
-		if (player.hasTag("tpCanceled") && !player.hasTag(adminTag)) return tellraw(player.name, "§cYou can't accept a teleportation request in this area.");
 		const name = concatenateArgs(args, 1)
 		const ahome = DB.db_player.get(player.name)?.home.find((h) => h.getName() === name);
 		if (ahome != undefined) {
