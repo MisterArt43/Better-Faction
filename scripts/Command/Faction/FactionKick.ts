@@ -38,8 +38,6 @@ function FactionKick(args: string[], player: Player, ply: Ply) {
 
 function FactionKickCMD(args: string[], player: Player, ply: Ply, fac: Faction) {
 	const name = concatenateArgs(args, 2, (s) => s.replace(/["@]/g, ""));
-	
-
 
 	const targetMember = fac.playerList.find((p) => p.name.toLowerCase() === name.toLowerCase() && p.permission !== factionRank.Leader);
 	if (targetMember !== undefined) {
