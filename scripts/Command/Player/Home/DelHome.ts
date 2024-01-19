@@ -37,17 +37,17 @@ function removeHomeForPlayer(player: Player, target: Ply, homeName: string): voi
         let home = target.home.find((h) => h.getName() === homeName);
         if (home !== undefined) {
             removeHomeFromPly(target, home);
-            tellraw(player.name, translate(target.lang, home.getName(), target.name)?.admin_home_remove ?? `§e•> "§a${home.getName()}§e" removed for ${target.name}.`);
+            tellraw(player, translate(target.lang, home.getName(), target.name)?.admin_home_remove ?? `§e•> "§a${home.getName()}§e" removed for ${target.name}.`);
         } else {
-            tellraw(player.name, translate(target.lang)?.error_find_home ?? "no translation");
+            tellraw(player, translate(target.lang)?.error_find_home ?? "no translation");
         }
     } else {
-        tellraw(player.name, translate(target.lang)?.error_find_home ?? "no translation");
+        tellraw(player, translate(target.lang)?.error_find_home ?? "no translation");
     }
 }
 
 function deleteHomeModal(player: Player, target: Ply | undefined): void {
-	tellraw(player.name, "§7You have 1 second to quit chat, a form will appear.");
+	tellraw(player, "§7You have 1 second to quit chat, a form will appear.");
     system.runTimeout(async () => {
 		if (target === undefined) return;
         let copyHome = [...target.home];
@@ -65,7 +65,7 @@ function deleteHomeModal(player: Player, target: Ply | undefined): void {
             for (let i = 0; i < res.formValues.length; i++) {
                 if (res.formValues[i] === true) {
                     target.home.splice(target.home.indexOf(copyHome[i]), 1);
-                    tellraw(player.name, "§aHome §b" + copyHome[i].getName() + " §aof §b" + target.name + " §ahas been deleted.");
+                    tellraw(player, "§aHome §b" + copyHome[i].getName() + " §aof §b" + target.name + " §ahas been deleted.");
                 }
             }
             target.add_to_update_player();
@@ -86,17 +86,17 @@ async function delhome(args: string[], player: Player, ply: Ply) {
                     if (target !== undefined && target instanceof Ply) {
                         removeHomeForPlayer(player, target, args[2].replace(/"/g, ""));
                     } else {
-                        tellraw(player.name, translate(ply.lang)?.error_find_player ?? "no translation");
+                        tellraw(player, translate(ply.lang)?.error_find_player ?? "no translation");
                     }
                 } else {
-                    tellraw(player.name, translate(ply.lang)?.error_find_home ?? "no translation");
+                    tellraw(player, translate(ply.lang)?.error_find_home ?? "no translation");
                 }
             } else {
-                tellraw(player.name, translate(ply.lang)?.error_find_home ?? "no translation");
+                tellraw(player, translate(ply.lang)?.error_find_home ?? "no translation");
             }
         }
     } else {
-        if (!player.hasTag(adminTag)) return tellraw(player.name, translate(ply.lang)?.error_arg ?? "§cWrong Arguments");
+        if (!player.hasTag(adminTag)) return tellraw(player, translate(ply.lang)?.error_arg ?? "§cWrong Arguments");
         deleteHomeModal(player, await UI_find_player(player));
     }
 }

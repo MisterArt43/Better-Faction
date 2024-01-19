@@ -29,16 +29,16 @@ function pay(args: string[], player: Player, ply: Ply) {
 }
 
 function Pui_pay(player: Player, ply: Ply) {
-	tellraw(ply.name, "§o§7you have 2 seconds to quit the chat and the form will appear.");
+	tellraw(player, "§o§7you have 2 seconds to quit the chat and the form will appear.");
 
 	if (DB.db_player.size <= 1) {
-		tellraw(ply.name, "§cnot enough players in the database");
+		tellraw(player, "§cnot enough players in the database");
 		return;
 	}
 
 	const money = ply.money;
 	if (money <= 0) {
-		tellraw(ply.name, translate(ply.lang)?.error_money ?? "no translation");
+		tellraw(player, translate(ply.lang)?.error_money ?? "no translation");
 		return;
 	}
 
@@ -63,7 +63,7 @@ function Pui_pay(player: Player, ply: Ply) {
 async function onlinePlayerSel(player: Player, ply: Ply) {
 	const onlinePlayers = [...world.getPlayers()].filter((p) => p.name !== ply.name).map((p) => p.name);
 	if (onlinePlayers.length === 0) {
-		tellraw(ply.name, "§cNo player online");
+		tellraw(player, "§cNo player online");
 		return;
 	}
 
@@ -131,22 +131,22 @@ function cmd_pay(args: string[], player: Player, ply: Ply) {
 					target.money += money;
 					ply.add_to_update_player();
 					target.add_to_update_player();
-					tellraw(ply.name, translate(ply.lang, money, target.name)?.pay ?? "no translation");
+					tellraw(player, translate(ply.lang, money, target.name)?.pay ?? "no translation");
 					tellraw(target.name, translate(ply.lang, money, ply.name)?.pay_get ?? "no translation");
 				}
 				else {
-					tellraw(ply.name, translate(ply.lang)?.error_money ?? "no translation");
+					tellraw(player, translate(ply.lang)?.error_money ?? "no translation");
 				}
 			}
 			else {
-				tellraw(ply.name, translate(ply.lang)?.error_find_player ?? "no translation");
+				tellraw(player, translate(ply.lang)?.error_find_player ?? "no translation");
 			}
 		}
 		else {
-			tellraw(ply.name, translate(ply.lang)?.error_number ?? "no translation");
+			tellraw(player, translate(ply.lang)?.error_number ?? "no translation");
 		}
 	}
 	else {
-		tellraw(ply.name, translate(ply.lang)?.error_arg ?? "no translation");
+		tellraw(player, translate(ply.lang)?.error_arg ?? "no translation");
 	}
 }

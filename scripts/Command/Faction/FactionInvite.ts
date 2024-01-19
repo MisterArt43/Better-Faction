@@ -1,4 +1,4 @@
-import { Player } from "@minecraft/server";
+import { Player, world } from "@minecraft/server";
 import { DB } from "../../Object/database/database";
 import { Ply } from "../../Object/player/Ply";
 import { concatenateArgs, tellraw } from "../../Object/tool/tools";
@@ -28,11 +28,11 @@ addSubCommand(
 function Factioninvite(args: string[], player: Player, ply: Ply) {
 	const fac = DB.db_faction.get(ply.faction_name ?? "");
 	if (!fac)
-		return tellraw(player.name, translate(ply.lang)?.error_cant_do_that ?? "no translation");
+		return tellraw(player, translate(ply.lang)?.error_cant_do_that ?? "no translation");
 
 	const factionMember = fac.playerList.find((p) => p.name === ply.name);
 	if (!factionMember)
-		return tellraw(player.name, translate(ply.lang)?.error_cant_do_that ?? "no translation"); //Change this to a more specific error message
+		return tellraw(player, translate(ply.lang)?.error_cant_do_that ?? "no translation"); //Change this to a more specific error message
 
 	if (args.length === 2) {
 		factionInviteUI(player, ply, fac, factionMember);
@@ -57,22 +57,22 @@ function invitePlayer(args: string[], player: Player, ply: Ply, fac: Faction, fa
 				fac.remove_to_update_faction();
 				fac.invitList.push(name);
 				fac.add_to_update_faction();
-				tellraw(player.name, translate(ply.lang, name)?.faction_invit ?? "no translation");
+				tellraw(player, translate(ply.lang, name)?.faction_invit ?? "no translation");
 				const target = DB.db_player.get(name);
 				if (target !== undefined) {
 					tellraw(target.name, translate(ply.lang, fac.name)?.faction_invit_get ?? "no translation");
 				}
 			}
 			else {
-				tellraw(player.name, translate(ply.lang)?.error_have_invit ?? "no translation");
+				tellraw(player, translate(ply.lang)?.error_have_invit ?? "no translation");
 			}
 		}
 		else {
-			tellraw(player.name, translate(ply.lang)?.error_have_faction ?? "no translation");
+			tellraw(player, translate(ply.lang)?.error_have_faction ?? "no translation");
 		}
 	}
 	else {
-		tellraw(player.name, translate(ply.lang)?.error_cant_do_that ?? "no translation");
+		tellraw(player, translate(ply.lang)?.error_cant_do_that ?? "no translation");
 	}
 }
 
@@ -81,10 +81,10 @@ function clearInvite(player: Player, ply: Ply, fac: Faction, factionMember: fact
 		fac.remove_to_update_faction();
 		fac.invitList.splice(0, fac.invitList.length);
 		fac.add_to_update_faction();
-		tellraw(player.name, translate(ply.lang)?.faction_invit_clear ?? "no translation");
+		tellraw(player, translate(ply.lang)?.faction_invit_clear ?? "no translation");
 	}
 	else {
-		tellraw(player.name, translate(ply.lang)?.error_cant_do_that ?? "no translation");
+		tellraw(player, translate(ply.lang)?.error_cant_do_that ?? "no translation");
 	}
 }
 
@@ -95,12 +95,12 @@ function listInvite(player: Player, ply: Ply, fac: Faction, factionMember: facti
 			message += "\n -" + p;
 		}
 		if (message === "§eInvited players :§r") {
-			tellraw(player.name, translate(ply.lang)?.error_list_invit ?? "no translation"); return;
+			tellraw(player, translate(ply.lang)?.error_list_invit ?? "no translation"); return;
 		}
-		tellraw(player.name, message);
+		tellraw(player, message);
 	}
 	else {
-		tellraw(player.name, translate(ply.lang)?.error_cant_do_that ?? "no translation");
+		tellraw(player, translate(ply.lang)?.error_cant_do_that ?? "no translation");
 	}
 }
 

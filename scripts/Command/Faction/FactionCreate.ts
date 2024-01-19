@@ -34,8 +34,8 @@ function factionCreate(args: string[], player: Player, ply: Ply) {
 
 function factionCreateCmd(Fname: string, player: Player, ply: Ply) {
 	if (Fname.match(/^([0-9a-zA-Z ]){1,40}$/) && Fname != "Admin") {//nom des claims Admin
-		if (ply.faction_name != null) return tellraw(player.name, translate(ply.lang)?.error_faction_create ?? "no translation");
-		if (DB.db_faction.has(Fname)) return tellraw(player.name, translate(ply.lang)?.error_have_name ?? "no translation");
+		if (ply.faction_name != null) return tellraw(player, translate(ply.lang)?.error_faction_create ?? "no translation");
+		if (DB.db_faction.has(Fname)) return tellraw(player, translate(ply.lang)?.error_have_name ?? "no translation");
 		let FacObject = new Faction(Fname, player.name);
 		if (player.dimension.id === "minecraft:overworld") {
 			FacObject.Fhome = new Vector_3(
@@ -47,16 +47,16 @@ function factionCreateCmd(Fname: string, player: Player, ply: Ply) {
 		ply.remove_to_update_player();
 		ply.faction_name = FacObject.name;
 		ply.add_to_update_player();
-		tellraw(player.name, translate(ply.lang, Fname)?.faction_create ?? "no translation");
+		tellraw(player, translate(ply.lang, Fname)?.faction_create ?? "no translation");
 	}
 	else {
-		tellraw(player.name, translate(ply.lang)?.error_name ?? "no translation");
+		tellraw(player, translate(ply.lang)?.error_name ?? "no translation");
 	}
 }
 
 function factionCreateUI(player: Player, ply: Ply) {
 	const fac = DB.db_faction.get(ply.faction_name ?? "");
-	if (fac !== undefined) return tellraw(player.name, "§cYou are already in a faction");
+	if (fac !== undefined) return tellraw(player, "§cYou are already in a faction");
 	new ModalFormData()
 		.title("Faction Create")
 		.textField("Faction Name", "faction name")

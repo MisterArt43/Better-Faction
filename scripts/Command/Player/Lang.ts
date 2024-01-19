@@ -23,10 +23,10 @@ function lang(args: string[], player: Player, ply: Ply) {
             ply.remove_to_update_player();
             ply.lang = args[1];
             ply.add_to_update_player();
-            tellraw(ply.name, translate(ply.lang)?.lang ?? "no translation");
+            tellraw(player, translate(ply.lang)?.lang ?? "no translation");
         }
         else {
-            tellraw(ply.name, translate(ply.lang)?.error_lang ?? "no translation");
+            tellraw(player, translate(ply.lang)?.error_lang ?? "no translation");
         }
     }
 }

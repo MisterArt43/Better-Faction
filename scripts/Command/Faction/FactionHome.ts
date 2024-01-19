@@ -36,6 +36,6 @@ function Factionhome(args: string[], player: Player, ply: Ply) {
 		}
 	}
 	else {
-		tellraw(player.name, translate(ply.lang)?.error_find_faction ?? "no translation");
+		tellraw(player, translate(ply.lang)?.error_find_faction ?? "no translation");
 	}
 }

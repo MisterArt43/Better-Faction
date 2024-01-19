@@ -23,6 +23,6 @@ async function ping(args: string[], player: Player, ply: Ply) {
 	system.runTimeout(() => {
 		const end = Date.now();
 		const diff = end - start - delay;
-		tellraw(ply.name, diff + " ms");
+		tellraw(player, diff + " ms");
 	},waitTime);
 }

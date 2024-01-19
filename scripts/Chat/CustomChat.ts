@@ -11,11 +11,11 @@ export function customChat(data: ChatSendBeforeEvent) {
     if (player === undefined) return;
 
     if (data.message.length > 200)
-        return tellraw(data.sender.name, "§cYour message exceeds 200 characters");
+        return tellraw(data.sender, "§cYour message exceeds 200 characters");
 	if (player.lastMessage === data.message.trim())
-		return tellraw(data.sender.name, "§cYou can't send the same message twice");
+		return tellraw(data.sender, "§cYou can't send the same message twice");
 	if (player.isMute)
-		return tellraw(data.sender.name, "§cYou are muted");
+		return tellraw(data.sender, "§cYou are muted");
 
 	player.remove_to_update_player();
 	player.lastMessage = data.message.trim();

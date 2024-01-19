@@ -18,7 +18,7 @@ export async function UI_find_faction(pl: Player): Promise<Faction | undefined> 
     const selectedFaction = await selectFaction(pl, factionList);
 
     if (!selectedFaction) {
-        tellraw(pl.name, "§cFaction not found");
+        tellraw(pl, "§cFaction not found");
     }
 
     return selectedFaction;
@@ -52,7 +52,7 @@ async function getFactionList(searchInOnlineFactions: boolean, searchKeyword: st
             if (factionName.startsWith(searchKeyword)) {
                 listFaction.push(factionName);
                 if (listFaction.length === 100) {
-                    tellraw(pl.name, "§cToo many results, will only return the first 100");
+                    tellraw(pl, "§cToo many results, will only return the first 100");
                     await sleep(10);
                     break;
                 }

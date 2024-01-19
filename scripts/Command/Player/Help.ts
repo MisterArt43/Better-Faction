@@ -22,14 +22,14 @@ function help(args: string[], player: Player, ply: Ply) {
 		for (let [key, value] of commands) {
 			msg += recursiveSubCommand(ply, value);
 		}
-		tellraw(player.name, msg);
+		tellraw(player, msg);
 	}
 	else {
 		if (commands.has(args[0])) {
 			recurUsageSubCommand(ply, commands.get(args[0]) as SubCommand, args, 1);
 		}
 		else {
-			tellraw(player.name, `§cUnknown command. Try ${globalThis.prefix}help for a list of commands.`);
+			tellraw(player, `§cUnknown command. Try ${globalThis.prefix}help for a list of commands.`);
 		}
 	}
 }

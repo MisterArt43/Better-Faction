@@ -27,18 +27,18 @@ function tpahere(args: string[], player: Player, ply: Ply) {
 				target.remove_to_update_player();
 				target.tpa = new Tpa(ply.name, TpaType.tpahere, DB.db_map.tpaDelay);
 				target.add_to_update_player();
-				tellraw(ply.name, translate(ply.lang, target.name)?.tpa_send ?? "no translation");
+				tellraw(player, translate(ply.lang, target.name)?.tpa_send ?? "no translation");
 				tellraw(target.name, translate(ply.lang, ply.name, prefix)?.tpahere_get ?? "no translation")
 			}
 			else {
-				tellraw(ply.name, translate(ply.lang)?.error_tpa ?? "no translation");
+				tellraw(player, translate(ply.lang)?.error_tpa ?? "no translation");
 			}
 		}
 		else {
-			tellraw(ply.name, translate(ply.lang)?.error_find_player ?? "no translation");
+			tellraw(player, translate(ply.lang)?.error_find_player ?? "no translation");
 		}
 	}
 	else {
-		tellraw(ply.name, translate(ply.lang)?.error_arg ?? "no translation");
+		tellraw(player, translate(ply.lang)?.error_arg ?? "no translation");
 	}
 }

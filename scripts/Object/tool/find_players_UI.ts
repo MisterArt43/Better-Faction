@@ -18,7 +18,7 @@ export async function UI_find_player(pl: Player): Promise<Ply | undefined> {
     const selectedPlayer = await selectPlayer(pl, playerList);
 
     if (!selectedPlayer) {
-        tellraw(pl.name, "§cPlayer not found");
+        tellraw(pl, "§cPlayer not found");
     }
 
     return selectedPlayer;
@@ -50,7 +50,7 @@ async function getPlayerList(searchInOnlinePlayers: boolean, searchKeyword: stri
         if (playerName.startsWith(searchKeyword)) {
             playerList.push(playerName);
             if (playerList.length === 100) {
-                tellraw(pl.name, "§cToo many results, will only return the first 100");
+                tellraw(pl, "§cToo many results, will only return the first 100");
                 await sleep(10);
                 break;
             }

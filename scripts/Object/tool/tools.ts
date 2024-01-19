@@ -1,4 +1,4 @@
-import { Dimension, Player, system, world } from "@minecraft/server";
+import { Dimension, Player, RawMessage, system, world } from "@minecraft/server";
 import { ModalFormData } from "@minecraft/server-ui";
 import { DB } from "../database/database";
 import { Ply } from "../player/Ply";
@@ -12,11 +12,19 @@ export const Server = world.getDimension("overworld");
 export const Nether = world.getDimension("nether");
 export const TheEnd = world.getDimension("the end");
 
-export function tellraw(selector : string, text : string) {
-	if (!selector.match(/@/g))
-		Server.runCommandAsync(`tellraw "${selector}" {"rawtext":[{"text":"§r${text.replace(/"/g, "\'")}"}]}`);
-	else
+type tellrawSelector = Player | string;
+
+export function tellraw(selector : tellrawSelector, text : string) {
+	if (selector instanceof Player) {
+		const rawMessage: RawMessage = {rawtext: [{text: `§r${text.replace(/"/g, "\'")}`}]};
+		selector.sendMessage(rawMessage);
+	}
+	else if (selector.match(/@a|@p|@r|@s|@e/g) !== null) {
 		Server.runCommandAsync(`tellraw ${selector} {"rawtext":[{"text":"§r${text.replace(/"/g, "\'")}"}]}`);
+	}
+		//Server.runCommandAsync(`tellraw "${selector.name}" {"rawtext":[{"text":"§r${text.replace(/"/g, "\'")}"}]}`);
+	else
+		Server.runCommandAsync(`tellraw "${selector}" {"rawtext":[{"text":"§r${text.replace(/"/g, "\'")}"}]}`);
 }
 export function log(text : number | string) { Server.runCommandAsync(`tellraw @a[tag=log] {"rawtext":[{"text":"§7{log} §r${text.toString().replace(/"/g, "\'").replace(/\n/g, "§r\n")}"}]}`) }
 

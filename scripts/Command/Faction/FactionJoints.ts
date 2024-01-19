@@ -54,7 +54,7 @@ async function factionJoinUI(player: Player, ply: Ply) {
         cmdFactionJoin(["f", "j", facName], player, ply);
     }
     else {
-        tellraw(player.name, translate(ply.lang)?.error_have_faction ?? "no translation");
+        tellraw(player, translate(ply.lang)?.error_have_faction ?? "no translation");
     }
 }
 
@@ -76,16 +76,16 @@ function cmdFactionJoin(args: string[], player: Player, ply: Ply) {
                     updatePlayerJoinFaction(player, ply, fac, newMember);
                 }
                 else {
-                    tellraw(player.name, translate(ply.lang)?.error_faction_join_invit ?? "no translation");
+                    tellraw(player, translate(ply.lang)?.error_faction_join_invit ?? "no translation");
                 }
             }
         }
         else {
-            tellraw(player.name, translate(ply.lang)?.error_find_faction ?? "no translation");
+            tellraw(player, translate(ply.lang)?.error_find_faction ?? "no translation");
         }
     }
     else {
-        tellraw(player.name, translate(ply.lang)?.error_have_faction2 ?? "no translation")
+        tellraw(player, translate(ply.lang)?.error_have_faction2 ?? "no translation")
     }
 }
 
@@ -103,7 +103,7 @@ function updatePlayerJoinFaction(player: Player, ply: Ply, fac: Faction, newMemb
         }
     }
     else {
-        tellraw(player.name, translate(ply.lang)?.error_faction_join_full ?? "no translation")
+        tellraw(player, translate(ply.lang)?.error_faction_join_full ?? "no translation")
     }
 }
 

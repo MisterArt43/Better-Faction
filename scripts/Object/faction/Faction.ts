@@ -1,7 +1,8 @@
-import { Player, world } from "@minecraft/server";
+import { Player, Vector3, world } from "@minecraft/server";
 import { DB } from "../database/database";
 import { Vector_2, Vector_3 } from "../tool/object/Vector";
 import { Server, hexToText, log, textToHex } from "../tool/tools";
+import { Location } from "../..";
 
 export let db_faction: Map<Faction['name'], Faction> = new Map<Faction['name'], Faction>();
 
@@ -103,6 +104,14 @@ export class Faction {
 		}
 	}
 
+	setFhome(location: Vector_3 | Location | Vector3) {
+		this.Fhome = new Vector_3(
+			Math.ceil(location.x + 0.0001) - 1, 
+			Math.ceil(location.y - 0.4999), 
+			Math.ceil(location.z + 0.0001) - 1
+		);
+	}
+	
 	remove_to_update_faction() {
 		if (this === undefined) return;
 		Server.runCommandAsync("scoreboard players reset \"$db_faction(" + textToHex(JSON.stringify(this)) + ")\" db_faction");
@@ -128,6 +137,19 @@ export class Faction {
 		if (faction === undefined) return;
 		Server.runCommandAsync("scoreboard players reset \"$db_faction(" + textToHex(JSON.stringify(faction)) + ")\" db_faction");
 		db_faction.delete(faction.name);
+	}
+
+	getRankFromName(name: string) {
+		return this.playerList.find(p => p.name === name)?.permission;
+	}
+
+	/** @warn This function doesn't return reference because of map */
+	getNamesFromRank(rank: (typeof factionRank[keyof typeof factionRank])) {
+		return this.playerList.filter(p => p.permission === rank)?.map(p => p.name);
+	}
+
+	getMembersFromRank(rank: (typeof factionRank[keyof typeof factionRank])) {
+		return this.playerList.filter(p => p.permission === rank);
 	}
 }
 

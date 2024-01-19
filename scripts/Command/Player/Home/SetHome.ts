@@ -22,11 +22,11 @@ function sethome(args: string[], player: Player, ply: Ply) {
 	if (args.length >= 2) {
 		let name = concatenateArgs(args, 1, (s) => s.replace(/"/g, ""));
 		if (ply.home.find((h) => h.getName() === name) != undefined) {
-			tellraw(player.name, translate(ply.lang)?.error_have_home ?? "no translation");
+			tellraw(player, translate(ply.lang)?.error_have_home ?? "no translation");
 			return;
 		}
 		if (ply.home.length >= ply.homeLimit) {
-			tellraw(player.name, translate(ply.lang)?.error_limit_home ?? "no translation");
+			tellraw(player, translate(ply.lang)?.error_limit_home ?? "no translation");
 			return;
 		}
 		
@@ -42,9 +42,9 @@ function sethome(args: string[], player: Player, ply: Ply) {
 		ply.home.push(homeObject);
 		ply.add_to_update_player();
 
-		tellraw(ply.name, translate(ply.lang, name)?.home_add ?? "no translation");
+		tellraw(player, translate(ply.lang, name)?.home_add ?? "no translation");
 	}
 	else {
-		tellraw(ply.name, translate(ply.lang)?.error_arg ?? "no translation");
+		tellraw(player, translate(ply.lang)?.error_arg ?? "no translation");
 	}
 }

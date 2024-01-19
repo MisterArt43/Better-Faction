@@ -21,16 +21,16 @@ addSubCommand(
 
 function balance(args: string[], player: Player, ply: Ply) {
 	if (args.length == 1) {
-		tellraw(player.name, `§e${DB.db_player.get(player.name)?.money ?? 0}`);
+		tellraw(player, `§e${DB.db_player.get(player.name)?.money ?? 0}`);
 	}
 	else {
 		let name = concatenateArgs(args, 1, (s) => s.replace(/[@"]/g, ""));
 		let pl = DB.db_player.get(name);
 		if (pl !== undefined) {
-			tellraw(pl.name, `§e${pl.money}`);
+			tellraw(player, `§e${pl.money}`);
 		}
 		else {
-			tellraw(ply.name, translate(ply.lang)?.error_find_player ?? "§cCan't find player.");
+			tellraw(player, translate(ply.lang)?.error_find_player ?? "§cCan't find player.");
 		}
 	}
 

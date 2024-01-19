@@ -19,7 +19,7 @@ addSubCommand(
 )
 
 function listhome(args: string[], player: Player, ply: Ply) {
-	const handleError = (errorMessage: string) => tellraw(player.name, errorMessage);
+	const handleError = (errorMessage: string) => tellraw(player, errorMessage);
 	const adminTag = globalThis.adminTag;
 
 	if (args.length === 1) {

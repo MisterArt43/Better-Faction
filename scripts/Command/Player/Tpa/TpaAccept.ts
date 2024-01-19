@@ -23,7 +23,7 @@ function tpaAccept(args: string[], player: Player, ply: Ply) {
 	if (DB.db_delay.has(ply.name)) {
         const delay = DB.db_delay.get(ply.name) as Delay;
         if (!delay.check_time()) 
-            return tellraw(ply.name, "§cYou have to wait " + (delay.time - new Date().getTime()) / 1000 + " seconds before using this command.");
+            return tellraw(player, "§cYou have to wait " + (delay.time - new Date().getTime()) / 1000 + " seconds before using this command.");
     }
     if (args.length == 1) {
         if (Delay.isTpCanceled(player))
@@ -51,10 +51,10 @@ function tpaAccept(args: string[], player: Player, ply: Ply) {
             }
         }
         else {
-            tellraw(ply.name, translate(ply.lang)?.error_find_tpayes ?? "no translation");
+            tellraw(player, translate(ply.lang)?.error_find_tpayes ?? "no translation");
         }
     }
     else {
-        tellraw(ply.name, translate(ply.lang)?.error_arg ?? "no translation");
+        tellraw(player, translate(ply.lang)?.error_arg ?? "no translation");
     }
 }

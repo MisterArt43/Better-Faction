@@ -24,10 +24,10 @@ function chat(args: string[], player: Player, ply: Ply) {
 				ply.remove_to_update_player();
 				ply.chat = "all";
 				ply.add_to_update_player();
-				tellraw(player.name, translate(ply.lang)?.private_chat_reset ?? "you are now back to the public chat");
+				tellraw(player, translate(ply.lang)?.private_chat_reset ?? "you are now back to the public chat");
 			}
 			else {
-				tellraw(player.name, translate(ply.lang)?.error_have_private_chat ?? "you are already in the public chat");
+				tellraw(player, translate(ply.lang)?.error_have_private_chat ?? "you are already in the public chat");
 			}
 		}
 		else if (args[1].replace(/[@"]/g, "").match(/[A-Za-z0-9]/g)) {
@@ -39,16 +39,16 @@ function chat(args: string[], player: Player, ply: Ply) {
 			else
 				ply.chat = args[1];
 			ply.add_to_update_player();
-			tellraw(player.name, translate(ply.lang, ply.chat)?.change_private_chat ?? `§achat changed to ${ply.chat} chat`);
+			tellraw(player, translate(ply.lang, ply.chat)?.change_private_chat ?? `§achat changed to ${ply.chat} chat`);
 		}
 		else
-			tellraw(player.name, translate(ply.lang)?.error_arg ?? "§cInvalid argument.");
+			tellraw(player, translate(ply.lang)?.error_arg ?? "§cInvalid argument.");
 	}
 	else
 	{
 		ply.remove_to_update_player();
 		ply.chat = "all";
 		ply.add_to_update_player();
-		tellraw(player.name, translate(ply.lang)?.private_chat_reset ?? "you are now back to the public chat");
+		tellraw(player, translate(ply.lang)?.private_chat_reset ?? "you are now back to the public chat");
 	}
 }

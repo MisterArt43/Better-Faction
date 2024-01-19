@@ -46,11 +46,11 @@ function FactioninfoCmd(args: string[], player: Player, ply: Ply) {
 	const fac = DB.db_faction.get(name);
 
 	if (fac === undefined) {
-		tellraw(player.name, translate(ply.lang)?.error_faction_info ?? "no translation");
+		tellraw(player, translate(ply.lang)?.error_faction_info ?? "no translation");
 	}
 	else {
 		const date = new Date(fac.creationDate + ply.UTC * MILLISECONDS_IN_AN_HOUR);
-		tellraw(player.name, translate(ply.lang, fac.name, fac.description, date.getDay() + "/" + ((date.getMonth() + 1) + "/" + date.getFullYear() + " : " + addDateZ(date.getHours()) + "h" + addDateZ(date.getMinutes())), fac.playerList.length, fac.memberLimit, fac.bank, fac.power)?.faction_info ?? "no translation");
+		tellraw(player, translate(ply.lang, fac.name, fac.description, date.getDay() + "/" + ((date.getMonth() + 1) + "/" + date.getFullYear() + " : " + addDateZ(date.getHours()) + "h" + addDateZ(date.getMinutes())), fac.playerList.length, fac.memberLimit, fac.bank, fac.power)?.faction_info ?? "no translation");
 	}
 }
 
@@ -83,7 +83,7 @@ async function ChooseFactionUI(player: Player, ply: Ply) {
 async function PlayerFactionInfoUI(player: Player, ply: Ply, faction?: Faction) {
 	const fac = faction ? faction : DB.db_faction.get(ply.faction_name ?? "");
 	if (!fac)
-		return tellraw(player.name, translate(ply.lang)?.error_faction_info ?? "no translation");
+		return tellraw(player, translate(ply.lang)?.error_faction_info ?? "no translation");
 	
 	const form = new ActionFormData()
 		.title("Faction Info")

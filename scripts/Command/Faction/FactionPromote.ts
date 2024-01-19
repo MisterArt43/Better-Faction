@@ -24,7 +24,7 @@ addSubCommand(
 function Factionpromote(args: string[], player: Player, ply: Ply) {
 	const fac = DB.db_faction.get(ply.faction_name ?? "");
 	if (fac === undefined || (fac?.playerList.find((p) => p.name === player.name && isAtLeastOfficer(p)) === undefined ?? true))
-		return tellraw(player.name, translate(ply.lang)?.error_cant_do_that ?? "no translation");
+		return tellraw(player, translate(ply.lang)?.error_cant_do_that ?? "no translation");
 	if (args.length >= 3) {
 		factionPromoteCmd(args, player, ply, fac);
 	}
@@ -42,7 +42,7 @@ function factionPromoteCmd(args: string[], player: Player, ply: Ply, fac: Factio
 		updateFactionPromote(player, ply, target, promoter, fac);
 	}
 	else {
-		tellraw(player.name, translate(ply.lang)?.error_find_player ?? "no translation");
+		tellraw(player, translate(ply.lang)?.error_find_player ?? "no translation");
 	}
 }
 
@@ -59,7 +59,7 @@ function updateFactionPromote(player: Player, ply: Ply, target: faction_member, 
 		fac.playerList.forEach((p) => {
 			tellraw(DB.db_player.get(p.name)!.name, translate(ply.lang, target.name)?.faction_new_leader ?? "no translation");
 		})
-		tellraw(player.name, translate(ply.lang)?.faction_new_leader_get ?? "no translation");
+		tellraw(player, translate(ply.lang)?.faction_new_leader_get ?? "no translation");
 	}
 	// promote to a member to officer
 	else if (target.permission === factionRank.Member && promoter.permission === factionRank.Leader) {
@@ -68,7 +68,7 @@ function updateFactionPromote(player: Player, ply: Ply, target: faction_member, 
 		target.permission = factionRank.Officer;
 		fac.add_to_update_faction();
 
-		tellraw(player.name, translate(ply.lang, target.name)?.faction_promote_co_leader ?? "no translation");
+		tellraw(player, translate(ply.lang, target.name)?.faction_promote_co_leader ?? "no translation");
 		tellraw(target.name, translate(ply.lang)?.faction_promote_co_leader_get ?? "no translation");
 	}
 	// promote to a visitor to member
@@ -78,11 +78,11 @@ function updateFactionPromote(player: Player, ply: Ply, target: faction_member, 
 		target.permission = factionRank.Member;
 		fac.add_to_update_faction();
 
-		tellraw(player.name, translate(ply.lang, target.name)?.faction_promote_member ?? "no translation");
+		tellraw(player, translate(ply.lang, target.name)?.faction_promote_member ?? "no translation");
 		tellraw(target.name, translate(ply.lang)?.faction_promote_member_get ?? "no translation");
 	}
 	else {
-		tellraw(player.name, translate(ply.lang)?.error_cant_do_that ?? "no translation");
+		tellraw(player, translate(ply.lang)?.error_cant_do_that ?? "no translation");
 	}
 }
 
@@ -107,7 +107,7 @@ async function FactionrankUI(player: Player, ply: Ply, fac: Faction) {
 		return;
 
     if (!DB.db_faction.has(fac.name))
-        return tellraw(player.name, "Error: faction was deleted while you were doing this");
+        return tellraw(player, "Error: faction was deleted while you were doing this");
 
     fac.remove_to_update_faction();
 
@@ -119,12 +119,12 @@ async function FactionrankUI(player: Player, ply: Ply, fac: Faction) {
         if (!target || target.getRankName() === res.formValues[playerIndex])
 			continue;
 
-        tellraw(player.name, `§eFaction §a${fac.name} §e${plList[playerIndex].name} rank changed to §a${rankValue}`);
+        tellraw(player, `§eFaction §a${fac.name} §e${plList[playerIndex].name} rank changed to §a${rankValue}`);
 
         if (rankValue === strFacRank[factionRank.Leader] && !haveLeader) {
             haveLeader = true;
         } else if (rankValue === strFacRank[factionRank.Leader] && haveLeader) {
-            tellraw(player.name, "§cFaction already has a leader, rank changed to Officer");
+            tellraw(player, "§cFaction already has a leader, rank changed to Officer");
             rankValue = strFacRank[factionRank.Officer];
         }
 
@@ -136,7 +136,7 @@ async function FactionrankUI(player: Player, ply: Ply, fac: Faction) {
 			return currentPlayer.permission > highestPermPlayer.permission ? currentPlayer : highestPermPlayer;
 		}, fac.playerList[0]);		
 		perm.permission = factionRank.Leader;
-		tellraw(player.name, `§cDue to no leader, ${perm.name} is now the leader`);
+		tellraw(player, `§cDue to no leader, ${perm.name} is now the leader`);
 	}
 
     fac.add_to_update_faction();

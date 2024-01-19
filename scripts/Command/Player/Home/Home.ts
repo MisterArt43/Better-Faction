@@ -20,7 +20,7 @@ addSubCommand(
 );
 
 function home(args: string[], player: Player, ply: Ply) {
-	if (DB.db_delay.has(ply.name)) if (!DB.db_delay.get(ply.name)?.check_time()) return tellraw(ply.name, "§cYou have to wait " + ((DB.db_delay.get(ply.name)?.time ?? 0 - new Date().getTime()) / 1000) + " seconds before using this command.");
+	if (DB.db_delay.has(ply.name)) if (!DB.db_delay.get(ply.name)?.check_time()) return tellraw(player, "§cYou have to wait " + ((DB.db_delay.get(ply.name)?.time ?? 0 - new Date().getTime()) / 1000) + " seconds before using this command.");
 	if (Delay.isTpCanceled(player)) return;
 	if (args.length >= 2) {
 		const name = concatenateArgs(args, 1)
@@ -35,10 +35,10 @@ function home(args: string[], player: Player, ply: Ply) {
 			tpsound(player);
 		}
 		else {
-			tellraw(player.name, translate(ply.lang)?.error_find_home ?? "no translation");
+			tellraw(player, translate(ply.lang)?.error_find_home ?? "no translation");
 		}
 	}
 	else {
-		tellraw(player.name, translate(ply.lang)?.error_arg ?? "no translation");
+		tellraw(player, translate(ply.lang)?.error_arg ?? "no translation");
 	}
 }

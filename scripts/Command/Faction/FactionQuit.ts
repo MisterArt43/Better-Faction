@@ -72,8 +72,8 @@ async function Factionquit(args: string[], player: Player, ply: Ply) {
 				tellraw(p.name, translate(ply.lang, ply.name)?.faction_quit ?? "no translation");
 			});
 		}
-		tellraw(ply.name, translate(ply.lang, fac.name)?.faction_quit_get ?? "no translation");
+		tellraw(player, translate(ply.lang, fac.name)?.faction_quit_get ?? "no translation");
 	} else {
-		tellraw(ply.name, translate(ply.lang)?.error_find_faction ?? "no translation");
+		tellraw(player, translate(ply.lang)?.error_find_faction ?? "no translation");
 	}
 }

@@ -30,7 +30,7 @@ async function subCommandExecuter(args: string[], data: ChatSendBeforeEvent, it:
 	else if (!(cursor instanceof Command)) cursor = cursor.get(args[it]);
 
 	if (cursor === undefined)
-		return tellraw(data.sender.name, `§cUnknown command. Try ${prefix}help for a list of commands.`);
+		return tellraw(data.sender, `§cUnknown command. Try ${prefix}help for a list of commands.`);
 
 	if (cursor instanceof Command) {
 		if (cursor.isEnable) {
@@ -38,21 +38,21 @@ async function subCommandExecuter(args: string[], data: ChatSendBeforeEvent, it:
 			const player = pl ? pl : world.getPlayers({ name: data.sender.name })?.[0];
 
 			if (ply === undefined || player === undefined)
-				return tellraw(data.sender.name, `§cError You are not registered yet. Wait a few seconds and try again.`);
+				return tellraw(data.sender, `§cError You are not registered yet. Wait a few seconds and try again.`);
 			if (cursor.module == cmd_module.all || ply.cmd_module.includes(cursor.module)) {
 				if (cursor.permission <= ply.permission) {
 					cursor.func(args, player, ply);
 				}
 				else {
-					tellraw(data.sender.name, `§cYou don't have permission to use this command.`);
+					tellraw(data.sender, `§cYou don't have permission to use this command.`);
 				}
 			}
 			else {
-				tellraw(data.sender.name, `§cThe module of this command is disabled.`);
+				tellraw(data.sender, `§cThe module of this command is disabled.`);
 			}
 		}
 		else {
-			tellraw(data.sender.name, `§cThis command is disabled.`);
+			tellraw(data.sender, `§cThis command is disabled.`);
 		}
 	}
 	else {
