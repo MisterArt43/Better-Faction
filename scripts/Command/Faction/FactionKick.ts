@@ -23,10 +23,9 @@ addSubCommand(
 
 function FactionKick(args: string[], player: Player, ply: Ply) {
 	const fac = DB.db_faction.get(ply.faction_name ?? "");
+	
 	if (fac === undefined) return tellraw(player, translate(ply.lang)?.error_no_faction ?? "no translation");
-
-	const rank = fac.getRankFromName(ply.name);
-	if (rank !== factionRank.Leader && rank !== factionRank.Officer) return tellraw(player, translate(ply.lang)?.error_not_allow_command ?? "no translation");
+	if (!fac.isAtLeastRank(ply.name, factionRank.Officer)) return tellraw(player, translate(ply.lang)?.error_not_allow_command ?? "no translation");
 
 	if (args.length >= 3) {
 		FactionKickCMD(args, player, ply, fac);

@@ -23,7 +23,7 @@ addSubCommand(
 
 function Factionpromote(args: string[], player: Player, ply: Ply) {
 	const fac = DB.db_faction.get(ply.faction_name ?? "");
-	if (fac === undefined || (fac?.playerList.find((p) => p.name === player.name && isAtLeastOfficer(p)) === undefined ?? true))
+	if (fac === undefined || (fac?.playerList.find((p) => p.name === player.name && fac.isAtLeastRank(p, factionRank.Officer)) === undefined ?? true))
 		return tellraw(player, translate(ply.lang)?.error_cant_do_that ?? "no translation");
 	if (args.length >= 3) {
 		factionPromoteCmd(args, player, ply, fac);
@@ -140,13 +140,4 @@ async function FactionrankUI(player: Player, ply: Ply, fac: Faction) {
 	}
 
     fac.add_to_update_faction();
-}
-
-
-// ---------------------------------- //
-// -------- TOOLS FUNCTIONS --------- //
-// ---------------------------------- //
-
-function isAtLeastOfficer(factionMember: faction_member) {
-	return (factionMember.permission <= factionRank.Officer); //Officer = 1, Leader = 0
 }

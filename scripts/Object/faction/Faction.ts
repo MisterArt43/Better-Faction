@@ -104,6 +104,12 @@ export class Faction {
 		}
 	}
 
+	isAtLeastRank(member: faction_member | faction_member['name'], fRank: (typeof factionRank[keyof typeof factionRank])) {
+		if (typeof member === "string")
+			member = this.playerList.find(p => p.name === member)!;
+		return member?.permission <= fRank || false;
+	}
+
 	setFhome(location: Vector_3 | Location | Vector3) {
 		this.Fhome = new Vector_3(
 			Math.ceil(location.x + 0.0001) - 1, 

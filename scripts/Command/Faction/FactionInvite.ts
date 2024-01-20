@@ -51,7 +51,7 @@ function Factioninvite(args: string[], player: Player, ply: Ply) {
 
 function invitePlayer(args: string[], player: Player, ply: Ply, fac: Faction, factionMember: faction_member) {
 	const name = concatenateArgs(args, 2, (s) => s.replace(/["@]/g, ""));
-	if (isAtLeastOfficer(factionMember)) {
+	if (fac.isAtLeastRank(factionMember, factionRank.Officer)) {
 		if (DB.db_faction.get(DB.db_player.get(name)?.faction_name ?? "") === undefined) {
 			if (fac.invitList.find((p) => p === name) === undefined) {
 				fac.remove_to_update_faction();
@@ -77,7 +77,7 @@ function invitePlayer(args: string[], player: Player, ply: Ply, fac: Faction, fa
 }
 
 function clearInvite(player: Player, ply: Ply, fac: Faction, factionMember: faction_member) {
-	if (isAtLeastOfficer(factionMember)) {
+	if (fac.isAtLeastRank(factionMember, factionRank.Officer)) {
 		fac.remove_to_update_faction();
 		fac.invitList.splice(0, fac.invitList.length);
 		fac.add_to_update_faction();
@@ -89,7 +89,7 @@ function clearInvite(player: Player, ply: Ply, fac: Faction, factionMember: fact
 }
 
 function listInvite(player: Player, ply: Ply, fac: Faction, factionMember: faction_member) {
-	if (isAtLeastOfficer(factionMember)) {
+	if (fac.isAtLeastRank(factionMember, factionRank.Officer)) {
 		let message = "§eInvited players :§r";
 		for (const p of fac.invitList) {
 			message += "\n -" + p;
@@ -165,12 +165,4 @@ async function invitePlayerUI(player: Player, ply: Ply, fac: Faction, factionMem
 
 	const name = res.formValues![0] as string;
 	invitePlayer(name.split(" "), player, ply, fac, factionMember);
-}
-
-// ---------------------------------- //
-// -------- TOOLS FUNCTIONS --------- //
-// ---------------------------------- //
-
-function isAtLeastOfficer(factionMember: faction_member) {
-	return (factionMember.permission <= factionRank.Officer); //Officer = 1, Leader = 0
 }
