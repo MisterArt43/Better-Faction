@@ -10,7 +10,7 @@ import { cmd_module } from "../../Object/database/db_map";
 
 addSubCommand(
 	"bank",
-	"add or remove money from the faction bank",
+	"add or remove money from the faction bank\n §7You need to be at least officer to remove money",
 	`${globalThis.prefix}faction bank [<add/remove> <amount>]`,
 	["bank", "b"],
 	cmd_module.faction,
