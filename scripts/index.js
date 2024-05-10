@@ -1,4 +1,4 @@
-import {system, Dimension, Player, ChatSendAfterEvent, world, ItemStack, ScoreboardScoreInfo, Container, ItemDurabilityComponent, ChatSendBeforeEvent, Vector, System, WatchdogTerminateBeforeEvent, WatchdogTerminateBeforeEventSignal, Entity, WatchdogTerminateReason, EntityType, EntityTypes, ItemComponent, BlockInventoryComponent, BlockComponent, EntityInventoryComponent, ItemComponentTypes, EnchantmentType, EnchantmentTypes} from "@minecraft/server";
+import {system, Dimension, Player, ChatSendAfterEvent, world, ItemStack, ScoreboardScoreInfo, Container, ItemDurabilityComponent, ChatSendBeforeEvent, System, WatchdogTerminateBeforeEvent, WatchdogTerminateBeforeEventSignal, Entity, WatchdogTerminateReason, EntityType, EntityTypes, ItemComponent, BlockInventoryComponent, BlockComponent, EntityInventoryComponent, ItemComponentTypes, EnchantmentType, EnchantmentTypes} from "@minecraft/server";
 import {translate, list_lang} from "./lang.js";
 import {ActionFormData, ModalFormData, ModalFormResponse, MessageFormData, FormCancelationReason} from "@minecraft/server-ui"
 
