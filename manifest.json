@@ -2,12 +2,12 @@
 	"format_version": 2,
 	"header": {
 		"description": "better faction by Mister Art43 +help",
-		"name": "§e§lBetter §6Faction §bv§a1.1.30",
+		"name": "§e§lBetter §6Faction §bv§a1.1.32",
 		"uuid": "34b1e49b-1512-4c92-b348-1611e82cb031",
 		"version": [
 			1,
 			1,
-			30
+			32
 		],
 		"min_engine_version": [
 			1,
@@ -42,7 +42,7 @@
     "dependencies": [
         {
             "module_name": "@minecraft/server",
-            "version": "1.9.0-beta"
+            "version": "1.11.0-beta"
         },
         {
             "module_name": "@minecraft/server-ui",

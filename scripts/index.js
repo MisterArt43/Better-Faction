@@ -1,4 +1,4 @@
-import {system, Dimension, Player, ChatSendAfterEvent, world, ItemStack, ScoreboardScoreInfo, Container, ItemDurabilityComponent, ChatSendBeforeEvent, Vector, System, WatchdogTerminateBeforeEvent, WatchdogTerminateBeforeEventSignal, Entity, WatchdogTerminateReason, EntityType, EntityTypes, ItemComponent, BlockInventoryComponent, BlockComponent, EntityInventoryComponent} from "@minecraft/server";
+import {system, Dimension, Player, ChatSendAfterEvent, world, ItemStack, ScoreboardScoreInfo, Container, ItemDurabilityComponent, ChatSendBeforeEvent, Vector, System, WatchdogTerminateBeforeEvent, WatchdogTerminateBeforeEventSignal, Entity, WatchdogTerminateReason, EntityType, EntityTypes, ItemComponent, BlockInventoryComponent, BlockComponent, EntityInventoryComponent, ItemComponentTypes, EnchantmentType, EnchantmentTypes} from "@minecraft/server";
 import {translate, list_lang} from "./lang.js";
 import {ActionFormData, ModalFormData, ModalFormResponse, MessageFormData, FormCancelationReason} from "@minecraft/server-ui"
 
@@ -187,7 +187,7 @@ import {ActionFormData, ModalFormData, ModalFormResponse, MessageFormData, FormC
  * @property {Map<string, Chunk>} chunks
  */
 
-const version = "1.1.30";
+const version = "1.1.32";
 let prefix = "+";
 const adminTag = "Admin";
 let isLoaded = false;
@@ -442,6 +442,7 @@ system.runInterval(() => {
 								const Frank = faction?.playerList.find((pla) => pla.name === player.name).permission ?? "none";
 								const Fcount = faction === undefined ? "none" : faction.playerList.length + "/" + faction?.memberLimit;
 								const Fbank = faction?.bank ?? "0";
+								const Fpower = faction?.power ?? "0";
 								let localTime;
 								const date = new Date(new Date().getTime() + player.UTC * 3600000); // 60 * 60 * 1000
 								if (player.lang == "fr") localTime = player.UTC + addDateZ(new custom_date(new Date()).change_daylight_saving_time()) + ":" + addDateZ(new Date().getMinutes());

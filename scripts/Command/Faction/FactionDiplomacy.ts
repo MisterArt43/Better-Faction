@@ -39,12 +39,12 @@ async function FactionDiplomacyUI(player: Player, ply: Ply, fac: Faction) {
 		.button("Quit")
 		.show(player).then(res => {
 			if (res.canceled) return;
-			if (res.selection === 0) return FActionDiplomacyMode(player, ply, fac, "ally");
-			if (res.selection === 1) return FActionDiplomacyMode(player, ply, fac, "enemy");
+			if (res.selection === 0) return FactionDiplomacyMode(player, ply, fac, "ally");
+			if (res.selection === 1) return FactionDiplomacyMode(player, ply, fac, "enemy");
 		})
 }
 
-async function FActionDiplomacyMode(player: Player, ply: Ply, fac: Faction, type: "ally" | "enemy") {
+async function FactionDiplomacyMode(player: Player, ply: Ply, fac: Faction, type: "ally" | "enemy") {
 	const res = await new ActionFormData()
 		.title("Diplomacy " + type)
 		.button("add")
@@ -65,7 +65,7 @@ async function FActionDiplomacyMode(player: Player, ply: Ply, fac: Faction, type
 async function FactionDiplomacyAddUI(player: Player, ply: Ply, fac: Faction, type: "ally" | "enemy") {
 	const targetFac = await UI_find_faction(player);
 
-	if (!targetFac) return FActionDiplomacyMode(player, ply, fac, type);
+	if (!targetFac) return FactionDiplomacyMode(player, ply, fac, type);
 	if (!DB.db_faction.has(fac.name)) return tellraw(player, translate(ply.lang)?.error_find_faction ?? "no translation");
 	
 	if (fac.ally.length >= 10) return tellraw(player.name, "You can't have more than 10 ally");
@@ -86,10 +86,10 @@ async function FactionDiplomacyListUI(player: Player, ply: Ply, fac: Faction, li
 	}
 
 	const res2 = await form.show(player)
-	if (res2.canceled) return FActionDiplomacyMode(player, ply, fac, type);
+	if (res2.canceled) return FactionDiplomacyMode(player, ply, fac, type);
 	if (!DB.db_faction.has(fac.name)) return tellraw(player, translate(ply.lang)?.error_find_faction ?? "no translation");
 
-	if (res2.formValues!.every((v) => v === true)) return FActionDiplomacyMode(player, ply, fac, type);
+	if (res2.formValues!.every((v) => v === true)) return FactionDiplomacyMode(player, ply, fac, type);
 
 	fac.remove_to_update_faction();
 	i = 0;
