@@ -1,4 +1,4 @@
-import { Player } from "@minecraft/server";
+import { MinecraftDimensionTypes, Player } from "@minecraft/server";
 import { Ply } from "../../Object/player/Ply";
 import { Warp, db_warp } from "../../Object/warp/Warp";
 import { addSubCommand, cmd_permission } from "../CommandManager";
@@ -45,14 +45,35 @@ function addWarpCommand(args: string[], player: Player, ply: Ply) {
 			player.sendMessage(translate(ply.lang)?.error_name ?? "no translation")
 		}
 }
+
 function addWarpUI(player: Player, ply: Ply) {
+	const dimensionTab = [MinecraftDimensionTypes.overworld, MinecraftDimensionTypes.nether, MinecraftDimensionTypes.theEnd]
 	new ModalFormData()
 		.title("Add Warp")
 		.textField("Name", "warp name")
+		.textField("X", "coordinate x", player.location.x.toString())
+		.textField("Y", "coordinate y", player.location.y.toString())
+		.textField("Z", "coordinate z", player.location.z.toString())
+		.dropdown("Dimension", dimensionTab, dimensionTab.indexOf(player.dimension.id))
+		.toggle("is Open", true)
+		.textField("delay before a new tp to this warp", '5', '5')
 		.show(player).then(res => {
 			if (res.canceled) return;
 			if (db_warp.has(res.formValues![0] as string)) return player.sendMessage("This warp already exists");
-			Warp.add_warp(new Warp(res.formValues![0] as string, player));
+			if (!isDigit(res.formValues![1] as string) || !isDigit(res.formValues![2] as string) || !isDigit(res.formValues![3] as string))
+				return player.sendMessage("wrong coordinates inputs")
+			const newWarp = new Warp(res.formValues![0] as string, player);
+			newWarp.pos.x = parseInt(res.formValues![1] as string)
+			newWarp.pos.y = parseInt(res.formValues![2] as string)
+			newWarp.pos.z = parseInt(res.formValues![3] as string)
+			newWarp.pos.dim = dimensionTab[res.formValues![4] as string]
+			Warp.add_warp(newWarp);
 			player.sendMessage("Warp added");
 		})
+}
+
+function isDigit(str : string) {
+	if (str.match(/[0-9]/g))
+		return true
+	return false
 }

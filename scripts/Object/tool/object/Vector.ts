@@ -1,4 +1,4 @@
-import { Dimension, DimensionLocation, Vector2, Vector3 } from "@minecraft/server";
+import { Dimension, DimensionLocation, MinecraftDimensionTypes, Vector2, Vector3 } from "@minecraft/server";
 
 export class Vector_2 {
 	public x: number;
@@ -16,6 +16,10 @@ export class Vector_2 {
 			this.y = x.y;
 		}
 		return this;
+	}
+
+	toString() : string {
+		return `${this.x}, ${this.y}`
 	}
 }
 
@@ -35,6 +39,10 @@ export class Vector_3 extends Vector_2 {
 		}
 		return this;
 	}
+
+	toString() : string {
+		return `${this.x}, ${this.y}, ${this.z}`
+	}
 }
 
 export class Vector_3_Dim extends Vector_3 {
@@ -53,5 +61,13 @@ export class Vector_3_Dim extends Vector_3 {
 			this.dim = x.dimension.id;
 		}
 		return this;
+	}
+
+	/**
+	 * 
+	 * @returns {string} return the dimension corresponding color (green, red, black)
+	 */
+	getDimColor() : '§a' | '§c' | '§0' {
+		return this.dim === MinecraftDimensionTypes.overworld ? "§a" : this.dim === MinecraftDimensionTypes.nether ? "§c" : "§0"
 	}
 }
