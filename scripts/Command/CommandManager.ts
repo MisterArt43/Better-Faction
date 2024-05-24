@@ -1,22 +1,21 @@
 import { ChatSendBeforeEvent, Player, world } from "@minecraft/server";
-import { DB } from "../Object/database/database";
-import { cmd_module } from "../Object/database/db_map";
-import { Ply } from "../Object/player/Ply";
+import { cmd_module, db_map } from "../Object/database/db_map";
+import { Ply, db_player } from "../Object/player/Ply";
 import { tellraw } from "../Object/tool/tools";
-import { customChat } from "../Chat/customchat";
 import { ActionFormData } from "@minecraft/server-ui";
+import { customChat } from "../Chat/CustomChat";
 
 world.beforeEvents.chatSend.subscribe(data => {
 	try {
-		if (data.message.substring(0, DB.db_map.prefix.length) === prefix) {
+		if (data.message.substring(0, db_map.prefix.length) === db_map.prefix) {
 			if (data.sender.nameTag === undefined) {
 				data.sender.nameTag = data.sender.name;
 			}
-			const msg = data.message.substring(prefix.length).replace(/@"/g, "\"").trim();
+			const msg = data.message.substring(db_map.prefix.length).replace(/@"/g, "\"").trim();
 			subCommandExecuter(msg.match(/[\""].+?[\""]|[^ ]+/g) ?? [], data);
 			data.cancel = true;
 		}
-		else if (DB.db_map.default_cmd_module.includes(cmd_module.chat)) {
+		else if (db_map.default_cmd_module.includes(cmd_module.chat)) {
 			customChat(data);
 			data.cancel = true;
 		}
@@ -30,11 +29,11 @@ async function subCommandExecuter(args: string[], data: ChatSendBeforeEvent, it:
 	else if (!(cursor instanceof Command)) cursor = cursor.get(args[it]);
 
 	if (cursor === undefined)
-		return tellraw(data.sender, `§cUnknown command. Try ${prefix}help for a list of commands.`);
+		return tellraw(data.sender, `§cUnknown command. Try ${db_map.prefix}help for a list of commands.`);
 
 	if (cursor instanceof Command) {
 		if (cursor.isEnable) {
-			const ply = DB.db_player.get(data.sender.name);
+			const ply = db_player.get(data.sender.name);
 			const player = pl ? pl : world.getPlayers({ name: data.sender.name })?.[0];
 
 			if (ply === undefined || player === undefined)

@@ -1,12 +1,11 @@
 import { Player, world } from "@minecraft/server";
-import { DB } from "../../Object/database/database";
-import { Ply } from "../../Object/player/Ply";
+import { Ply, db_player } from "../../Object/player/Ply";
 import { concatenateArgs, tellraw } from "../../Object/tool/tools";
-import { translate } from "../../lang";
-import { Faction, factionRank, faction_member } from "../../Object/faction/Faction";
+import { Faction, db_faction, factionRank, faction_member } from "../../Object/faction/Faction";
 import { addSubCommand, cmd_permission } from "../CommandManager";
 import { cmd_module } from "../../Object/database/db_map";
 import { ActionFormData, ModalFormData } from "@minecraft/server-ui";
+import { translate } from "../../Object/tool/lang";
 
 addSubCommand(
 	"invite",
@@ -26,7 +25,7 @@ addSubCommand(
 // ---------------------------------- //
 
 function Factioninvite(args: string[], player: Player, ply: Ply) {
-	const fac = DB.db_faction.get(ply.faction_name ?? "");
+	const fac = db_faction.get(ply.faction_name ?? "");
 	if (!fac)
 		return tellraw(player, translate(ply.lang)?.error_cant_do_that ?? "no translation");
 
@@ -52,13 +51,13 @@ function Factioninvite(args: string[], player: Player, ply: Ply) {
 function invitePlayer(args: string[], player: Player, ply: Ply, fac: Faction, factionMember: faction_member) {
 	const name = concatenateArgs(args, 2, (s) => s.replace(/["@]/g, ""));
 	if (fac.isAtLeastRank(factionMember, factionRank.Officer)) {
-		if (DB.db_faction.get(DB.db_player.get(name)?.faction_name ?? "") === undefined) {
+		if (db_faction.get(db_player.get(name)?.faction_name ?? "") === undefined) {
 			if (fac.invitList.find((p) => p === name) === undefined) {
 				fac.remove_to_update_faction();
 				fac.invitList.push(name);
 				fac.add_to_update_faction();
 				tellraw(player, translate(ply.lang, name)?.faction_invit ?? "no translation");
-				const target = DB.db_player.get(name);
+				const target = db_player.get(name);
 				if (target !== undefined) {
 					tellraw(target.name, translate(ply.lang, fac.name)?.faction_invit_get ?? "no translation");
 				}

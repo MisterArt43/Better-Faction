@@ -1,11 +1,10 @@
 import { Player } from "@minecraft/server";
 import { Ply } from "../../Object/player/Ply";
-import { DB } from "../../Object/database/database";
 import { tellraw } from "../../Object/tool/tools";
-import { translate } from "../../lang";
-import { factionRank } from "../../Object/faction/Faction";
+import { db_faction, factionRank } from "../../Object/faction/Faction";
 import { addSubCommand, cmd_permission } from "../CommandManager";
 import { cmd_module } from "../../Object/database/db_map";
+import { translate } from "../../Object/tool/lang";
 
 addSubCommand(
 	"InviteStatus",
@@ -22,7 +21,7 @@ addSubCommand(
 
 function FactionInviteStatus(args: string[], player: Player, ply: Ply) {
 	if (args.length === 2) {
-		const fac = DB.db_faction.get(ply.faction_name ?? "");
+		const fac = db_faction.get(ply.faction_name ?? "");
 		if (fac === undefined) return tellraw(player, translate(ply.lang)?.error_no_faction ?? "no translation");
 		if (fac.isAtLeastRank(player.name, factionRank.Leader)) return tellraw(player, translate(ply.lang)?.error_cant_do_that ?? "no translation");
 		

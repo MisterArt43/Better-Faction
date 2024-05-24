@@ -187,7 +187,7 @@ import {ActionFormData, ModalFormData, ModalFormResponse, MessageFormData, FormC
  * @property {Map<string, Chunk>} chunks
  */
 
-const version = "1.1.32";
+const version = "1.1.33";
 let prefix = "+";
 const adminTag = "Admin";
 let isLoaded = false;
@@ -7354,7 +7354,6 @@ world.beforeEvents.playerPlaceBlock.subscribe((data) => {
 
 world.beforeEvents.playerInteractWithBlock.subscribe((data) => {
 	if (data.player.hasTag(adminTag)) return;
-	log("interact")
 	const player = db_player.get(data.player.name);
 	const xChunk = (data.block.location.x >> 4).toFixed(0);
 	const zChunk = (data.block.location.z >> 4).toFixed(0);

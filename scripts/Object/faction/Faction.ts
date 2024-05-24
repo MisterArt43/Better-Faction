@@ -1,8 +1,7 @@
 import { Player, Vector3, world } from "@minecraft/server";
-import { DB } from "../database/database";
 import { Vector_2, Vector_3 } from "../tool/object/Vector";
 import { Server, hexToText, log, textToHex } from "../tool/tools";
-import { Location } from "../..";
+import { db_map } from "../database/db_map";
 
 export let db_faction: Map<Faction['name'], Faction> = new Map<Faction['name'], Faction>();
 
@@ -33,7 +32,7 @@ export class Faction {
 		this.name = Fname;
 		this.description = "";
 		this.color = "§6";
-		this.separator = DB.db_map.factionSeparator;
+		this.separator = db_map.factionSeparator;
 		this.creationDate = new Date().getTime();
 		this.owner = plName;
 		this.bank = 0;
@@ -42,15 +41,15 @@ export class Faction {
 		this.enemy = new Array();
 		this.invitList = new Array();
 		this.playerList = [new faction_member(plName, factionRank.Leader)];
-		this.memberLimit = DB.db_map.factionMemberLimit;
-		this.isFhome = DB.db_map.isFhome;
+		this.memberLimit = db_map.factionMemberLimit;
+		this.isFhome = db_map.isFhome;
 		this.Fhome = null;
 		this.isOpen = false;
 		this.claim = new Array();
 	}
 
 	static async initDB_faction() {
-		if (DB.db_faction.size === 0) {
+		if (db_faction.size === 0) {
 			const objectiveName = "db_faction";
 			await Server.runCommandAsync(`scoreboard objectives add ${objectiveName} dummy`);
 			const start = Date.now();
@@ -80,14 +79,14 @@ export class Faction {
 						let faction = JSON.parse(hexToText(db.join(""))) as Faction;
 						
 						// Update db_faction map
-						const existingObject = DB.db_faction.get(faction.name);
+						const existingObject = db_faction.get(faction.name);
 	
 						if (existingObject) {
 							// Update existing faction data
 							log(`§cDuplicate faction found, fixing ${faction.name}`)
 							objective.removeParticipant(score.participant);
 						} else {
-							DB.db_faction.set(`${faction.name}`, faction);
+							db_faction.set(`${faction.name}`, faction);
 						}
 					});
 					// Update progress bar
@@ -110,7 +109,7 @@ export class Faction {
 		return member?.permission <= fRank || false;
 	}
 
-	setFhome(location: Vector_3 | Location | Vector3) {
+	setFhome(location: Vector_3) {
 		this.Fhome = new Vector_3(
 			Math.ceil(location.x + 0.0001) - 1, 
 			Math.ceil(location.y - 0.4999), 
@@ -133,7 +132,7 @@ export class Faction {
 		if (faction === undefined) return;
 		if (db_faction.has(faction.name)) {
 			log(`§cDuplicate faction found, fixing ${faction.name}`);
-			Faction.remove_faction(DB.db_faction.get(faction.name));
+			Faction.remove_faction(db_faction.get(faction.name));
 		}
 		db_faction.set(faction.name, faction);
 		Server.runCommandAsync("scoreboard players set \"$db_faction(" + textToHex(JSON.stringify(faction)) + ")\" db_faction 1");

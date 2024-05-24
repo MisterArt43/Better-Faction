@@ -1,12 +1,16 @@
 import { EntityHealthComponent, Player, system, world } from "@minecraft/server";
 import { Server, findFirstTagStartWith, findTagsStartWithV2, log, tellraw, textToHex } from "../Object/tool/tools";
-import { DB } from "../Object/database/database";
-import { Ply, Tpa } from "../Object/player/Ply";
-import { Display } from "../Object/display/Display";
-import { translate } from "../lang";
-import { Faction } from "../Object/faction/Faction";
+import { Ply, db_player, db_player_online } from "../Object/player/Ply";
+import { Display, db_display } from "../Object/display/Display";
+import { Faction, db_faction } from "../Object/faction/Faction";
 import { display_rule } from "../Command/Player/Rule";
 import { addDateZ, formatCreationDayTime } from "../Object/tool/dateTools";
+import { translate } from "../Object/tool/lang";
+import { db_map } from "../Object/database/db_map";
+import { db_warp } from "../Object/warp/Warp";
+import { db_admin } from "../Object/player/Admin";
+import { db_chunk } from "../Object/chunk/Chunk";
+import { db_delay } from "../Object/player/Delay";
 
 let curTick = 0;
 const START_TICK = 20; //start 0.5 secondes after a "/reload"
@@ -73,16 +77,16 @@ function processTPA(playerData: Ply) {
 system.runInterval(() => {
 	try {
 		if (isLoaded) {
-			if (DB.db_player_online.size !== 0) {
-				for (const [key, p] of DB.db_player_online) {
+			if (db_player_online.size !== 0) {
+				for (const [key, p] of db_player_online) {
 					p.remove_to_update_player();
 					p.timePlayed += 5;
-					if (p.power < DB.db_map.powerLimit.max && p.lastPowerRegen + DB.db_map.timeToRegenPower * 60 < p.timePlayed) {
+					if (p.power < db_map.powerLimit.max && p.lastPowerRegen + db_map.timeToRegenPower * 60 < p.timePlayed) {
 						log("power regen for " + p.name + " : " + p.power + " -> " + (p.power + 1));
 						p.power++;
 						p.lastPowerRegen = p.timePlayed;
 					}
-					else if (p.lastPowerRegen + 1 > p.timePlayed + DB.db_map.timeToRegenPower * 60) {
+					else if (p.lastPowerRegen + 1 > p.timePlayed + db_map.timeToRegenPower * 60) {
 						p.lastPowerRegen = p.timePlayed;
 					}
 					p.add_to_update_player();
@@ -90,23 +94,24 @@ system.runInterval(() => {
 			}
 		}
 	} catch (er) {
-		log("error in runInterval : " + er.toString());
+		if (er instanceof Error)
+			log("error in runInterval : " + er.toString());
 	}
 }, 100)
 
 system.runInterval(async () => {
 	if (isLoaded && curTick > START_TICK) {
 		const players = world.getPlayers()
-		if (players.length !== 0 && DB.db_map != undefined) {
+		if (players.length !== 0 && db_map != undefined) {
 			const start = Date.now();
-			if (curTick % (DB.db_map.refreshTick + 1) === 0) Server.runCommandAsync("title @a[tag=debug] actionbar " + Math.round(curTick / 20) + " script is now running.\n§7> RefreshTime : §s" + loadDatabase.refreshTime);
+			if (curTick % (db_map.refreshTick + 1) === 0) Server.runCommandAsync("title @a[tag=debug] actionbar " + Math.round(curTick / 20) + " script is now running.\n§7> RefreshTime : §s" + loadDatabase.refreshTime);
 			
 			//------------------------------------ warp delay
 			const is_second = curTick % 20 === 0;
 			if (is_second) {
-				prefix = DB.db_map.prefix;
-				if (DB.db_warp.size !== 0) {
-					for (let [k, warp] of DB.db_warp) {
+				prefix = db_map.prefix;
+				if (db_warp.size !== 0) {
+					for (let [k, warp] of db_warp) {
 						if (warp.log.length === 0) continue;
 						warp.remove_to_update_warp();
 						for (let i = warp.log.length - 1; i >= 0; i--) {
@@ -125,19 +130,19 @@ system.runInterval(async () => {
 
 			//------------------------------------ Global Gameplay
 			
-			let objectiveMoney = world.scoreboard.getObjective(DB.db_map.scoreMoney) ?? world.scoreboard.addObjective(DB.db_map.scoreMoney, "");
+			let objectiveMoney = world.scoreboard.getObjective(db_map.scoreMoney) ?? world.scoreboard.addObjective(db_map.scoreMoney, "");
 			let objectiveWarn = world.scoreboard.getObjective("warn") ?? world.scoreboard.addObjective("warn", "");
-			const refreshCalc = curTick % DB.db_map.refreshTick === 0;
-			let refreshCalc2 = refreshCalc ? curTick % (DB.db_map.refreshTick * 2) === 0 : false;
-			let refreshCalc3 = refreshCalc ? curTick % (DB.db_map.refreshTick * 20) === 0 : false;
+			const refreshCalc = curTick % db_map.refreshTick === 0;
+			let refreshCalc2 = refreshCalc ? curTick % (db_map.refreshTick * 2) === 0 : false;
+			let refreshCalc3 = refreshCalc ? curTick % (db_map.refreshTick * 20) === 0 : false;
 			for (const p of players) {
 				let is_edit = false
-				const player = DB.db_player.get(p.name);
+				const player = db_player.get(p.name);
 				if (!p || !p.isValid()) continue;
 				const tags = p.getTags();
 				if (player !== undefined) {
 	
-					if (!DB.db_player.has(p.name)) continue;
+					if (!db_player.has(p.name)) continue;
 	
 					if (await processTags(p, player, tags)) {
 						is_edit = true;
@@ -150,8 +155,8 @@ system.runInterval(async () => {
 					}
 				}
 				if (refreshCalc) {
-					let admin = DB.db_admin.get(p.name);
-					if (DB.db_map.lockAdmin && p.hasTag(globalThis.adminTag)) {
+					let admin = db_admin.get(p.name);
+					if (db_map.lockAdmin && p.hasTag(globalThis.adminTag)) {
 						if (admin === undefined) {
 							p.removeTag(globalThis.adminTag);
 							log(`§7${p.name} had Admin tag but was not register in the Admin database.`);
@@ -180,7 +185,7 @@ system.runInterval(async () => {
 					let id = findTagsStartWithV2(p, "id:", tags);
 					if (id.length > 0) {
 						if (player === undefined) {
-							log("§c•> Error can't find " + p.name + " in the database but was in before... (did you reset the database ?)" + DB.db_player.size);
+							log("§c•> Error can't find " + p.name + " in the database but was in before... (did you reset the database ?)" + db_player.size);
 							id.forEach(uid => {
 								p.removeTag(uid);
 							})
@@ -192,18 +197,18 @@ system.runInterval(async () => {
 						p.addTag("id:" + new_id);
 						const ply = new Ply(p);
 						Ply.add_player(ply);
-						DB.db_player_online.set(p.name, ply);
+						db_player_online.set(p.name, ply);
 						display_rule(p, ply, true);
 					}
 					else if (player !== undefined) {
 						let faction: Faction | undefined;
 
-						if (DB.db_display.size() > 0 || DB.db_map.customName) faction = DB.db_faction.get(player.faction_name ?? "");
+						if (db_display.size() > 0 || db_map.customName) faction = db_faction.get(player.faction_name ?? "");
 
 						//-- display
-						if (DB.db_display.size() > 0) {
+						if (db_display.size() > 0) {
 							let display_list: Display[] = [];
-							tags.forEach((tag) => { display_list.concat(DB.db_display.get(tag)); });
+							tags.forEach((tag) => { display_list.concat(db_display.get(tag)); });
 							if (display_list[0] !== undefined || display_list[1] !== undefined) {
 								const Fname = faction?.name ?? "none";
 								const Frank = faction?.playerList.find((pla) => pla.name === player.name)?.permission.toString() ?? "none";
@@ -217,7 +222,7 @@ system.runInterval(async () => {
 								const coordZ = Math.floor(p.location.z);
 								const chunkX = (coordX >> 4).toFixed(0);
 								const chunkZ = (coordZ >> 4).toFixed(0);
-								const chunk = DB.db_chunk?.get(chunkX + "," + chunkZ + p.dimension.id)?.faction_name ?? "none";
+								const chunk = db_chunk?.get(chunkX + "," + chunkZ + p.dimension.id)?.faction_name ?? "none";
 								const timePlayed = Math.floor(player.timePlayed / 3600) + "h" + Math.floor((player.timePlayed % 3600) / 60) + "m" + (player.timePlayed % 60) + "s";
 
 								for (const display of display_list) {
@@ -240,7 +245,7 @@ system.runInterval(async () => {
 												case "Zchunk": return chunkZ;
 												case "chunk": return chunk;
 												case "online": return players.length.toString();
-												case "allPlayer": return DB.db_player.size.toString();
+												case "allPlayer": return db_player.size.toString();
 												case "version": return version;
 												case "prefix": return prefix;
 												case "time": return localTime;
@@ -262,7 +267,8 @@ system.runInterval(async () => {
 										p.runCommandAsync(`titleraw @s ${display.type} {"rawtext":[{"text":"§r${formated_display}"}]}`);
 									}
 									catch (er) {
-										log("display error : " + er.toString());
+										if (er instanceof Error)
+											log("display error : " + er.toString());
 									}
 								}
 							}
@@ -287,19 +293,19 @@ system.runInterval(async () => {
 						if (refreshCalc2) {
 							objectiveWarn.setScore(p, player.warn)
 							let nameTag = p.name;
-							if (DB.db_map.customName) {
-								const rankSeparator = (text) => { return "§7[" + text + "§7]§r"; };
+							if (db_map.customName) {
+								const rankSeparator = (text: string) => { return "§7[" + text + "§7]§r"; };
 								let rank = findTagsStartWithV2(p, "role:", tags).map(tag => rankSeparator(tag.replace("role:", ""))).join("\n");
 								let colorN = findFirstTagStartWith(p, "colorName:", tags)?.replace("colorName:", "") ?? "§r";
 								nameTag = colorN + nameTag + "§r";
 
-								if (rank && DB.db_map.showRole) nameTag = rank + "\n" + nameTag;
+								if (rank && db_map.showRole) nameTag = rank + "\n" + nameTag;
 
 								if (faction) {
 									nameTag = `${faction.color + faction.separator[0] + faction.name + faction.separator[1]}\n${nameTag}`;
 								}
 
-								if (DB.db_map.showHeart) nameTag = nameTag + "\n§r§4§l§o" + (p.getComponent("minecraft:health") as EntityHealthComponent)?.currentValue.toFixed(1) + "§r§c§l ❤§r";
+								if (db_map.showHeart) nameTag = nameTag + "\n§r§4§l§o" + (p.getComponent("minecraft:health") as EntityHealthComponent)?.currentValue.toFixed(1) + "§r§c§l ❤§r";
 
 								if (nameTag !== p.nameTag) {
 									player.remove_to_update_player();
@@ -316,7 +322,7 @@ system.runInterval(async () => {
 							}
 							if (refreshCalc3)
 							{
-								let delay = DB.db_delay.get(player.name);
+								let delay = db_delay.get(player.name);
 								if (delay !== undefined) {
 									if (delay.check_time()) tellraw(player.name, "§7You aren't in combat anymore");
 								}
@@ -326,11 +332,11 @@ system.runInterval(async () => {
 				}
 				if (is_edit) player?.add_to_update_player(); // Add player to update queue if edited
 				if (curTick % 200 === 0) {
-					if (DB.db_admin.size == 0 && DB.db_map.lockAdmin == true) {
+					if (db_admin.size == 0 && db_map.lockAdmin == true) {
 						log("§7admin database is lock but nobody is inside ? unlocking it");
-						Server.runCommandAsync("scoreboard players reset \"$db_map(" + textToHex(JSON.stringify(DB.db_map)) + ")\" database");
-						DB.db_map.lockAdmin = false;
-						Server.runCommandAsync("scoreboard players set \"$db_map(" + textToHex(JSON.stringify(DB.db_map)) + ")\" database 1");
+						Server.runCommandAsync("scoreboard players reset \"$db_map(" + textToHex(JSON.stringify(db_map)) + ")\" database");
+						db_map.lockAdmin = false;
+						Server.runCommandAsync("scoreboard players set \"$db_map(" + textToHex(JSON.stringify(db_map)) + ")\" database 1");
 					}
 				}
 			}
@@ -349,16 +355,16 @@ system.runInterval(async () => {
 system.runInterval(() => {
 	try {
 		if (isLoaded) {
-			if (DB.db_player_online.size !== 0) {
-				for (const [key, p] of DB.db_player_online) {
+			if (db_player_online.size !== 0) {
+				for (const [key, p] of db_player_online) {
 					p.remove_to_update_player();
 					p.timePlayed += 5;
-					if (p.power < DB.db_map.powerLimit.max && p.lastPowerRegen + DB.db_map.timeToRegenPower * 60 < p.timePlayed) {
+					if (p.power < db_map.powerLimit.max && p.lastPowerRegen + db_map.timeToRegenPower * 60 < p.timePlayed) {
 						log("power regen for " + p.name + " : " + p.power + " -> " + (p.power + 1));
 						p.power++;
 						p.lastPowerRegen = p.timePlayed;
 					}
-					else if (p.lastPowerRegen + 1 > p.timePlayed + DB.db_map.timeToRegenPower * 60) {
+					else if (p.lastPowerRegen + 1 > p.timePlayed + db_map.timeToRegenPower * 60) {
 						p.lastPowerRegen = p.timePlayed;
 					}
 					p.add_to_update_player();
@@ -366,6 +372,7 @@ system.runInterval(() => {
 			}
 		}
 	} catch (er) {
-		log("error in runInterval : " + er.toString());
+		if (er instanceof Error)
+			log("error in runInterval : " + er.toString());
 	}
 }, 100)

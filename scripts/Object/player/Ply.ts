@@ -1,9 +1,8 @@
 import { DimensionLocation, Player, Vector3, world } from "@minecraft/server";
 import { Home } from "./Home";
-import { DB } from "../database/database";
 import { Vector_3_Dim } from "../tool/object/Vector";
 import { Server, hexToText, log, sleep, textToHex } from "../tool/tools";
-import { cmd_module } from "../database/db_map";
+import { cmd_module, db_map } from "../database/db_map";
 import { cmd_permission } from "../../Command/CommandManager";
 
 export let db_player: Map<Ply['name'], Ply> = new Map<Ply['name'], Ply>();
@@ -44,7 +43,7 @@ export class Ply {
 		this.faction_name = null;
 		this.money = 0;
 		this.id = player.id;
-		this.homeLimit = DB.db_map?.homeLimit ?? 3;
+		this.homeLimit = db_map?.homeLimit ?? 3;
 		this.warn = 0;
 		this.home = new Array;
 		this.lastMessage = "";
@@ -55,9 +54,9 @@ export class Ply {
 		this.back = new Vector_3_Dim(player.location.x, player.location.y, player.location.z, player.dimension.id);
 		this.chat = "all";
 		this.isunban = false;
-		this.lang = DB.db_map?.defaultLang ?? "en";
-		this.UTC = DB.db_map?.UTC ?? 0;
-		this.cmd_module = DB.db_map?.default_cmd_module ?? [0];
+		this.lang = db_map?.defaultLang ?? "en";
+		this.UTC = db_map?.UTC ?? 0;
+		this.cmd_module = db_map?.default_cmd_module ?? [0];
 		this.deathCount = 0;
 		this.killCount = 0;
 		this.power = 5;
@@ -67,6 +66,10 @@ export class Ply {
 		this.permission = cmd_permission.member;
 	}
 
+	/**
+	 * Update the back position of the playern Important note: `does not update the database` so you need to call `remove_to_update_player` and `add_to_update_player`. 
+	 * @param location {DimensionLocation} the location to update the back position
+	 */
 	public update_back_position(location: DimensionLocation) {
 		this.back.x = Math.ceil(location.x + 0.0001) - 1;
 		this.back.y = Math.floor(location.y + 0.4999);
@@ -83,7 +86,7 @@ export class Ply {
     }
 
 	static async initDB_player() {
-		if (DB.db_player.size === 0) {
+		if (db_player.size === 0) {
 			const objectiveName = "db_player";
 			await Server.runCommandAsync(`scoreboard objectives add ${objectiveName} dummy`);
 			const start = Date.now();
@@ -116,7 +119,7 @@ export class Ply {
 						let player = JSON.parse(hexToText(db.join(""))) as Ply;
 	
 						// Update db_player map
-						const existingPlayer = DB.db_player.get(player.name);
+						const existingPlayer = db_player.get(player.name);
 	
 						if (existingPlayer) {
 							// Update existing player data
@@ -128,12 +131,12 @@ export class Ply {
 								await Ply.async_add_to_update_player(player);
 							}
 						} else {
-							DB.db_player.set(player.name, player);
+							db_player.set(player.name, player);
 						}
 						// Update db_online_player map
 						const onlinePlayer = onlinePlayers.find((p) => p.name === player.name);
 						if (onlinePlayer) {
-							DB.db_player_online.set(player.name, player);
+							db_player_online.set(player.name, player);
 						}
 					});
 					await sleep(1);
@@ -167,8 +170,15 @@ export class Ply {
 	static add_player(player: Ply | undefined) {
 		if (player === undefined) return;
 		if (db_player.has(player.name)) {
-			log(`§cDuplicate player found, fixing ${player.name}`);
-			Ply.remove_player(DB.db_player.get(player.name));
+			try {
+				Ply.remove_player(db_player.get(player.name));
+				throw new Error("§cDuplicate player found, fixing " + player.name);
+			} catch (error) {
+				if (error instanceof Error) {
+					log(error.message);
+					log("§6> Error Stack: §c" + error.stack);	
+				}
+			}
 		}
 		db_player.set(player.name, player);
 		Server.runCommandAsync("scoreboard players set \"$db_player(" + textToHex(JSON.stringify(player)) + ")\" db_player 1");

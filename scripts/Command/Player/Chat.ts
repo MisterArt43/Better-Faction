@@ -3,7 +3,7 @@ import { cmd_module } from "../../Object/database/db_map";
 import { addSubCommand, cmd_permission } from "../CommandManager"
 import { Ply } from "../../Object/player/Ply";
 import { tellraw } from "../../Object/tool/tools";
-import { translate } from "../../lang";
+import { translate } from "../../Object/tool/lang";
 
 addSubCommand(
 	"chat",

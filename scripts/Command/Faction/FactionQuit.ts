@@ -1,12 +1,11 @@
 import { Player } from "@minecraft/server";
-import { Ply } from "../../Object/player/Ply";
-import { DB } from "../../Object/database/database";
-import { Faction, factionRank } from "../../Object/faction/Faction";
+import { Ply, db_player } from "../../Object/player/Ply";
+import { Faction, db_faction, factionRank } from "../../Object/faction/Faction";
 import { Server, log, sleep, tellraw } from "../../Object/tool/tools";
-import { Chunk } from "../../Object/chunk/chunk";
-import { translate } from "../../lang";
+import { Chunk, db_chunk } from "../../Object/chunk/Chunk";
 import { addSubCommand, cmd_permission } from "../CommandManager";
 import { cmd_module } from "../../Object/database/db_map";
+import { translate } from "../../Object/tool/lang";
 
 addSubCommand(
 	"quit",
@@ -22,12 +21,12 @@ addSubCommand(
 )
 
 async function Factionquit(args: string[], player: Player, ply: Ply) {
-	const fac = DB.db_faction.get(ply.faction_name ?? "");
+	const fac = db_faction.get(ply.faction_name ?? "");
 	if (fac) {
 		if (fac.playerList.find(p => p.name === ply.name && p.permission === factionRank.Leader)) {
 			log(`§e${ply.name}§r has disbanded the faction §e${fac.name}§r.`);
 			let i = 1;
-			for (const [key, faction] of DB.db_faction) {
+			for (const [key, faction] of db_faction) {
 				const allyIndex = faction.ally.findIndex(a => a === fac.name);
 				if (allyIndex !== -1) {
 					faction.remove_to_update_faction();
@@ -47,7 +46,7 @@ async function Factionquit(args: string[], player: Player, ply: Ply) {
 			}
 
 			for (const p of fac.playerList) {
-				const pl = DB.db_player.get(p.name);
+				const pl = db_player.get(p.name);
 				if (!pl) continue;
 				pl.remove_to_update_player();
 				pl.faction_name = null;
@@ -55,7 +54,7 @@ async function Factionquit(args: string[], player: Player, ply: Ply) {
 			}
 
 			fac.claim.forEach((c) => {
-				let chunk = DB.db_chunk.get(c.x + "," + c.y + Server.id); // y = z
+				let chunk = db_chunk.get(c.x + "," + c.y + Server.id); // y = z
 				if (chunk !== undefined) Chunk.remove_chunk(chunk);
 			});
 

@@ -33,8 +33,8 @@ export class Chunk {
 
 		this.defaultPermission = chunkPermission ?? new ChunkPermission(false, false, false);
 		this.permission = new Array();
+		this.rankPermission = new Array();
 		if (faction !== "Admin") {
-			this.rankPermission = new Array();
 			this.rankPermission.push(new ChunkRankPermission(factionRank.Leader, new ChunkPermission(true, true, true)));
 			this.rankPermission.push(new ChunkRankPermission(factionRank.Officer, new ChunkPermission(true, true, true)));
 			this.rankPermission.push(new ChunkRankPermission(factionRank.Member, new ChunkPermission(true, true, true)));

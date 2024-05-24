@@ -1,13 +1,12 @@
 import { Player, system } from "@minecraft/server";
 import { cmd_module } from "../../../Object/database/db_map";
 import { addSubCommand, cmd_permission } from "../../CommandManager";
-import { Ply } from "../../../Object/player/Ply";
-import { DB } from "../../../Object/database/database";
+import { Ply, db_player } from "../../../Object/player/Ply";
 import { concatenateArgs, tellraw } from "../../../Object/tool/tools";
-import { translate } from "../../../lang";
 import { ModalFormData } from "@minecraft/server-ui";
 import { UI_find_player } from "../../../Object/tool/find_players_UI";
 import { Home } from "../../../Object/player/Home";
+import { translate } from "../../../Object/tool/lang";
 
 addSubCommand(
 	"delhome",
@@ -58,7 +57,7 @@ function deleteHomeModal(player: Player, target: Ply | undefined): void {
         });
 
         form.show(player).then((res) => {
-            target = DB.db_player.get(target?.name ?? "");
+            target = db_player.get(target?.name ?? "");
             if (res.canceled || !target || !res.formValues || (res.formValues.every((v) => v === false) ?? true)) return;
 
             target.remove_to_update_player();
@@ -82,7 +81,7 @@ async function delhome(args: string[], player: Player, ply: Ply) {
         } else {
             if (args.length === 3) {
                 if (player.hasTag(adminTag)) {
-                    let target = DB.db_player.get(args[1].replace(/[@"]/g, ""));
+                    let target = db_player.get(args[1].replace(/[@"]/g, ""));
                     if (target !== undefined && target instanceof Ply) {
                         removeHomeForPlayer(player, target, args[2].replace(/"/g, ""));
                     } else {

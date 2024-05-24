@@ -1,11 +1,11 @@
 import { Player } from "@minecraft/server";
 import { Ply } from "../../Object/player/Ply";
 import { Server, tellraw, tpsound } from "../../Object/tool/tools";
-import { DB } from "../../Object/database/database";
-import { translate } from "../../lang";
 import { addSubCommand, cmd_permission } from "../CommandManager";
 import { cmd_module } from "../../Object/database/db_map";
 import { Delay } from "../../Object/player/Delay";
+import { translate } from "../../Object/tool/lang";
+import { db_faction } from "../../Object/faction/Faction";
 
 addSubCommand(
 	"home",
@@ -22,7 +22,7 @@ addSubCommand(
 
 function Factionhome(args: string[], player: Player, ply: Ply) {
 	if (Delay.isTpCanceled(player)) return;
-	const fac = DB.db_faction.get(ply.faction_name ?? "");
+	const fac = db_faction.get(ply.faction_name ?? "");
 
 	if (fac !== undefined) {
 		if (fac.isFhome === true && fac.Fhome !== null) {

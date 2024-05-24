@@ -1,6 +1,5 @@
 import { world } from "@minecraft/server";
 import { Server, hexToText, log } from "../tool/tools";
-import { DB } from "../database/database";
 
 export const db_display = {
     db_display_title: new Map<Display['tag'], Display>(),
@@ -28,11 +27,11 @@ function display_getter_tag(tag: string): Display[] {
 
 function display_setter_tag(key: Display['tag'], display: Display) {
 	if (display.type === displayTypes.title) {
-		DB.db_display.db_display_title.set(key, display);
+		db_display.db_display_title.set(key, display);
 	} else if (display.type === displayTypes.actionbar) {
-		DB.db_display.db_display_actionbar.set(key, display);
+		db_display.db_display_actionbar.set(key, display);
 	} else if (display.type === displayTypes.rule) {
-		DB.db_display.db_display_rule = display;
+		db_display.db_display_rule = display;
 	}
 }
 
@@ -86,14 +85,14 @@ export class Display {
 						display.tag = "";
 
 					// Update db_display map
-					const existingObject = DB.db_display.get(display.tag).find((d) => d.type === display.type && d.tag === display.tag);
+					const existingObject = db_display.get(display.tag).find((d) => d.type === display.type && d.tag === display.tag);
 
 					if (existingObject) {
 						// Update existing display data
 						log(`§cDuplicate display found, fixing ${display.tag}`)
 						objective.removeParticipant(score.participant);
 					} else {
-						DB.db_display.set(`${display.tag}`, display);
+						db_display.set(`${display.tag}`, display);
 					}
 				});
 				// Update progress bar

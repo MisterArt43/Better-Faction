@@ -1,7 +1,4 @@
 import { Dimension, Player, RawMessage, system, world } from "@minecraft/server";
-import { ModalFormData } from "@minecraft/server-ui";
-import { DB } from "../database/database";
-import { Ply } from "../player/Ply";
 
 
 // -------------------------- //

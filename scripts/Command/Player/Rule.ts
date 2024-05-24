@@ -1,12 +1,13 @@
 import { Player, system, world } from "@minecraft/server";
-import { Ply } from "../../Object/player/Ply";
-import { DB } from "../../Object/database/database";
+import { Ply, db_player } from "../../Object/player/Ply";
 import { log, sleep } from "../../Object/tool/tools";
 import { ActionFormData, FormCancelationReason, ModalFormData } from "@minecraft/server-ui";
-import { displayTypes } from "../../Object/display/Display";
+import { db_display, displayTypes } from "../../Object/display/Display";
 import { addSubCommand, cmd_permission } from "../CommandManager";
-import { cmd_module } from "../../Object/database/db_map";
+import { cmd_module, db_map } from "../../Object/database/db_map";
 import { addDateZ, formatCreationDayTime } from "../../Object/tool/dateTools";
+import { db_faction } from "../../Object/faction/Faction";
+import { db_chunk } from "../../Object/chunk/Chunk";
 
 addSubCommand(
 	"rule",
@@ -25,8 +26,8 @@ function rule(args: string[], player: Player, ply: Ply) {
 }
 
 export async function display_rule(player: Player, ply: Ply, isNewPlayer: boolean) {
-	if (DB.db_display.db_display_rule === null) return;
-	const faction = DB.db_faction.get(ply.faction_name ?? "");
+	if (db_display.db_display_rule === null) return;
+	const faction = db_faction.get(ply.faction_name ?? "");
 
 	const Fname = faction?.name ?? "none";
 	const Frank = faction?.playerList.find((pla) => pla.name === ply.name)?.permission.toString() ?? "none";
@@ -41,12 +42,12 @@ export async function display_rule(player: Player, ply: Ply, isNewPlayer: boolea
 	const coordZ = Math.floor(player.location.z);
 	const chunkX = (coordX >> 4).toFixed(0);
 	const chunkZ = (coordZ >> 4).toFixed(0);
-	const chunk = DB.db_chunk?.get(chunkX + "," + chunkZ + player.dimension.id)?.faction_name ?? "none";
+	const chunk = db_chunk?.get(chunkX + "," + chunkZ + player.dimension.id)?.faction_name ?? "none";
 
 	const onlinePlCount = world.getAllPlayers().length;
 
 	await sleep(1);
-	let formated_display = DB.db_display.db_display_rule.text.replace(/<([^>]+)>/g, (match, key) => {
+	let formated_display = db_display.db_display_rule.text.replace(/<([^>]+)>/g, (match, key) => {
 		switch (key) {
 			case "faction": return Fname;
 			case "player": return ply.name;
@@ -63,7 +64,7 @@ export async function display_rule(player: Player, ply: Ply, isNewPlayer: boolea
 			case "Zchunk": return chunkZ;
 			case "chunk": return chunk;
 			case "online": return onlinePlCount.toString();
-			case "allPlayer": return DB.db_player.size.toString();
+			case "allPlayer": return db_player.size.toString();
 			case "version": return version;
 			case "prefix": return prefix;
 			case "time": return localTime;
@@ -93,8 +94,8 @@ export async function display_rule(player: Player, ply: Ply, isNewPlayer: boolea
 			if (hasRead) { system.clearRun(interval); log("§a" + ply.name + " has read the rule"); return; }
 			else if (test === false) {
 				let code = "";
-				if (DB.db_map.ruleCode.isRuleCode) code = DB.db_map.ruleCode.code;
-				if (DB.db_map.ruleCode.isAutoGen) code = generateRandomCode(5);
+				if (db_map.ruleCode.isRuleCode) code = db_map.ruleCode.code;
+				if (db_map.ruleCode.isAutoGen) code = generateRandomCode(5);
 				if (code === undefined) code = "none";
 				form.body(formated_display.replace(/\<code\>/g, "§r" + code))
 				const res = await form.show(player)
@@ -111,7 +112,7 @@ export async function display_rule(player: Player, ply: Ply, isNewPlayer: boolea
 					test = false;
 					return;
 				}
-				if (DB.db_map.ruleCode.isRuleCode) {
+				if (db_map.ruleCode.isRuleCode) {
 					const res1 = await form2.show(player)
 					if (res1.canceled) return;
 					if (res1.formValues?.[0] === code) {
@@ -129,7 +130,8 @@ export async function display_rule(player: Player, ply: Ply, isNewPlayer: boolea
 			}
 			else test = false;
 		} catch (error) {
-			log(error.toString());
+			if (error instanceof Error)
+				log(error.toString());
 		}
 	}, 30);
 }

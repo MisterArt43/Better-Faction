@@ -1,11 +1,10 @@
 import { Player, world } from "@minecraft/server";
-import { Ply, TpaType } from "../../../Object/player/Ply";
-import { DB } from "../../../Object/database/database";
+import { Ply, TpaType, db_player } from "../../../Object/player/Ply";
 import { Server, log, tellraw, tpsound } from "../../../Object/tool/tools";
-import { Delay } from "../../../Object/player/Delay";
-import { translate } from "../../../lang";
+import { Delay, db_delay } from "../../../Object/player/Delay";
 import { addSubCommand, cmd_permission } from "../../CommandManager";
 import { cmd_module } from "../../../Object/database/db_map";
+import { translate } from "../../../Object/tool/lang";
 
 addSubCommand(
     "tpaccept",
@@ -20,8 +19,8 @@ addSubCommand(
 );
 
 function tpaAccept(args: string[], player: Player, ply: Ply) {
-	if (DB.db_delay.has(ply.name)) {
-        const delay = DB.db_delay.get(ply.name) as Delay;
+	if (db_delay.has(ply.name)) {
+        const delay = db_delay.get(ply.name) as Delay;
         if (!delay.check_time()) 
             return tellraw(player, "§cYou have to wait " + (delay.time - new Date().getTime()) / 1000 + " seconds before using this command.");
     }
@@ -29,7 +28,7 @@ function tpaAccept(args: string[], player: Player, ply: Ply) {
         if (Delay.isTpCanceled(player))
             return;
         if (ply.tpa !== null) {
-            const other = DB.db_player.get(ply.tpa.name);
+            const other = db_player.get(ply.tpa.name);
             const otherPlayer = [...world.getPlayers()].find((p) => p.name === other?.name);
             if (other !== undefined && otherPlayer !== undefined) {
                 ply.remove_to_update_player();

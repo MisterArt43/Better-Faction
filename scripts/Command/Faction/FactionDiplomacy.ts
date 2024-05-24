@@ -1,13 +1,12 @@
 import { Player } from "@minecraft/server";
 import { Ply } from "../../Object/player/Ply";
-import { DB } from "../../Object/database/database";
-import { Faction, factionRank } from "../../Object/faction/Faction";
-import { translate } from "../../lang";
+import { Faction, db_faction, factionRank } from "../../Object/faction/Faction";
 import { sleep, tellraw } from "../../Object/tool/tools";
 import { ActionFormData, ModalFormData } from "@minecraft/server-ui";
 import { UI_find_faction } from "../../Object/tool/find_factions_UI";
 import { addSubCommand, cmd_permission } from "../CommandManager";
 import { cmd_module } from "../../Object/database/db_map";
+import { translate } from "../../Object/tool/lang";
 
 addSubCommand(
 	"diplomacy",
@@ -23,7 +22,7 @@ addSubCommand(
 )
 
 function FactionAlly(args: string[], player: Player, ply: Ply) {
-	const fac = DB.db_faction.get(ply.faction_name ?? "");
+	const fac = db_faction.get(ply.faction_name ?? "");
 
 	if (!fac) return tellraw(player, translate(ply.lang)?.error_no_faction ?? "no translation");
 	if (fac.playerList.some((p) => p.name === player.name && p.permission == factionRank.Leader)) return tellraw(player, translate(ply.lang)?.error_faction_leader_permission ?? "no translation");
@@ -52,7 +51,7 @@ async function FactionDiplomacyMode(player: Player, ply: Ply, fac: Faction, type
 		.show(player);
 	
 	if (res.canceled) return FactionDiplomacyUI(player, ply, fac);
-	if (!DB.db_faction.has(fac.name)) return tellraw(player, translate(ply.lang)?.error_find_faction ?? "no translation");
+	if (!db_faction.has(fac.name)) return tellraw(player, translate(ply.lang)?.error_find_faction ?? "no translation");
 	
 	if (res.selection === 0) {
 		FactionDiplomacyAddUI(player, ply, fac, type);
@@ -66,7 +65,7 @@ async function FactionDiplomacyAddUI(player: Player, ply: Ply, fac: Faction, typ
 	const targetFac = await UI_find_faction(player);
 
 	if (!targetFac) return FactionDiplomacyMode(player, ply, fac, type);
-	if (!DB.db_faction.has(fac.name)) return tellraw(player, translate(ply.lang)?.error_find_faction ?? "no translation");
+	if (!db_faction.has(fac.name)) return tellraw(player, translate(ply.lang)?.error_find_faction ?? "no translation");
 	
 	if (fac.ally.length >= 10) return tellraw(player.name, "You can't have more than 10 ally");
 	fac.remove_to_update_faction();
@@ -87,7 +86,7 @@ async function FactionDiplomacyListUI(player: Player, ply: Ply, fac: Faction, li
 
 	const res2 = await form.show(player)
 	if (res2.canceled) return FactionDiplomacyMode(player, ply, fac, type);
-	if (!DB.db_faction.has(fac.name)) return tellraw(player, translate(ply.lang)?.error_find_faction ?? "no translation");
+	if (!db_faction.has(fac.name)) return tellraw(player, translate(ply.lang)?.error_find_faction ?? "no translation");
 
 	if (res2.formValues!.every((v) => v === true)) return FactionDiplomacyMode(player, ply, fac, type);
 

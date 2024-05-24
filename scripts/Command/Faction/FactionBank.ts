@@ -1,12 +1,11 @@
 import { Player } from "@minecraft/server";
 import { Ply } from "../../Object/player/Ply";
-import { DB } from "../../Object/database/database";
 import { tellraw } from "../../Object/tool/tools";
-import { translate } from "../../lang";
-import { Faction, factionRank } from "../../Object/faction/Faction";
+import { Faction, db_faction, factionRank } from "../../Object/faction/Faction";
 import { ActionFormData, ModalFormData } from "@minecraft/server-ui";
 import { addSubCommand, cmd_permission } from "../CommandManager";
 import { cmd_module } from "../../Object/database/db_map";
+import { translate } from "../../Object/tool/lang";
 
 addSubCommand(
 	"bank",
@@ -22,7 +21,7 @@ addSubCommand(
 )
 
 function FactionBank(args: string[], player: Player, ply: Ply) {
-    const fac = DB.db_faction.get(ply.faction_name ?? "");
+    const fac = db_faction.get(ply.faction_name ?? "");
 
     if (!fac) return tellraw(player, translate(ply.lang)?.error_no_faction ?? "no translation");
     if (args.length === 2) return FactionBankUI(player, ply, fac);
@@ -95,7 +94,7 @@ async function FactionBankAddUI(player: Player, ply: Ply, fac: Faction) {
 	const money = parseInt(rawValue);
 
 	//check if data are still valid
-	if (!(DB.db_faction.has(fac.name) && fac.playerList.some(p => p.name === player.name))) return tellraw(player, translate(ply.lang)?.error_find_faction ?? "no translation");
+	if (!(db_faction.has(fac.name) && fac.playerList.some(p => p.name === player.name))) return tellraw(player, translate(ply.lang)?.error_find_faction ?? "no translation");
 
 	if (ply.money >= money) {
 		fac.remove_to_update_faction();
@@ -123,7 +122,7 @@ async function FactionBankRemoveUI(player: Player, ply: Ply, fac: Faction) {
 	const money = parseInt(rawValue);
 
 	//check if data are still valid
-	if (!(DB.db_faction.has(fac.name) && fac.playerList.some(p => p.name === player.name))) return tellraw(player, translate(ply.lang)?.error_find_faction ?? "no translation");
+	if (!(db_faction.has(fac.name) && fac.playerList.some(p => p.name === player.name))) return tellraw(player, translate(ply.lang)?.error_find_faction ?? "no translation");
 
 	if (fac.bank >= money) {
 		fac.remove_to_update_faction();

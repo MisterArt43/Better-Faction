@@ -1,12 +1,12 @@
 import { ChatSendBeforeEvent, Player, world } from "@minecraft/server";
-import { DB } from "../Object/database/database";
 import { findFirstTagStartWith, findTagsStartWithV2, tellraw } from "../Object/tool/tools";
-import { Faction } from "../Object/faction/Faction";
-import { Ply } from "../Object/player/Ply";
+import { Faction, db_faction } from "../Object/faction/Faction";
+import { Ply, db_player, db_player_online } from "../Object/player/Ply";
+import { db_map } from "../Object/database/db_map";
 
 export function customChat(data: ChatSendBeforeEvent) {
     const name = data.sender.name;
-    const player = DB.db_player.get(name);
+    const player = db_player.get(name);
 
     if (player === undefined) return;
 
@@ -25,7 +25,7 @@ export function customChat(data: ChatSendBeforeEvent) {
 }
 
 function processMessage(data: ChatSendBeforeEvent, player: Ply) {
-    const faction = DB.db_faction.get(player?.faction_name ?? "");
+    const faction = db_faction.get(player?.faction_name ?? "");
     let message = buildMessage(data, player, faction);
     
 	handleChatChannels(data, faction, player, message);
@@ -45,13 +45,13 @@ function buildMessage(data: ChatSendBeforeEvent, player: Ply, faction: Faction |
         message += faction.color + faction.separator[0] + faction.name + faction.separator[1] + "§r ";
     }
 
-    message += ranks + colorN + player.name + " " + DB.db_map.chatPrefix + "§r " + colorM + data.message.replace(/§[1-9a-z]/g, "").replace(/\\/g, "\\\\");
+    message += ranks + colorN + player.name + " " + db_map.chatPrefix + "§r " + colorM + data.message.replace(/§[1-9a-z]/g, "").replace(/\\/g, "\\\\");
     
     return message;
 }
 
 function handleChatChannels(data: ChatSendBeforeEvent, faction: Faction | undefined, player: Ply, message: string) {
-	const onlinePlayers = Array.from(DB.db_player_online.values());
+	const onlinePlayers = Array.from(db_player_online.values());
 	
 	if (player.chat === "faction" && faction !== undefined) {
 		message = "§g[Faction] " + message;
@@ -78,7 +78,7 @@ function broadcastFactionMessage(message: string, faction: Faction, players: Ply
 function broadcastAllyMessage(message: string, faction: Faction, players: Ply[]) {
 	let ally: Faction[] = []
 	faction.ally.forEach(a => {
-		let f = DB.db_faction.get(a)
+		let f = db_faction.get(a)
 		if (f !== undefined)
 			ally.push(f);
 	})

@@ -1,12 +1,11 @@
 import { Player } from "@minecraft/server";
 import { concatFacName, concatenateArgs, sleep, tellraw } from "../../Object/tool/tools";
-import { Ply } from "../../Object/player/Ply";
-import { DB } from "../../Object/database/database";
-import { translate } from "../../lang";
-import { Faction, factionRank, faction_member } from "../../Object/faction/Faction";
+import { Ply, db_player } from "../../Object/player/Ply";
+import { Faction, db_faction, factionRank, faction_member } from "../../Object/faction/Faction";
 import { ActionFormData } from "@minecraft/server-ui";
 import { addSubCommand, cmd_permission } from "../CommandManager";
 import { cmd_module } from "../../Object/database/db_map";
+import { translate } from "../../Object/tool/lang";
 
 addSubCommand(
     "join",
@@ -31,10 +30,10 @@ async function Factionjoin(args: string[], player: Player, ply: Ply) {
 }
 
 async function factionJoinUI(player: Player, ply: Ply) {
-    if (DB.db_faction.has(ply.faction_name ?? "") === false) {
+    if (db_faction.has(ply.faction_name ?? "") === false) {
         const listJoinableFaction = new Array<string>();
         let i = 0;
-        for (const fac of DB.db_faction.values()) {
+        for (const fac of db_faction.values()) {
             if (fac.isOpen === true) {
                 listJoinableFaction.push(fac.name);
             }
@@ -61,8 +60,8 @@ async function factionJoinUI(player: Player, ply: Ply) {
 function cmdFactionJoin(args: string[], player: Player, ply: Ply) {
     const name = concatFacName(args, 2);
 
-    if (DB.db_faction.has(ply.faction_name ?? "") === false) {
-        const fac = DB.db_faction.get(name);
+    if (db_faction.has(ply.faction_name ?? "") === false) {
+        const fac = db_faction.get(name);
 
         if (fac !== undefined) {
             const newMember = new faction_member(player.name, factionRank.Visitor);
@@ -99,7 +98,7 @@ function updatePlayerJoinFaction(player: Player, ply: Ply, fac: Faction, newMemb
         ply.faction_name = fac.name;
         ply.add_to_update_player();
         for (const p of fac.playerList) {
-            tellraw(p.name, translate(DB.db_player.get(p.name)!.lang, player.name)?.faction_join ?? "no translation");
+            tellraw(p.name, translate(db_player.get(p.name)!.lang, player.name)?.faction_join ?? "no translation");
         }
     }
     else {
@@ -109,7 +108,7 @@ function updatePlayerJoinFaction(player: Player, ply: Ply, fac: Faction, newMemb
 
 function broadcastRemoveInvite(playerName: string) {
     let i = 0;
-    for (const fac of DB.db_faction.values()) {
+    for (const fac of db_faction.values()) {
         const inviteIndex = fac.invitList.findIndex((p) => p === playerName);
         if (inviteIndex !== -1) {
             fac.remove_to_update_faction();

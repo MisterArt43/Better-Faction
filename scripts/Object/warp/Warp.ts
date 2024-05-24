@@ -1,7 +1,7 @@
 import { Player, world } from "@minecraft/server";
 import { Server, hexToText, log, sleep, textToHex } from "../tool/tools"
 import { Vector_3_Dim } from "../tool/object/Vector";
-import { DB } from "../database/database";
+import { db_map } from "../database/db_map";
 
 export let db_warp: Map<Warp['name'], Warp> = new Map<Warp['name'], Warp>();
 
@@ -32,9 +32,41 @@ export class Warp {
 			Math.ceil(player.location.z + 0.0001) - 1,
 			player.dimension.id
 		);
-		this.delay = DB.db_map.warpDelay;
+		this.delay = db_map.warpDelay;
 		this.runCommandAsync = new Array();
 		this.log = new Array();
+	}
+
+	addAllowedTag(player : Player, tag: string) {
+		if (this.allow.includes(tag))
+			return player.sendMessage("§cThis tag is already allowed");
+		this.remove_to_update_warp();
+		this.allow.push(tag);
+		this.add_to_update_warp();
+	}
+
+	addDeniedTag(player : Player, tag: string) {
+		if (this.deny.includes(tag))
+			return player.sendMessage("§cThis tag is already denied");
+		this.remove_to_update_warp();
+		this.deny.push(tag);
+		this.add_to_update_warp();
+	}
+
+	removeAllowedTag(player : Player, tag: string) {
+		if (!this.allow.includes(tag))
+			return player.sendMessage("§cThis tag doesn't exist in the allowed list");
+		this.remove_to_update_warp();
+		this.allow.splice(this.allow.indexOf(tag), 1);
+		this.add_to_update_warp();
+	}
+
+	removeDeniedTag(player : Player, tag: string) {
+		if (!this.deny.includes(tag))
+			return player.sendMessage("§cThis tag doesn't exist in the denied list");
+		this.remove_to_update_warp();
+		this.deny.splice(this.deny.indexOf(tag), 1);
+		this.add_to_update_warp();
 	}
 
 	static add_warp(warp: Warp) {
@@ -62,7 +94,7 @@ export class Warp {
 	}
 
 	static async initDB_warp() {
-		if (DB.db_warp.size === 0) {
+		if (db_warp.size === 0) {
 			const objectiveName = "db_warp";
 			await Server.runCommandAsync(`scoreboard objectives add ${objectiveName} dummy`);
 			const start = Date.now();
@@ -92,14 +124,14 @@ export class Warp {
 						let warp = JSON.parse(hexToText(db.join(""))) as Warp;
 						
 						// Update db_warp map
-						const existingObject = DB.db_warp.get(warp.name);
+						const existingObject = db_warp.get(warp.name);
 	
 						if (existingObject) {
 							// Update existing warp data
 							log(`§cDuplicate warp found, fixing ${warp.name}`)
 							objective.removeParticipant(score.participant);
 						} else {
-							DB.db_warp.set(`${warp.name}`, warp);
+							db_warp.set(`${warp.name}`, warp);
 						}
 					});
 					// Update progress bar
@@ -123,6 +155,6 @@ class WarpDelay {
 
 	constructor(name: string, delay: number) {
 		this.name = name;
-		this.delay = DB.db_map.warpDelay;
+		this.delay = db_map.warpDelay;
 	}
 }

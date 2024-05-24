@@ -1,12 +1,11 @@
 import { Player, system, world } from "@minecraft/server";
-import { Ply } from "../../../Object/player/Ply";
+import { Ply, db_player } from "../../../Object/player/Ply";
 import { concatenateArgs, tellraw } from "../../../Object/tool/tools";
-import { DB } from "../../../Object/database/database";
 import { ActionFormData, ModalFormData } from "@minecraft/server-ui";
-import { translate } from "../../../lang";
 import { UI_find_player } from "../../../Object/tool/find_players_UI";
 import { addSubCommand, cmd_permission } from "../../CommandManager";
 import { cmd_module } from "../../../Object/database/db_map";
+import { translate } from "../../../Object/tool/lang";
 
 addSubCommand(
 	"pay",
@@ -31,7 +30,7 @@ function pay(args: string[], player: Player, ply: Ply) {
 function Pui_pay(player: Player, ply: Ply) {
 	tellraw(player, "§o§7you have 2 seconds to quit the chat and the form will appear.");
 
-	if (DB.db_player.size <= 1) {
+	if (db_player.size <= 1) {
 		tellraw(player, "§cnot enough players in the database");
 		return;
 	}
@@ -75,7 +74,7 @@ async function onlinePlayerSel(player: Player, ply: Ply) {
 
 	if (res.canceled === true) return;
 
-	const targetName = DB.db_player.get(onlinePlayers[res.formValues?.[0] as number ?? ""])?.name ?? "";
+	const targetName = db_player.get(onlinePlayers[res.formValues?.[0] as number ?? ""])?.name ?? "";
 	const money = res.formValues?.[1] as string ?? "";
 
 	pay(["pay", targetName, money.toString()], player, ply);
@@ -109,7 +108,7 @@ function enterPlayerNameSel(player: Player, ply: Ply) {
 		.then((res) => {
 			if (res.canceled == true) return;
 
-			const targetName = DB.db_player.get(res.formValues?.[0] as string ?? "")?.name ?? "";
+			const targetName = db_player.get(res.formValues?.[0] as string ?? "")?.name ?? "";
 			const money = res.formValues?.[1] as string ?? "";
 
 			pay(["pay", targetName, money + ""], player, ply);
@@ -122,7 +121,7 @@ function cmd_pay(args: string[], player: Player, ply: Ply) {
 		const name = concatenateArgs(args, 1, (s) => s.replace(/[@"]/g, ""));
 		const money = parseInt(args[args.length - 1])
 		if (money > 0) {
-			const target = DB.db_player.get(name);
+			const target = db_player.get(name);
 			if (target != undefined) {
 				if (ply.money >= money) {
 					target.remove_to_update_player();

@@ -1,12 +1,11 @@
 import { Player } from "@minecraft/server";
-import { Ply } from "../../Object/player/Ply";
-import { DB } from "../../Object/database/database";
-import { Faction, factionRank, faction_member } from "../../Object/faction/Faction";
+import { Ply, db_player } from "../../Object/player/Ply";
+import { Faction, db_faction, factionRank, faction_member } from "../../Object/faction/Faction";
 import { concatenateArgs, getTypedKeys, tellraw } from "../../Object/tool/tools";
-import { translate } from "../../lang";
 import { ModalFormData } from "@minecraft/server-ui";
 import { addSubCommand, cmd_permission } from "../CommandManager";
 import { cmd_module } from "../../Object/database/db_map";
+import { translate } from "../../Object/tool/lang";
 
 addSubCommand(
 	"promote",
@@ -22,7 +21,7 @@ addSubCommand(
 )
 
 function Factionpromote(args: string[], player: Player, ply: Ply) {
-	const fac = DB.db_faction.get(ply.faction_name ?? "");
+	const fac = db_faction.get(ply.faction_name ?? "");
 	if (fac === undefined || (fac?.playerList.find((p) => p.name === player.name && fac.isAtLeastRank(p, factionRank.Officer)) === undefined ?? true))
 		return tellraw(player, translate(ply.lang)?.error_cant_do_that ?? "no translation");
 	if (args.length >= 3) {
@@ -57,7 +56,7 @@ function updateFactionPromote(player: Player, ply: Ply, target: faction_member, 
 		fac.add_to_update_faction();
 
 		fac.playerList.forEach((p) => {
-			tellraw(DB.db_player.get(p.name)!.name, translate(ply.lang, target.name)?.faction_new_leader ?? "no translation");
+			tellraw(db_player.get(p.name)!.name, translate(ply.lang, target.name)?.faction_new_leader ?? "no translation");
 		})
 		tellraw(player, translate(ply.lang)?.faction_new_leader_get ?? "no translation");
 	}
@@ -106,7 +105,7 @@ async function FactionrankUI(player: Player, ply: Ply, fac: Faction) {
     if (res.canceled || !res.formValues)
 		return;
 
-    if (!DB.db_faction.has(fac.name))
+    if (!db_faction.has(fac.name))
         return tellraw(player, "Error: faction was deleted while you were doing this");
 
     fac.remove_to_update_faction();

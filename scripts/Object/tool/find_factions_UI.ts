@@ -1,8 +1,7 @@
 import { Player } from "@minecraft/server";
 import { ModalFormData } from "@minecraft/server-ui";
 import { sleep, tellraw } from "./tools";
-import { DB } from "../database/database";
-import { Faction } from "../faction/Faction";
+import { Faction, db_faction } from "../faction/Faction";
 
 export async function UI_find_faction(pl: Player): Promise<Faction | undefined> {
     const searchOptions = await getSearchOptions(pl);
@@ -27,7 +26,7 @@ export async function UI_find_faction(pl: Player): Promise<Faction | undefined> 
 async function getSearchOptions(pl: Player): Promise<{ searchAllFaction: boolean; searchKeyword: string } | undefined> {
     const form = new ModalFormData()
         .textField("Enter the start of the faction name", "Faction name")
-    if (DB.db_faction.size < 100) form.toggle("show all faction", false)
+    if (db_faction.size < 100) form.toggle("show all faction", false)
     return await form.show(pl)
         .then(async (res) => {
             if (res.canceled || !res.formValues || typeof res.formValues[0] !== "string") return undefined;
@@ -43,11 +42,11 @@ async function getFactionList(searchInOnlineFactions: boolean, searchKeyword: st
     let listFaction: string[] = [];
 
     if (searchInOnlineFactions) {
-        listFaction = Array.from(DB.db_faction.keys())
+        listFaction = Array.from(db_faction.keys())
     }
     else {
         let i = 0;
-        for (const faction of DB.db_faction.keys()) {
+        for (const faction of db_faction.keys()) {
             const factionName = faction.toLowerCase();
             if (factionName.startsWith(searchKeyword)) {
                 listFaction.push(factionName);
@@ -74,6 +73,6 @@ async function selectFaction(pl: Player, FactionList: string[]): Promise<Faction
         .show(pl)
         .then(async (res) => {
             if (res.canceled || !res.formValues || typeof res.formValues[0] !== "string") return undefined;
-            return DB.db_faction.get(FactionList[res.formValues[0]]);
+            return db_faction.get(FactionList[res.formValues[0] as unknown as number]);
         });
 }

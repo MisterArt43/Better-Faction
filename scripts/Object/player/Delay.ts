@@ -1,5 +1,4 @@
 import { Player, world } from "@minecraft/server";
-import { DB } from "../database/database";
 import { Server, hexToText, log, tellraw, textToHex } from "../tool/tools";
 
 export let db_delay: Map<Delay['name'], Delay> = new Map<Delay['name'], Delay>();
@@ -9,7 +8,6 @@ export class Delay {
 	public time: number;
 
 	constructor(name: string, seconds: number) {
-		if (seconds === 0) return;
 		const hasDelay = db_delay.get(name);
 		if (hasDelay) this.remove_to_update_delay();
 		this.name = name;
@@ -71,7 +69,7 @@ export class Delay {
 	}
 
 	static async initDB_delay() {
-		if (DB.db_delay.size === 0) {
+		if (db_delay.size === 0) {
 			const objectiveName = "db_delay";
 			await Server.runCommandAsync(`scoreboard objectives add ${objectiveName} dummy`);
 			const start = Date.now();
@@ -101,14 +99,14 @@ export class Delay {
 						let delay = JSON.parse(hexToText(db.join(""))) as Delay;
 						
 						// Update db_delay map
-						const existingObject = DB.db_delay.get(delay.name);
+						const existingObject = db_delay.get(delay.name);
 	
 						if (existingObject) {
 							// Update existing delay data
 							log(`§cDuplicate delay found, fixing ${delay.name}`)
 							objective.removeParticipant(score.participant);
 						} else {
-							DB.db_delay.set(`${delay.name}`, delay);
+							db_delay.set(`${delay.name}`, delay);
 						}
 					});
 					// Update progress bar

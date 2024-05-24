@@ -1,14 +1,13 @@
 import { Player } from "@minecraft/server";
 import { Ply } from "../../Object/player/Ply";
-import { DB } from "../../Object/database/database";
 import { concatFacName, tellraw } from "../../Object/tool/tools";
-import { translate } from "../../lang";
-import { Faction, factionRank } from "../../Object/faction/Faction";
+import { Faction, db_faction, factionRank } from "../../Object/faction/Faction";
 import { ActionFormData } from "@minecraft/server-ui";
 import { addDateZ, formatCreationFullDate } from "../../Object/tool/dateTools";
 import { UI_find_faction } from "../../Object/tool/find_factions_UI";
 import { addSubCommand, cmd_permission } from "../CommandManager";
-import { cmd_module } from "../../Object/database/db_map";
+import { cmd_module, db_map } from "../../Object/database/db_map";
+import { translate } from "../../Object/tool/lang";
 
 addSubCommand(
 	"info",
@@ -43,7 +42,7 @@ function FactionInfo(args: string[], player: Player, ply: Ply) {
 function FactioninfoCmd(args: string[], player: Player, ply: Ply) {
 	const MILLISECONDS_IN_AN_HOUR = 3600000;
 	const name = concatFacName(args, 2);
-	const fac = DB.db_faction.get(name);
+	const fac = db_faction.get(name);
 
 	if (fac === undefined) {
 		tellraw(player, translate(ply.lang)?.error_faction_info ?? "no translation");
@@ -81,7 +80,7 @@ async function ChooseFactionUI(player: Player, ply: Ply) {
 }
 
 async function PlayerFactionInfoUI(player: Player, ply: Ply, faction?: Faction) {
-	const fac = faction ? faction : DB.db_faction.get(ply.faction_name ?? "");
+	const fac = faction ? faction : db_faction.get(ply.faction_name ?? "");
 	if (!fac)
 		return tellraw(player, translate(ply.lang)?.error_faction_info ?? "no translation");
 	
@@ -100,7 +99,7 @@ function buildFactionInfoMessage(ply: Ply, fac: Faction): string {
 - Creation Date   : ${formatCreationFullDate(fac.creationDate, ply.UTC)}§r
 - Members         : ${fac.playerList.length}/${fac.memberLimit}§r
 - Bank            : ${fac.bank}§r
-- Power           : ${fac.power}/${DB.db_map.powerLimit.max * fac.playerList.length}§r
+- Power           : ${fac.power}/${db_map.powerLimit.max * fac.playerList.length}§r
 - Claim           : ${fac.claim.length}\n\n§eMembers :§r
 `;
 	if (fac.playerList.find(p => p.name === ply.name)) {

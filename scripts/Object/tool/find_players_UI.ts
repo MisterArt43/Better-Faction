@@ -1,8 +1,7 @@
 import { Player } from "@minecraft/server";
-import { Ply } from "../player/Ply";
+import { Ply, db_player, db_player_online } from "../player/Ply";
 import { ModalFormData } from "@minecraft/server-ui";
 import { sleep, tellraw } from "./tools";
-import { DB } from "../database/database";
 
 export async function UI_find_player(pl: Player): Promise<Ply | undefined> {
     const searchOptions = await getSearchOptions(pl);
@@ -40,7 +39,7 @@ async function getSearchOptions(pl: Player): Promise<{ searchInOnlinePlayers: bo
 }
 
 async function getPlayerList(searchInOnlinePlayers: boolean, searchKeyword: string, pl: Player): Promise<string[] | undefined> {
-    const playerDB = searchInOnlinePlayers ? DB.db_player_online : DB.db_player;
+    const playerDB = searchInOnlinePlayers ? db_player_online : db_player;
 
     const playerList: string[] = [];
     let i = 0;
@@ -72,6 +71,6 @@ async function selectPlayer(pl: Player, playerList: string[]): Promise<Ply | und
         .show(pl)
         .then(async (res) => {
             if (res.canceled || !res.formValues || typeof res.formValues[0] !== "string") return undefined;
-            return DB.db_player.get(playerList[res.formValues[0]]);
+            return db_player.get(playerList[res.formValues[0] as unknown as number]);
         });
 }

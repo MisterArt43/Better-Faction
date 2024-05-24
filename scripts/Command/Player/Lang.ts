@@ -1,9 +1,9 @@
 import { Player } from "@minecraft/server";
 import { Ply } from "../../Object/player/Ply";
-import { list_lang, translate } from "../../lang";
 import { tellraw } from "../../Object/tool/tools";
 import { addSubCommand, cmd_permission } from "../CommandManager";
 import { cmd_module } from "../../Object/database/db_map";
+import { list_lang, translate } from "../../Object/tool/lang";
 
 addSubCommand(
     "lang",
