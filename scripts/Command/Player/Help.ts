@@ -24,6 +24,13 @@ function help(args: string[], player: Player, ply: Ply) {
 		}
 		tellraw(player, msg);
 	}
+	else if (args.length == 1) {
+		let msg = "List of root commands:\n";
+		for (const [key, value] of commands) {
+			msg += value instanceof Command ? `§7${key}§r - ${value.description}\n` : `§7§l${key}§r\n`;
+		}
+		tellraw(ply.name, msg);
+	}
 	else {
 		if (commands.has(args[1])) {
 			recurUsageSubCommand(ply, commands.get(args[1]) as SubCommand, args, 2);
@@ -38,7 +45,7 @@ function recurUsageSubCommand(ply: Ply, subCommand: SubCommand, args: string[], 
 	if (subCommand instanceof Command) {
 		if (subCommand.isEnable) {
 			if (subCommand.permission <= ply.permission) {
-				tellraw(ply.name, `§7${subCommand.command}§r - ${subCommand.description}\n§7Usage: ${subCommand.usage}`);
+				tellraw(ply.name, `§7${subCommand.command}§r - ${subCommand.description}\n§7Usage: ${subCommand.usage} §r\n§7Aliases: ${subCommand.aliases.join(", ")}\n`);	
 			}
 		}
 	}
