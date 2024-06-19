@@ -2,7 +2,7 @@
 	"format_version": 2,
 	"header": {
 		"description": "better faction by Mister Art43 +help",
-		"name": "§e§lBetter §6Faction §bv§a2.0.0",
+		"name": "§e§lBetter §6Faction §bv§a1.1.33",
 		"uuid": "34b1e49b-1512-4c92-b348-1611e82cb031",
 		"version": [
 			1,
@@ -36,7 +36,7 @@
 				0,
 				0
 			],
-			"entry": "lib/scripts/system/routine.js"
+			"entry": "scripts/index.js"
 		}
 	],
     "dependencies": [
