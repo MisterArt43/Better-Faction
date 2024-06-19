@@ -26,6 +26,11 @@ world.beforeEvents.chatSend.subscribe(data => {
 })
 
 async function subCommandExecuter(args: string[], data: ChatSendBeforeEvent, it: number = 0, cursor?: SubCommand, pl?: Player) {
+	let logmsg = `§a${data.sender.name}`;
+	args.forEach((arg, i) => {
+		logmsg += ` | ${arg}`;
+	})
+	log(logmsg);
 	if (cursor === undefined) cursor = commands.get(args[it]);
 	else if (!(cursor instanceof Command)) cursor = cursor.get(args[it]);
 

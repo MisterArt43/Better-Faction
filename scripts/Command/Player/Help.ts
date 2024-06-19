@@ -2,7 +2,7 @@ import { ChatSendAfterEvent, Player } from "@minecraft/server";
 import { cmd_module, cmd_permission } from "../../Object/database/db_map";
 import { Command, SubCommand, addSubCommand, commands } from "../CommandManager";
 import { Ply } from "../../Object/player/Ply";
-import { tellraw } from "../../Object/tool/tools";
+import { log, tellraw } from "../../Object/tool/tools";
 
 addSubCommand(
 	"help",
@@ -25,8 +25,8 @@ function help(args: string[], player: Player, ply: Ply) {
 		tellraw(player, msg);
 	}
 	else {
-		if (commands.has(args[0])) {
-			recurUsageSubCommand(ply, commands.get(args[0]) as SubCommand, args, 1);
+		if (commands.has(args[1])) {
+			recurUsageSubCommand(ply, commands.get(args[1]) as SubCommand, args, 2);
 		}
 		else {
 			tellraw(player, `§cUnknown command. Try ${globalThis.prefix}help for a list of commands.`);
@@ -47,7 +47,15 @@ function recurUsageSubCommand(ply: Ply, subCommand: SubCommand, args: string[], 
 			recurUsageSubCommand(ply, subCommand.get(args[i]) as SubCommand, args, i++);
 		}
 		else {
-			tellraw(ply.name, `§cUnknown command. Try ${globalThis.prefix}help for a list of commands.`);
+			if (args.length == i && subCommand instanceof Map) {
+				let msg = "list of subcommands:\n";
+				for (const [key, value] of subCommand) {
+					msg += value instanceof Command ? `§7${key}§r - ${value.description}\n` : `§7§l${key}§r\n`;
+				}
+				tellraw(ply.name, msg);
+			}
+			else
+				tellraw(ply.name, `§cUnknown command. Try ${globalThis.prefix}help for a list of commands.`);
 		}
 	}
 }
