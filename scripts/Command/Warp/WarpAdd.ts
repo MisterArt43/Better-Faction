@@ -1,11 +1,11 @@
 import { MinecraftDimensionTypes, Player } from "@minecraft/server";
 import { Ply } from "../../Object/player/Ply";
 import { Warp, db_warp } from "../../Object/warp/Warp";
-import { addSubCommand, cmd_permission } from "../CommandManager";
-import { cmd_module } from "../../Object/database/db_map";
+import { addSubCommand } from "../CommandManager";
+import { cmd_module, cmd_permission } from "../../Object/database/db_map";
 import { ModalFormData } from "@minecraft/server-ui";
 import { concatenateArgs } from "../../Object/tool/tools";
-import { translate } from "../../lang";
+import { translate } from "../../Object/tool/lang";
 
 addSubCommand(
 	"add",
@@ -57,16 +57,20 @@ function addWarpUI(player: Player, ply: Ply) {
 		.dropdown("Dimension", dimensionTab, dimensionTab.indexOf(player.dimension.id))
 		.toggle("is Open", true)
 		.textField("delay before a new tp to this warp", '5', '5')
+		.textField("message to display", 'message')
 		.show(player).then(res => {
 			if (res.canceled) return;
 			if (db_warp.has(res.formValues![0] as string)) return player.sendMessage("This warp already exists");
-			if (!isDigit(res.formValues![1] as string) || !isDigit(res.formValues![2] as string) || !isDigit(res.formValues![3] as string))
-				return player.sendMessage("wrong coordinates inputs")
+			if (!isDigit(res.formValues![1] as string) || !isDigit(res.formValues![2] as string) || !isDigit(res.formValues![3] as string) && !isDigit(res.formValues![6] as string))
+				return player.sendMessage("wrong coordinates or delay inputs")
 			const newWarp = new Warp(res.formValues![0] as string, player);
 			newWarp.pos.x = parseInt(res.formValues![1] as string)
 			newWarp.pos.y = parseInt(res.formValues![2] as string)
 			newWarp.pos.z = parseInt(res.formValues![3] as string)
-			newWarp.pos.dim = dimensionTab[res.formValues![4] as string]
+			newWarp.pos.dim = dimensionTab[res.formValues![4] as number]
+			newWarp.isOpen = res.formValues![5] as boolean
+			newWarp.delay = parseInt(res.formValues![6] as string)
+			newWarp.message = res.formValues![7] as string
 			Warp.add_warp(newWarp);
 			player.sendMessage("Warp added");
 		})

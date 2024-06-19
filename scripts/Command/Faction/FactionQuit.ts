@@ -3,10 +3,10 @@ import { Ply } from "../../Object/player/Ply";
 import { DB } from "../../Object/database/database";
 import { Faction, factionRank } from "../../Object/faction/Faction";
 import { Server, log, sleep, tellraw } from "../../Object/tool/tools";
-import { Chunk } from "../../Object/chunk/chunk";
-import { translate } from "../../lang";
-import { addSubCommand, cmd_permission } from "../CommandManager";
-import { cmd_module } from "../../Object/database/db_map";
+import { Chunk } from "../../Object/chunk/Chunk";
+import { translate } from "../../Object/tool/lang";
+import { addSubCommand } from "../CommandManager";
+import { cmd_module, cmd_permission } from "../../Object/database/db_map";
 
 addSubCommand(
 	"quit",

@@ -2,14 +2,6 @@ import { world } from "@minecraft/server";
 import { Server, hexToText, log } from "../tool/tools";
 import { DB } from "../database/database";
 
-export const db_display = {
-    db_display_title: new Map<Display['tag'], Display>(),
-    db_display_actionbar: new Map<Display['tag'], Display>(),
-    db_display_rule: null as Display | null,
-    get: display_getter_tag,
-    set: display_setter_tag,
-    size: display_size
-};
 
 function display_size(): number {
 	return db_display.db_display_actionbar.size + db_display.db_display_title.size + (db_display.db_display_rule ? 1 : 0);
@@ -109,3 +101,12 @@ export class Display {
 		log("§7db_display loaded in " + ((end - start) / 1000) + " second(s)");
 	}
 }
+
+export const db_display = {
+    db_display_title: new Map<Display['tag'], Display>(),
+    db_display_actionbar: new Map<Display['tag'], Display>(),
+    db_display_rule: null as Display | null,
+    get: display_getter_tag,
+    set: display_setter_tag,
+    size: display_size
+};

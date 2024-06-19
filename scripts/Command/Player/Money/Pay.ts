@@ -3,10 +3,10 @@ import { Ply } from "../../../Object/player/Ply";
 import { concatenateArgs, tellraw } from "../../../Object/tool/tools";
 import { DB } from "../../../Object/database/database";
 import { ActionFormData, ModalFormData } from "@minecraft/server-ui";
-import { translate } from "../../../lang";
+import { translate } from "../../../Object/tool/lang";
 import { UI_find_player } from "../../../Object/tool/find_players_UI";
-import { addSubCommand, cmd_permission } from "../../CommandManager";
-import { cmd_module } from "../../../Object/database/db_map";
+import { addSubCommand } from "../../CommandManager";
+import { cmd_module, cmd_permission } from "../../../Object/database/db_map";
 
 addSubCommand(
 	"pay",

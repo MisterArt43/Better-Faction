@@ -2,24 +2,12 @@ import { Player } from "@minecraft/server";
 import { Ply } from "../../Object/player/Ply";
 import { DB } from "../../Object/database/database";
 import { tellraw } from "../../Object/tool/tools";
-import { translate } from "../../lang";
+import { translate } from "../../Object/tool/lang";
 import { Faction, factionRank } from "../../Object/faction/Faction";
 import { ActionFormData, ModalFormData } from "@minecraft/server-ui";
-import { addSubCommand, cmd_permission } from "../CommandManager";
-import { cmd_module } from "../../Object/database/db_map";
+import { addSubCommand } from "../CommandManager";
+import { cmd_module, cmd_permission } from "../../Object/database/db_map";
 
-addSubCommand(
-	"bank",
-	"add or remove money from the faction bank\n §7You need to be at least officer to remove money",
-	`${globalThis.prefix}faction bank [<add/remove> <amount>]`,
-	["bank", "b"],
-	cmd_module.faction,
-	cmd_permission.member,
-	true,
-	true,
-	FactionBank,
-	[["faction", "f"]]
-)
 
 function FactionBank(args: string[], player: Player, ply: Ply) {
     const fac = DB.db_faction.get(ply.faction_name ?? "");
@@ -138,3 +126,18 @@ async function FactionBankRemoveUI(player: Player, ply: Ply, fac: Faction) {
 		tellraw(player, translate(ply.lang)?.error_bank_money ?? "no translation");
 	}
 }
+
+export {};
+
+addSubCommand(
+	"bank",
+	"add or remove money from the faction bank\n §7You need to be at least officer to remove money",
+	`${globalThis.prefix}faction bank [<add/remove> <amount>]`,
+	["bank", "b"],
+	cmd_module.faction,
+	cmd_permission.member,
+	true,
+	true,
+	FactionBank,
+	[["faction", "f"]]
+)

@@ -3,7 +3,7 @@ import { Server, findFirstTagStartWith, findTagsStartWithV2, log, tellraw, textT
 import { DB } from "../Object/database/database";
 import { Ply, Tpa } from "../Object/player/Ply";
 import { Display } from "../Object/display/Display";
-import { translate } from "../lang";
+import { translate } from "../Object/tool/lang";
 import { Faction } from "../Object/faction/Faction";
 import { display_rule } from "../Command/Player/Rule";
 import { addDateZ, formatCreationDayTime } from "../Object/tool/dateTools";
@@ -90,7 +90,8 @@ system.runInterval(() => {
 			}
 		}
 	} catch (er) {
-		log("error in runInterval : " + er.toString());
+		if (er instanceof Error)
+			log("error in runInterval : " + er.toString() + "\n" + er.stack);
 	}
 }, 100)
 
@@ -262,7 +263,8 @@ system.runInterval(async () => {
 										p.runCommandAsync(`titleraw @s ${display.type} {"rawtext":[{"text":"§r${formated_display}"}]}`);
 									}
 									catch (er) {
-										log("display error : " + er.toString());
+										if (er instanceof Error)
+											log("display error : " + er.toString());
 									}
 								}
 							}
@@ -288,7 +290,7 @@ system.runInterval(async () => {
 							objectiveWarn.setScore(p, player.warn)
 							let nameTag = p.name;
 							if (DB.db_map.customName) {
-								const rankSeparator = (text) => { return "§7[" + text + "§7]§r"; };
+								const rankSeparator = (text: string) => { return "§7[" + text + "§7]§r"; };
 								let rank = findTagsStartWithV2(p, "role:", tags).map(tag => rankSeparator(tag.replace("role:", ""))).join("\n");
 								let colorN = findFirstTagStartWith(p, "colorName:", tags)?.replace("colorName:", "") ?? "§r";
 								nameTag = colorN + nameTag + "§r";
@@ -366,6 +368,7 @@ system.runInterval(() => {
 			}
 		}
 	} catch (er) {
-		log("error in runInterval : " + er.toString());
+		if (er instanceof Error)
+			log("error in runInterval : " + er.toString() + "\n" + er.stack);
 	}
 }, 100)

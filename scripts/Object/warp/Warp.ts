@@ -3,7 +3,6 @@ import { Server, hexToText, log, sleep, textToHex } from "../tool/tools"
 import { Vector_3_Dim } from "../tool/object/Vector";
 import { DB } from "../database/database";
 
-export let db_warp: Map<Warp['name'], Warp> = new Map<Warp['name'], Warp>();
 
 export class Warp {
 	public name: string;
@@ -62,7 +61,7 @@ export class Warp {
 	}
 
 	static async initDB_warp() {
-		if (DB.db_warp.size === 0) {
+		if (db_warp.size === 0) {
 			const objectiveName = "db_warp";
 			await Server.runCommandAsync(`scoreboard objectives add ${objectiveName} dummy`);
 			const start = Date.now();
@@ -92,14 +91,14 @@ export class Warp {
 						let warp = JSON.parse(hexToText(db.join(""))) as Warp;
 						
 						// Update db_warp map
-						const existingObject = DB.db_warp.get(warp.name);
+						const existingObject = db_warp.get(warp.name);
 	
 						if (existingObject) {
 							// Update existing warp data
 							log(`§cDuplicate warp found, fixing ${warp.name}`)
 							objective.removeParticipant(score.participant);
 						} else {
-							DB.db_warp.set(`${warp.name}`, warp);
+							db_warp.set(`${warp.name}`, warp);
 						}
 					});
 					// Update progress bar
@@ -126,3 +125,5 @@ class WarpDelay {
 		this.delay = DB.db_map.warpDelay;
 	}
 }
+
+export let db_warp: Map<Warp['name'], Warp> = new Map<Warp['name'], Warp>();

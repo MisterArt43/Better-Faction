@@ -2,11 +2,11 @@ import { Player } from "@minecraft/server";
 import { Ply } from "../../Object/player/Ply";
 import { concatenateArgs, tellraw } from "../../Object/tool/tools";
 import { DB } from "../../Object/database/database";
-import { translate } from "../../lang";
+import { translate } from "../../Object/tool/lang";
 import { Faction, factionRank, faction_member } from "../../Object/faction/Faction";
 import { ActionFormData } from "@minecraft/server-ui";
-import { addSubCommand, cmd_permission } from "../CommandManager";
-import { cmd_module } from "../../Object/database/db_map";
+import { addSubCommand } from "../CommandManager";
+import { cmd_module, cmd_permission } from "../../Object/database/db_map";
 
 addSubCommand(
 	"kick",

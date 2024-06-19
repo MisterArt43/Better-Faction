@@ -72,6 +72,6 @@ async function selectPlayer(pl: Player, playerList: string[]): Promise<Ply | und
         .show(pl)
         .then(async (res) => {
             if (res.canceled || !res.formValues || typeof res.formValues[0] !== "string") return undefined;
-            return DB.db_player.get(playerList[res.formValues[0]]);
+            return DB.db_player.get(playerList[res.formValues[0] as unknown as number]);
         });
 }

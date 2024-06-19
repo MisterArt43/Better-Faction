@@ -74,6 +74,6 @@ async function selectFaction(pl: Player, FactionList: string[]): Promise<Faction
         .show(pl)
         .then(async (res) => {
             if (res.canceled || !res.formValues || typeof res.formValues[0] !== "string") return undefined;
-            return DB.db_faction.get(FactionList[res.formValues[0]]);
+            return DB.db_faction.get(FactionList[res.formValues[0] as unknown as number]);
         });
 }

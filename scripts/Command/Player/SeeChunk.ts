@@ -1,8 +1,8 @@
 import { Player, system } from "@minecraft/server";
 import { Ply } from "../../Object/player/Ply";
 import { Nether, Server, TheEnd, sleep } from "../../Object/tool/tools";
-import { addSubCommand, cmd_permission } from "../CommandManager";
-import { cmd_module } from "../../Object/database/db_map";
+import { addSubCommand } from "../CommandManager";
+import { cmd_module, cmd_permission } from "../../Object/database/db_map";
 
 addSubCommand(
 	"seechunk",

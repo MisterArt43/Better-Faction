@@ -2,10 +2,10 @@ import { Player, world } from "@minecraft/server";
 import { DB } from "../../Object/database/database";
 import { Ply } from "../../Object/player/Ply";
 import { concatenateArgs, tellraw } from "../../Object/tool/tools";
-import { translate } from "../../lang";
+import { translate } from "../../Object/tool/lang";
 import { Faction, factionRank, faction_member } from "../../Object/faction/Faction";
-import { addSubCommand, cmd_permission } from "../CommandManager";
-import { cmd_module } from "../../Object/database/db_map";
+import { addSubCommand } from "../CommandManager";
+import { cmd_module, cmd_permission } from "../../Object/database/db_map";
 import { ActionFormData, ModalFormData } from "@minecraft/server-ui";
 
 addSubCommand(

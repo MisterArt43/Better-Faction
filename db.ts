@@ -1,5 +1,5 @@
 import * as MC from '@minecraft/server';
-import { loadDatabase } from './conf_db';
+import { DatabaseKey, database, loadDatabase, loadDatabaseStrings } from './conf_db';
 
 export class ExtendedMap<K, V> extends Map<K, V> {
     dbName: string;
@@ -45,7 +45,7 @@ export class ExtendedMap<K, V> extends Map<K, V> {
 
 const Server = MC.world.getDimension('overworld');
 
-export async function initDB(dbName: string, keyName: any, dbMap: ExtendedMap<any, any>) {
+export async function initDB(dbName: keyof typeof database, keyName: string, dbMap: ExtendedMap<any, any>) {
 	if (dbMap.size === 0) {
 		await Server.runCommandAsync(`scoreboard objectives add ${dbName} dummy`);
 		const start = Date.now();
@@ -59,7 +59,7 @@ export async function initDB(dbName: string, keyName: any, dbMap: ExtendedMap<an
 
 			const progressBar = "§a[DB] §7loading db_chunk... §e";
 			const percentageUnit = 100 / nbParticipants;
-			loadDatabase[dbName] = progressBar + "0.00%";
+			loadDatabaseStrings[dbName] = progressBar + "0.00%";
 
 			for (let i = 0; i < batchNumber; i++) {
 				const batchStart = i * batchSize;
@@ -92,10 +92,10 @@ export async function initDB(dbName: string, keyName: any, dbMap: ExtendedMap<an
 					}
 				});
 				// Update progress bar
-				loadDatabase[dbName] = progressBar + (batchEnd * percentageUnit).toFixed(2) + "%";
+				loadDatabaseStrings[dbName] = progressBar + (batchEnd * percentageUnit).toFixed(2) + "%";
 				await Promise.all(updateDbPromises);
 			}
-			loadDatabase[dbName] = progressBar + "100%";
+			loadDatabaseStrings[dbName] = progressBar + "100%";
 		} catch (e) {
 			log(`§7[DB] can't find any database for ${dbName}, creating a new one ` + e);
 		}
@@ -124,4 +124,3 @@ function hexToText(hex: string): string {
 		return String.fromCharCode(parseInt(char, 16));
 	}).join("");
 }
-

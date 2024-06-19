@@ -2,13 +2,13 @@ import { Player } from "@minecraft/server";
 import { Ply } from "../../Object/player/Ply";
 import { DB } from "../../Object/database/database";
 import { concatFacName, tellraw } from "../../Object/tool/tools";
-import { translate } from "../../lang";
+import { translate } from "../../Object/tool/lang";
 import { Faction, factionRank } from "../../Object/faction/Faction";
 import { ActionFormData } from "@minecraft/server-ui";
 import { addDateZ, formatCreationFullDate } from "../../Object/tool/dateTools";
 import { UI_find_faction } from "../../Object/tool/find_factions_UI";
-import { addSubCommand, cmd_permission } from "../CommandManager";
-import { cmd_module } from "../../Object/database/db_map";
+import { addSubCommand } from "../CommandManager";
+import { cmd_module, cmd_permission } from "../../Object/database/db_map";
 
 addSubCommand(
 	"info",

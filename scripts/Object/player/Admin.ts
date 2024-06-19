@@ -1,7 +1,6 @@
 import { world } from "@minecraft/server";
 import { Server, hexToText, log, sleep, textToHex } from "../tool/tools";
 
-export let db_admin: Map<Admin['name'], Admin> = new Map<Admin['name'], Admin>();
 
 export class Admin {
 	public name: string;
@@ -35,7 +34,7 @@ export class Admin {
 		}
 	}
 
-	static initDB_admin() {
+	static async initDB_admin() {
 		if (db_admin.size == 0) {
 			Server.runCommandAsync("scoreboard objectives add db_admin dummy")
 			try {
@@ -61,3 +60,5 @@ export class Admin {
 		}
 	}
 }
+
+export let db_admin: Map<Admin['name'], Admin> = new Map<Admin['name'], Admin>();

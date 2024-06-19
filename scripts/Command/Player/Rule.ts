@@ -4,8 +4,8 @@ import { DB } from "../../Object/database/database";
 import { log, sleep } from "../../Object/tool/tools";
 import { ActionFormData, FormCancelationReason, ModalFormData } from "@minecraft/server-ui";
 import { displayTypes } from "../../Object/display/Display";
-import { addSubCommand, cmd_permission } from "../CommandManager";
-import { cmd_module } from "../../Object/database/db_map";
+import { addSubCommand } from "../CommandManager";
+import { cmd_module, cmd_permission } from "../../Object/database/db_map";
 import { addDateZ, formatCreationDayTime } from "../../Object/tool/dateTools";
 
 addSubCommand(
@@ -129,7 +129,8 @@ export async function display_rule(player: Player, ply: Ply, isNewPlayer: boolea
 			}
 			else test = false;
 		} catch (error) {
-			log(error.toString());
+			if (error instanceof Error)
+				log(error.toString());
 		}
 	}, 30);
 }

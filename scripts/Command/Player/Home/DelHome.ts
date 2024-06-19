@@ -1,10 +1,10 @@
 import { Player, system } from "@minecraft/server";
-import { cmd_module } from "../../../Object/database/db_map";
-import { addSubCommand, cmd_permission } from "../../CommandManager";
+import { cmd_module, cmd_permission } from "../../../Object/database/db_map";
+import { addSubCommand } from "../../CommandManager";
 import { Ply } from "../../../Object/player/Ply";
 import { DB } from "../../../Object/database/database";
 import { concatenateArgs, tellraw } from "../../../Object/tool/tools";
-import { translate } from "../../../lang";
+import { translate } from "../../../Object/tool/lang";
 import { ModalFormData } from "@minecraft/server-ui";
 import { UI_find_player } from "../../../Object/tool/find_players_UI";
 import { Home } from "../../../Object/player/Home";

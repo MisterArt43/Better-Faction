@@ -1,6 +1,6 @@
 import { ChatSendAfterEvent, Player } from "@minecraft/server";
-import { cmd_module } from "../../Object/database/db_map";
-import { Command, SubCommand, addSubCommand, cmd_permission, commands } from "../CommandManager";
+import { cmd_module, cmd_permission } from "../../Object/database/db_map";
+import { Command, SubCommand, addSubCommand, commands } from "../CommandManager";
 import { Ply } from "../../Object/player/Ply";
 import { tellraw } from "../../Object/tool/tools";
 

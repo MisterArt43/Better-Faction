@@ -1,9 +1,9 @@
 import { ChatSendBeforeEvent, Player, world } from "@minecraft/server";
 import { DB } from "../Object/database/database";
-import { cmd_module } from "../Object/database/db_map";
+import { cmd_module, cmd_permission } from "../Object/database/db_map";
 import { Ply } from "../Object/player/Ply";
-import { tellraw } from "../Object/tool/tools";
-import { customChat } from "../Chat/customchat";
+import { log, tellraw } from "../Object/tool/tools";
+import { customChat } from "../Chat/CustomChat";
 import { ActionFormData } from "@minecraft/server-ui";
 
 world.beforeEvents.chatSend.subscribe(data => {
@@ -39,7 +39,7 @@ async function subCommandExecuter(args: string[], data: ChatSendBeforeEvent, it:
 
 			if (ply === undefined || player === undefined)
 				return tellraw(data.sender, `§cError You are not registered yet. Wait a few seconds and try again.`);
-			if (cursor.module == cmd_module.all || ply.cmd_module.includes(cursor.module)) {
+			if (cursor.module == cmd_module.all || ply.cmd_module.includes(cmd_module.all) || ply.cmd_module.includes(cursor.module)) {
 				if (cursor.permission <= ply.permission) {
 					cursor.func(args, player, ply);
 				}
@@ -82,6 +82,19 @@ async function subCommandExecuter(args: string[], data: ChatSendBeforeEvent, it:
 	}
 }
 
+export class Command {
+	constructor(
+		public command: string,
+		public module: (typeof cmd_module[keyof typeof cmd_module]),
+		public description: string,
+		public usage: string,
+		public permission: (typeof cmd_permission[keyof typeof cmd_permission]),
+		public aliases: string[],
+		public isEnable: boolean,
+		public isUI: boolean,
+		public func: CommandFunction) {}
+}
+
 type CommandFunction = (args: string[], player: Player, ply: Ply) => void;
 export type SubCommand = Command | Map<string, SubCommand>
 
@@ -107,7 +120,12 @@ export function addSubCommand(
 			isUI,
 			func
 		);
+		if (!commands) {
+			commands = new Map<string, SubCommand>();
+			commands.set("all", commands);
+		}
 	let cursor = commands;
+	log("Add new command: " + command);
 	if (subCommandPath !== undefined) {
 		// create path in the map (keep same reference)
 		for (const path of subCommandPath) {
@@ -137,26 +155,4 @@ export function addSubCommand(
 	})
 }
 
-export class Command {
-	constructor(
-		public command: string,
-		public module: (typeof cmd_module[keyof typeof cmd_module]),
-		public description: string,
-		public usage: string,
-		public permission: (typeof cmd_permission[keyof typeof cmd_permission]),
-		public aliases: string[],
-		public isEnable: boolean,
-		public isUI: boolean,
-		public func: CommandFunction) {}
-}
-
-export const cmd_permission = {
-	"owner": 0,
-	"admin": 1,
-	"moderator": 2,
-	"helper": 3,
-	"member": 4
-} as const;
-
-export let commands : Map<string, SubCommand> = new Map<string, SubCommand>();
-commands.set("all", commands);
+export var commands : Map<string, SubCommand> = new Map<string, SubCommand>();

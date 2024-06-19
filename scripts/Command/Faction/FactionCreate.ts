@@ -1,12 +1,12 @@
 import { Player } from "@minecraft/server";
 import { Ply } from "../../Object/player/Ply";
 import { concatFacName, concatenateArgs, tellraw } from "../../Object/tool/tools";
-import { translate } from "../../lang";
+import { translate } from "../../Object/tool/lang";
 import { DB } from "../../Object/database/database";
 import { Faction } from "../../Object/faction/Faction";
 import { Vector_3 } from "../../Object/tool/object/Vector";
-import { addSubCommand, cmd_permission } from "../CommandManager";
-import { cmd_module } from "../../Object/database/db_map";
+import { addSubCommand } from "../CommandManager";
+import { cmd_module, cmd_permission } from "../../Object/database/db_map";
 import { ModalFormData } from "@minecraft/server-ui";
 
 addSubCommand(

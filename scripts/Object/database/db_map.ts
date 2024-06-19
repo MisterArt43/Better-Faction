@@ -164,3 +164,11 @@ export const cmd_module = {
 	claim: 10,
 	commoncommand: 11,
 } as const;
+
+export const cmd_permission = {
+	"owner": 0,
+	"admin": 1,
+	"moderator": 2,
+	"helper": 3,
+	"member": 4
+} as const;

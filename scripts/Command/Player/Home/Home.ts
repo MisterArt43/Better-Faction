@@ -1,10 +1,10 @@
 import { Player } from "@minecraft/server";
 import { Ply } from "../../../Object/player/Ply";
-import { cmd_module } from "../../../Object/database/db_map";
+import { cmd_module, cmd_permission } from "../../../Object/database/db_map";
 import { DB } from "../../../Object/database/database";
 import { concatenateArgs, runCommandDim, tellraw, tpsound } from "../../../Object/tool/tools";
-import { translate } from "../../../lang";
-import { addSubCommand, cmd_permission } from "../../CommandManager";
+import { translate } from "../../../Object/tool/lang";
+import { addSubCommand } from "../../CommandManager";
 import { Delay } from "../../../Object/player/Delay";
 
 addSubCommand(

@@ -1,13 +1,11 @@
-import { DimensionLocation, Player, Vector3, world } from "@minecraft/server";
+import { Dimension, DimensionLocation, Player, Vector3, world } from "@minecraft/server";
 import { Home } from "./Home";
 import { DB } from "../database/database";
 import { Vector_3_Dim } from "../tool/object/Vector";
 import { Server, hexToText, log, sleep, textToHex } from "../tool/tools";
-import { cmd_module } from "../database/db_map";
-import { cmd_permission } from "../../Command/CommandManager";
+import { cmd_module, cmd_permission } from "../database/db_map";
 
-export let db_player: Map<Ply['name'], Ply> = new Map<Ply['name'], Ply>();
-export let db_player_online: Map<Ply['name'], Ply> = new Map<Ply['name'], Ply>();
+
 
 export class Ply {
 	public name : string;
@@ -37,13 +35,13 @@ export class Ply {
 	public lastConnect : number;
 	public permission : (typeof cmd_permission[keyof typeof cmd_permission]);
 
-	constructor (player : Player) {
+	constructor({ name, nameTag, id, location, dimension }: { name: string, nameTag: string, id: string, location: { x: number, y: number, z: number }, dimension: {id: string} }) {
 		let date = new Date();
-		this.name = player.name;
-		this.nameTag = player.nameTag;
+		this.name = name;
+		this.nameTag = nameTag;
 		this.faction_name = null;
 		this.money = 0;
-		this.id = player.id;
+		this.id = id;
 		this.homeLimit = DB.db_map?.homeLimit ?? 3;
 		this.warn = 0;
 		this.home = new Array;
@@ -52,7 +50,7 @@ export class Ply {
 		this.tpa = null;
 		this.delay = new Array;
 		this.date = date.getTime();
-		this.back = new Vector_3_Dim(player.location.x, player.location.y, player.location.z, player.dimension.id);
+		this.back = new Vector_3_Dim(location.x, location.y, location.z, dimension.id);
 		this.chat = "all";
 		this.isunban = false;
 		this.lang = DB.db_map?.defaultLang ?? "en";
@@ -82,8 +80,35 @@ export class Ply {
         await Server.runCommandAsync(`scoreboard players set "$db_player(${player.name})" db_player 1`);
     }
 
+	public static fromObject(player: Ply) : Ply {
+		const ply = new Ply({name: player.name, nameTag: player.nameTag, id: player.id, location: {x: player.back.x, y: player.back.y, z: player.back.z}, dimension: {id: player.back.dim}});
+		ply.faction_name = player.faction_name;
+		ply.money = player.money;
+		ply.homeLimit = player.homeLimit;
+		ply.warn = player.warn;
+		ply.home = player.home;
+		ply.lastMessage = player.lastMessage;
+		ply.isMute = player.isMute;
+		ply.tpa = player.tpa;
+		ply.delay = player.delay;
+		ply.date = player.date;
+		ply.chat = player.chat;
+		ply.isunban = player.isunban;
+		ply.lang = player.lang;
+		ply.UTC = player.UTC;
+		ply.cmd_module = player.cmd_module;
+		ply.deathCount = player.deathCount;
+		ply.killCount = player.killCount;
+		ply.power = player.power;
+		ply.lastPowerRegen = player.lastPowerRegen;
+		ply.timePlayed = player.timePlayed;
+		ply.lastConnect = player.lastConnect;
+		ply.permission = player.permission;
+		return ply;
+	}
+
 	static async initDB_player() {
-		if (DB.db_player.size === 0) {
+		if (db_player.size === 0) {
 			const objectiveName = "db_player";
 			await Server.runCommandAsync(`scoreboard objectives add ${objectiveName} dummy`);
 			const start = Date.now();
@@ -113,10 +138,11 @@ export class Ply {
 							log("§cError: Mismatch data in db_player, try deleting the database and restarting the server. Contact the developer.");
 							return;
 						}
-						let player = JSON.parse(hexToText(db.join(""))) as Ply;
-	
+						const playerObj = JSON.parse(hexToText(db.join(""))) as Ply;
+						let player = Ply.fromObject(playerObj);
+						
 						// Update db_player map
-						const existingPlayer = DB.db_player.get(player.name);
+						const existingPlayer = db_player.get(player.name);
 	
 						if (existingPlayer) {
 							// Update existing player data
@@ -128,7 +154,7 @@ export class Ply {
 								await Ply.async_add_to_update_player(player);
 							}
 						} else {
-							DB.db_player.set(player.name, player);
+							db_player.set(player.name, player);
 						}
 						// Update db_online_player map
 						const onlinePlayer = onlinePlayers.find((p) => p.name === player.name);
@@ -168,7 +194,7 @@ export class Ply {
 		if (player === undefined) return;
 		if (db_player.has(player.name)) {
 			log(`§cDuplicate player found, fixing ${player.name}`);
-			Ply.remove_player(DB.db_player.get(player.name));
+			Ply.remove_player(db_player.get(player.name));
 		}
 		db_player.set(player.name, player);
 		Server.runCommandAsync("scoreboard players set \"$db_player(" + textToHex(JSON.stringify(player)) + ")\" db_player 1");
@@ -197,3 +223,6 @@ export const TpaType = {
 	tpa: "tpa",
 	tpahere: "tpahere"
 } as const;
+
+export let db_player: Map<Ply['name'], Ply> = new Map<Ply['name'], Ply>();
+export let db_player_online: Map<Ply['name'], Ply> = new Map<Ply['name'], Ply>();
