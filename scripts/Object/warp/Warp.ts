@@ -36,6 +36,38 @@ export class Warp {
 		this.log = new Array();
 	}
 
+	addAllowedTag(player : Player, tag: string) {
+		if (this.allow.includes(tag))
+			return player.sendMessage("§cThis tag is already allowed");
+		this.remove_to_update_warp();
+		this.allow.push(tag);
+		this.add_to_update_warp();
+	}
+
+	addDeniedTag(player : Player, tag: string) {
+		if (this.deny.includes(tag))
+			return player.sendMessage("§cThis tag is already denied");
+		this.remove_to_update_warp();
+		this.deny.push(tag);
+		this.add_to_update_warp();
+	}
+
+	removeAllowedTag(player : Player, tag: string) {
+		if (!this.allow.includes(tag))
+			return player.sendMessage("§cThis tag doesn't exist in the allowed list");
+		this.remove_to_update_warp();
+		this.allow.splice(this.allow.indexOf(tag), 1);
+		this.add_to_update_warp();
+	}
+
+	removeDeniedTag(player : Player, tag: string) {
+		if (!this.deny.includes(tag))
+			return player.sendMessage("§cThis tag doesn't exist in the denied list");
+		this.remove_to_update_warp();
+		this.deny.splice(this.deny.indexOf(tag), 1);
+		this.add_to_update_warp();
+	}
+
 	static add_warp(warp: Warp) {
 		if (db_warp.has(warp.name)) {
 			return log("§cadd warp error, the warp already exist");
