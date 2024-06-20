@@ -1,7 +1,4 @@
 import { Dimension, Player, RawMessage, system, world } from "@minecraft/server";
-import { ModalFormData } from "@minecraft/server-ui";
-import { DB } from "../database/database";
-import { Ply } from "../player/Ply";
 
 
 // -------------------------- //
@@ -27,6 +24,37 @@ export function tellraw(selector : tellrawSelector, text : string) {
 		Server.runCommandAsync(`tellraw "${selector}" {"rawtext":[{"text":"§r${text.replace(/"/g, "\'")}"}]}`);
 }
 export function log(text : number | string) { Server.runCommandAsync(`tellraw @a[tag=log] {"rawtext":[{"text":"§7{log} §r${text.toString().replace(/"/g, "\'").replace(/\n/g, "§r\n")}"}]}`) }
+
+const colors = {
+	reset: "§r",
+	key: "§s",     // Bleu
+	string: "§a",  // Vert
+	number: "§e",  // Jaune
+	boolean: "§d", // Magenta
+	null: "§c",    // Rouge
+};
+
+export function colorizeJSON(jsonString: string): string {
+
+	const colorize = (match: string): string => {
+		if (/^"/.test(match)) {
+			if (/:$/.test(match)) {
+				return colors.key + match + colors.reset; // Key
+			} else {
+				return colors.string + match + colors.reset; // string
+			}
+		} else if (/true|false/.test(match)) {
+			return colors.boolean + match + colors.reset; // boolean
+		} else if (/null/.test(match)) {
+			return colors.null + match + colors.reset; // null
+		} else if (/\d/.test(match)) {
+			return colors.number + match + colors.reset; // number
+		}
+		return match; // other
+	};
+
+	return jsonString.replace(/("(?:\\u[\da-fA-F]{4}|\\[^u]|[^\\"])*"(?:\s*:)?|\b(?:true|false|null)\b|\b\d+\b)/g, colorize);
+}
 
 export function sleep(ticks: number) { return new Promise<void>(resolve => system.runTimeout(resolve, ticks)); }
 
