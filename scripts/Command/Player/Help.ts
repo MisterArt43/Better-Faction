@@ -26,9 +26,39 @@ function help(args: string[], player: Player, ply: Ply) {
 	}
 	else if (args.length == 1) {
 		let msg = "List of root commands:\n";
+		let seenCommands = new Array<Command>();
+		let seenSubCommands = new Array<{ keys: string[], value: SubCommand }>(); 
+
 		for (const [key, value] of commands) {
-			msg += value instanceof Command ? `§7${key}§r - ${value.description}\n` : `§7§l${key}§r\n`;
+			if (value instanceof Command) {
+				if (value.isEnable === false || value.permission > ply.permission || value.module === cmd_module.dev) continue;
+				if (!seenCommands.includes(value)) {
+					seenCommands.push(value);
+				}
+			} else {
+				// Same Value NOT SAME KEYS !!!!
+				log("§a" + key)
+				if (seenSubCommands.some((v) => v.value === value)) {
+					seenSubCommands.forEach((v) => {
+						if (v.value === value) {
+							v.keys.push(key);
+						}
+					});
+				} else {
+					seenSubCommands.push({ keys: [key], value: value });
+				}
+			}
 		}
+
+		seenCommands.forEach((v) => {
+			// command - alias - description
+			msg += `§7${globalThis.prefix + v.command}§r - [${v.aliases.join(", ")}] - §e§o${v.description}\n§r`;
+		});
+		seenSubCommands.forEach((v) => {
+			log(JSON.stringify(v));
+			// Arrow -> SubCommand
+			msg += `§7§l > ${v.keys.join(", ")}§r\n`;
+		});
 		tellraw(ply.name, msg);
 	}
 	else {
