@@ -15,7 +15,7 @@ addSubCommand(
     "debug database",
     "+db <db_name> [nu page]",
     ["db"],
-    cmd_module.debugcommand,
+    cmd_module.dev,
     cmd_permission.admin,
     true,
     false,

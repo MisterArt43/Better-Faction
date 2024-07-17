@@ -12,7 +12,7 @@ addSubCommand(
     "test if db player can handle a lot of players loaded in db",
     "+manage ut player",
     ["player", "p"],
-    cmd_module.debugcommand,
+    cmd_module.dev,
     cmd_permission.admin,
     isDebug,
     false,
