@@ -15,7 +15,7 @@ declare global {
 		refreshTime:string
 	};
 }
-globalThis.version = "1.1.29";
+globalThis.version = "1.2.0";
 globalThis.prefix = "+";
 globalThis.adminTag = "Admin";
 globalThis.isLoaded = false;
