@@ -1,10 +1,10 @@
-import { ChatSendBeforeEvent, Player, world } from "@minecraft/server";
+import { ChatSendBeforeEvent, Player, system, world } from "@minecraft/server";
 import { DB } from "../Object/database/database";
 import { cmd_module, cmd_permission } from "../Object/database/db_map";
 import { Ply } from "../Object/player/Ply";
-import { log, tellraw } from "../Object/tool/tools";
+import { log, sleep, tellraw } from "../Object/tool/tools";
 import { customChat } from "../Chat/CustomChat";
-import { ActionFormData } from "@minecraft/server-ui";
+import { ActionFormData, FormCancelationReason } from "@minecraft/server-ui";
 
 world.beforeEvents.chatSend.subscribe(data => {
 	try {
@@ -26,11 +26,8 @@ world.beforeEvents.chatSend.subscribe(data => {
 })
 
 async function subCommandExecuter(args: string[], data: ChatSendBeforeEvent, it: number = 0, cursor?: SubCommand, pl?: Player) {
-	let logmsg = `§a${data.sender.name}`;
-	args.forEach((arg, i) => {
-		logmsg += ` | ${arg}`;
-	})
-	log(logmsg);
+	log(`§a${data.sender.name} | ` + args.join(' | '));
+
 	if (cursor === undefined) cursor = commands.get(args[it]);
 	else if (!(cursor instanceof Command)) cursor = cursor.get(args[it]);
 
@@ -46,7 +43,13 @@ async function subCommandExecuter(args: string[], data: ChatSendBeforeEvent, it:
 				return tellraw(data.sender, `§cError You are not registered yet. Wait a few seconds and try again.`);
 			if (cursor.module == cmd_module.all || ply.cmd_module.includes(cmd_module.all) || ply.cmd_module.includes(cursor.module)) {
 				if (cursor.permission <= ply.permission) {
-					cursor.func(args, player, ply);
+					try {
+						cursor.func(args, player, ply)
+					} catch (error : any) {
+						if (error instanceof Error) {
+							log(`§cError: ${error.message}\n\n${error.stack}\n`);
+						}
+					}
 				}
 				else {
 					tellraw(data.sender, `§cYou don't have permission to use this command.`);
@@ -61,7 +64,7 @@ async function subCommandExecuter(args: string[], data: ChatSendBeforeEvent, it:
 		}
 	}
 	else {
-		if (args.length <= it + 1) {
+		if (args.length < it + 1) {
 			subCommandExecuter(args, data, it + 1, cursor, pl);
 		}
 		else {
@@ -79,10 +82,22 @@ async function subCommandExecuter(args: string[], data: ChatSendBeforeEvent, it:
 					listCmd.push(key);
 				}
 			}
-			const dataForm = await form.show(player);
-			if (dataForm.canceled || dataForm.selection === undefined) return;
-			args[it++] = listCmd[dataForm.selection];
-			subCommandExecuter(args, data, it, cursor, player);
+			system.run(async () => {
+				let hasBeenDisplayed = false;
+				while (!hasBeenDisplayed) {
+					await sleep(30);
+					const dataForm = await form.show(player);
+					if (dataForm.canceled || dataForm.selection === undefined) {
+						if (dataForm.cancelationReason !== FormCancelationReason.UserBusy)
+							hasBeenDisplayed = true;
+						await sleep(30);
+					}
+					else {
+						args[++it] = listCmd[dataForm.selection];
+						subCommandExecuter(args, data, it, cursor, player);
+					}
+				}
+			})
 		}
 	}
 }
@@ -143,10 +158,15 @@ export function addSubCommand(
 				cursor = cursor.get(path[0]) as Map<string, SubCommand>;
 			}
 			else {
-				if (!cursor.has(path))
-					cursor.set(path, new Map<string, SubCommand>)
-				cursor = cursor.get(path) as Map<string, SubCommand>;
+				tellraw("@a", "§cAn Error occured while adding a new command. Check logs for more informations.");
+				log("§cError: subCommandPath must be an array of string or an array of array of string. like this : [['warp', 'w'], ['edit', 'e']]");
+				throw new Error("subCommandPath must be an array of string or an array of array of string. like this : [['warp', 'w'], ['edit', 'e']]");
 			}
+			// else {
+			// 	if (!cursor.has(path))
+			// 		cursor.set(path, new Map<string, SubCommand>)
+			// 	cursor = cursor.get(path) as Map<string, SubCommand>;
+			// }
 		}
 	}
 	while (true) {
@@ -161,3 +181,4 @@ export function addSubCommand(
 }
 
 export var commands : Map<string, SubCommand> = new Map<string, SubCommand>();
+commands.set("all", commands);
