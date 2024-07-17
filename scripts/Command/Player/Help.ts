@@ -17,49 +17,9 @@ addSubCommand(
 )
 
 function help(args: string[], player: Player, ply: Ply) {
-	if (args.length == 0) {
-		let msg = "";
-		for (let [key, value] of commands) {
-			msg += recursiveSubCommand(ply, value);
-		}
-		tellraw(player, msg);
-	}
-	else if (args.length == 1) {
-		let msg = "List of root commands:\n";
-		let seenCommands = new Array<Command>();
-		let seenSubCommands = new Array<{ keys: string[], value: SubCommand }>(); 
-
-		for (const [key, value] of commands) {
-			if (value instanceof Command) {
-				if (value.isEnable === false || value.permission > ply.permission || value.module === cmd_module.dev) continue;
-				if (!seenCommands.includes(value)) {
-					seenCommands.push(value);
-				}
-			} else {
-				// Same Value NOT SAME KEYS !!!!
-				log("§a" + key)
-				if (seenSubCommands.some((v) => v.value === value)) {
-					seenSubCommands.forEach((v) => {
-						if (v.value === value) {
-							v.keys.push(key);
-						}
-					});
-				} else {
-					seenSubCommands.push({ keys: [key], value: value });
-				}
-			}
-		}
-
-		seenCommands.forEach((v) => {
-			// command - alias - description
-			msg += `§7${globalThis.prefix + v.command}§r - [${v.aliases.join(", ")}] - §e§o${v.description}\n§r`;
-		});
-		seenSubCommands.forEach((v) => {
-			log(JSON.stringify(v));
-			// Arrow -> SubCommand
-			msg += `§7§l > ${v.keys.join(", ")}§r\n`;
-		});
-		tellraw(ply.name, msg);
+	if (args.length <= 1) {
+		let msg = "\nlist of root commands:\n" + buildCursorMessage(ply, commands);
+		player.sendMessage(msg);
 	}
 	else {
 		if (commands.has(args[1])) {
@@ -75,7 +35,7 @@ function recurUsageSubCommand(ply: Ply, subCommand: SubCommand, args: string[], 
 	if (subCommand instanceof Command) {
 		if (subCommand.isEnable) {
 			if (subCommand.permission <= ply.permission) {
-				tellraw(ply.name, `§7${subCommand.command}§r - ${subCommand.description}\n§7Usage: ${subCommand.usage} §r\n§7Aliases: ${subCommand.aliases.join(", ")}\n`);	
+				tellraw(ply.name, `§7${subCommand.command}§r - §e${subCommand.description}\n§7Usage: ${subCommand.usage} §r\n§7Aliases: ${subCommand.aliases.join(", ")}\n`);	
 			}
 		}
 	}
@@ -85,10 +45,7 @@ function recurUsageSubCommand(ply: Ply, subCommand: SubCommand, args: string[], 
 		}
 		else {
 			if (args.length == i && subCommand instanceof Map) {
-				let msg = "list of subcommands:\n";
-				for (const [key, value] of subCommand) {
-					msg += value instanceof Command ? `§7${key}§r - ${value.description}\n` : `§7§l${key}§r\n`;
-				}
+				let msg = "list of subcommands:\n" + buildCursorMessage(ply, subCommand);
 				tellraw(ply.name, msg);
 			}
 			else
@@ -116,4 +73,40 @@ function buildMessage(command: Command, ply: Ply): string {
 		}
 	}
 	return "";
+}
+
+function buildCursorMessage(ply: Ply, cursor: Map<string, SubCommand>): string {
+	let msg = "";
+		let seenCommands = new Array<Command>();
+		let seenSubCommands = new Array<{ keys: string[], value: SubCommand }>();
+
+		for (const [key, value] of cursor) {
+			if (value instanceof Command) {
+				if (value.isEnable === false || value.permission > ply.permission || value.module === cmd_module.dev) continue;
+				if (!seenCommands.includes(value)) {
+					seenCommands.push(value);
+				}
+			} else {
+				// Same Value NOT SAME KEYS !!!!
+				log("§a" + key)
+				if (seenSubCommands.some((v) => v.value === value)) {
+					seenSubCommands.forEach((v) => {
+						if (v.value === value) {
+							v.keys.push(key);
+						}
+					});
+				} else {
+					seenSubCommands.push({ keys: [key], value: value });
+				}
+			}
+		}
+
+		seenCommands.forEach((v) => {
+			msg += `§7${globalThis.prefix + v.command}§r - [${v.aliases.join(", ")}] - §e§o${v.description}\n§r`;
+		});
+		if (seenSubCommands.length > 0) msg += "\nList of subcommands:\n";
+		seenSubCommands.forEach((v) => {
+			msg += `§7§l > ${v.keys.join(", ")}§r\n`;
+		});
+		return msg
 }
