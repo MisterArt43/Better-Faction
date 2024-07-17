@@ -11,49 +11,40 @@ import { addDateZ, formatCreationDayTime } from "../Object/tool/dateTools";
 let curTick = 0;
 const START_TICK = 20; //start 0.5 secondes after a "/reload"
 
-async function processTags(player: Player, playerData: Ply, tags: string[]) : Promise<boolean> {
-	const nbParticipants = tags.length;
-	const batchSize = 10 >>> 0;
-	const batchNumber = Math.ceil(nbParticipants / batchSize);
+function processTags(player: Player, playerData: Ply, tags: string[]): boolean {
 	let is_edit = false;
 
-	const processTag = (tag: string, keyString: string): number => {
-		if (tag.startsWith(keyString)) {
-			if (is_edit === false)
-			{
+	for (const tag of tags) {
+		let amount = 0;
+
+		if (tag.startsWith("money:")) {
+			amount = parseInt(tag.slice(6), 10);
+			if (!isNaN(amount)) {
 				playerData.remove_to_update_player();
 				is_edit = true;
-			}
-			const amount = parseInt(tag.replace(keyString, ""));
-			player.removeTag(tag);
-			if (!isNaN(amount)) {
-				return amount;
-			}
-			log(`§cError Convert Tag : ${tag} for ${player.name}`);
-		}
-		return 0;
-	};
-
-	for (let i = 0; i < batchNumber; i++) {
-		const batchStart = i * batchSize;
-		const batchEnd = batchStart + batchSize;
-		const batch = batchEnd < nbParticipants ? tags.slice(batchStart, batchEnd) : tags.slice(batchStart);
-
-		const updateDbPlayerPromises = batch.map(async (score) => {
-			let amount = processTag(score, "money:");
-			if (amount) {
 				playerData.money += amount;
 			}
-			amount = processTag(score, "setmoney:");
-			if (amount) {
+			else log(`§cError Convert Tag : ${tag} for ${player.name}`);
+			player.removeTag(tag);
+		} else if (tag.startsWith("setmoney:")) {
+			amount = parseInt(tag.slice(9), 10);
+			if (!isNaN(amount)) {
+				playerData.remove_to_update_player();
+				is_edit = true;
 				playerData.money = amount;
 			}
-			amount = processTag(score, "power:");
-			if (amount) {
+			else log(`§cError Convert Tag : ${tag} for ${player.name}`);
+			player.removeTag(tag);
+		} else if (tag.startsWith("power:")) {
+			amount = parseInt(tag.slice(6), 10);
+			if (!isNaN(amount)) {
+				playerData.remove_to_update_player();
+				is_edit = true;
 				playerData.power = amount;
 			}
-		});
-		await Promise.all(updateDbPlayerPromises);
+			else log(`§cError Convert Tag : ${tag} for ${player.name}`);
+			player.removeTag(tag);
+		}
 	}
 	return is_edit;
 }
@@ -140,7 +131,7 @@ system.runInterval(async () => {
 	
 					if (!DB.db_player.has(p.name)) continue;
 	
-					if (await processTags(p, player, tags)) {
+					if (processTags(p, player, tags)) {
 						is_edit = true;
 					}
 	
