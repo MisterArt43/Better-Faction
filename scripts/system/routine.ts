@@ -7,6 +7,7 @@ import { translate } from "../Object/tool/lang";
 import { Faction } from "../Object/faction/Faction";
 import { display_rule } from "../Command/Player/Rule";
 import { addDateZ, formatCreationDayTime } from "../Object/tool/dateTools";
+import { processQueue } from "../Object/formQueue/formQueue";
 
 let curTick = 0;
 const START_TICK = 20; //start 0.5 secondes after a "/reload"
@@ -313,6 +314,8 @@ system.runInterval(async () => {
 								if (delay !== undefined) {
 									if (delay.check_time()) tellraw(player.name, "§7You aren't in combat anymore");
 								}
+								//refresh form Queue
+								processQueue(p);
 							}
 						}
 					}

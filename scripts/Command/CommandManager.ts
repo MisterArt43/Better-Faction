@@ -5,6 +5,7 @@ import { Ply } from "../Object/player/Ply";
 import { log, sleep, tellraw } from "../Object/tool/tools";
 import { customChat } from "../Chat/CustomChat";
 import { ActionFormData, FormCancelationReason } from "@minecraft/server-ui";
+import { BFActionFormData } from "../Object/formQueue/formQueue";
 
 world.beforeEvents.chatSend.subscribe(data => {
 	try {
@@ -68,36 +69,30 @@ async function subCommandExecuter(args: string[], data: ChatSendBeforeEvent, it:
 			subCommandExecuter(args, data, it + 1, cursor, pl);
 		}
 		else {
-			const form = new ActionFormData().title(args[it]);
+			// Initialize the form using BFActionFormData
+			const form = new BFActionFormData().title(args[it]);
 			const listCmd = new Array<string>();
 			const player = pl ? pl : world.getPlayers({ name: data.sender.name })?.[0];
-
+		
+			// Populate form buttons
 			for (const [key, value] of cursor) {
 				if (value instanceof Command && !listCmd.includes(value.command)) {
 					form.button(value.command);
 					listCmd.push(value.command);
-				}
-				else if (!listCmd.includes(key)) {
+				} else if (!listCmd.includes(key)) {
 					form.button(key);
 					listCmd.push(key);
 				}
 			}
+		
 			system.run(async () => {
-				let hasBeenDisplayed = false;
-				while (!hasBeenDisplayed) {
-					await sleep(30);
-					const dataForm = await form.show(player);
-					if (dataForm.canceled || dataForm.selection === undefined) {
-						if (dataForm.cancelationReason !== FormCancelationReason.UserBusy)
-							hasBeenDisplayed = true;
-						await sleep(30);
-					}
-					else {
-						args[++it] = listCmd[dataForm.selection];
-						subCommandExecuter(args, data, it, cursor, player);
-					}
-				}
-			})
+				// Call the show method of the form, which will use the queue system
+				const dataForm = await form.show(player);
+				if (dataForm.canceled)
+					return;
+				args[++it] = listCmd[dataForm.selection!];
+				subCommandExecuter(args, data, it, cursor, player);
+			});
 		}
 	}
 }
