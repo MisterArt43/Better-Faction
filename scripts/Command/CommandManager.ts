@@ -77,6 +77,8 @@ async function subCommandExecuter(args: string[], data: ChatSendBeforeEvent, it:
 			// Populate form buttons
 			for (const [key, value] of cursor) {
 				if (value instanceof Command && !listCmd.includes(value.command)) {
+					if (!value.isUI)
+						continue;
 					form.button(value.command);
 					listCmd.push(value.command);
 				} else if (!listCmd.includes(key)) {
