@@ -1,4 +1,4 @@
-import { Dimension, DimensionLocation, Player, Vector3, world } from "@minecraft/server";
+import { DimensionLocation, world } from "@minecraft/server";
 import { Home } from "./Home";
 import { DB } from "../database/database";
 import { Vector_3_Dim } from "../tool/object/Vector";

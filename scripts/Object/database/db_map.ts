@@ -79,7 +79,7 @@ export class DB_Map {
 		this.lockAdmin = false,
 		this.privateChat = false,
 		this.chatPrefix = "§r•>",
-		this.refreshTick = 5,
+		this.refreshTick = 2,
 		this.defaultLang = "en",
 		this.factionSeparator = "••",
 		this.factionColor = "§6",
@@ -167,9 +167,10 @@ export const cmd_module = {
 } as const;
 
 export const cmd_permission = {
-	"owner": 0,
-	"admin": 1,
-	"moderator": 2,
-	"helper": 3,
-	"member": 4
+	"dev": 0,
+	"owner": 1,
+	"admin": 2,
+	"moderator": 3,
+	"helper": 4,
+	"member": 5
 } as const;

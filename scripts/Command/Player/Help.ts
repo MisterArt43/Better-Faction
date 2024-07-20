@@ -45,7 +45,7 @@ function recurUsageSubCommand(ply: Ply, subCommand: SubCommand, args: string[], 
 		}
 		else {
 			if (args.length == i && subCommand instanceof Map) {
-				let msg = "list of subcommands:\n" + buildCursorMessage(ply, subCommand);
+				const msg = "list of subcommands:\n" + buildCursorMessage(ply, subCommand);
 				tellraw(ply.name, msg);
 			}
 			else
@@ -82,13 +82,13 @@ function buildCursorMessage(ply: Ply, cursor: Map<string, SubCommand>): string {
 
 		for (const [key, value] of cursor) {
 			if (value instanceof Command) {
-				if (value.isEnable === false || value.permission > ply.permission || value.module === cmd_module.dev) continue;
+				//log("is enable: " + value.isEnable + " permission: " + value.permission + " ply permission: " + ply.permission)
+				if (value.isEnable === false || value.permission <= ply.permission) continue;
 				if (!seenCommands.includes(value)) {
 					seenCommands.push(value);
 				}
 			} else {
 				// Same Value NOT SAME KEYS !!!!
-				log("§a" + key)
 				if (seenSubCommands.some((v) => v.value === value)) {
 					seenSubCommands.forEach((v) => {
 						if (v.value === value) {

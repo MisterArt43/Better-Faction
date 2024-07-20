@@ -7,6 +7,19 @@ function display_size(): number {
 	return db_display.db_display_actionbar.size + db_display.db_display_title.size + (db_display.db_display_rule ? 1 : 0);
 }
 
+function display_values(): Display[] {
+	const displayList: Display[] = [];
+	Object.values(db_display).forEach((displayMap) => {
+		if (displayMap instanceof Map) {
+			displayList.concat(Array.from(displayMap.values()));
+		}
+		else if (displayMap instanceof Display) {
+			displayList.push(displayMap);
+		}
+	});
+	return displayList;
+}
+
 function display_getter_tag(tag: string): Display[] {
 	const displayList: Display[] = [];
 	Object.values(db_display).forEach((displayMap) => {
@@ -108,5 +121,6 @@ export const db_display = {
     db_display_rule: null as Display | null,
     get: display_getter_tag,
     set: display_setter_tag,
-    size: display_size
+    size: display_size,
+	values: display_values
 };

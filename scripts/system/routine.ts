@@ -8,6 +8,7 @@ import { Faction } from "../Object/faction/Faction";
 import { display_rule } from "../Command/Player/Rule";
 import { addDateZ, formatCreationDayTime } from "../Object/tool/dateTools";
 import { processQueue } from "../Object/formQueue/formQueue";
+import { cmd_permission } from "../Object/database/db_map";
 
 let curTick = 0;
 const START_TICK = 20; //start 0.5 secondes after a "/reload"
@@ -184,6 +185,8 @@ system.runInterval(async () => {
 						let new_id = p.id;
 						p.addTag("id:" + new_id);
 						const ply = new Ply(p);
+						if (DB.db_player.size === 0)
+							ply.permission = cmd_permission.owner;
 						Ply.add_player(ply);
 						DB.db_player_online.set(p.name, ply);
 						display_rule(p, ply, true);
