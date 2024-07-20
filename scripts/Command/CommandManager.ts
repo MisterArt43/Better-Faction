@@ -4,7 +4,7 @@ import { cmd_module, cmd_permission } from "../Object/database/db_map";
 import { Ply } from "../Object/player/Ply";
 import { log, sleep, tellraw } from "../Object/tool/tools";
 import { customChat } from "../Chat/CustomChat";
-import { ActionFormData, FormCancelationReason } from "@minecraft/server-ui";
+import { ActionFormData, ActionFormResponse, FormCancelationReason } from "@minecraft/server-ui";
 import { BFActionFormData } from "../Object/formQueue/formQueue";
 
 world.beforeEvents.chatSend.subscribe(data => {
@@ -43,7 +43,7 @@ async function subCommandExecuter(args: string[], data: ChatSendBeforeEvent, it:
 			if (ply === undefined || player === undefined)
 				return tellraw(data.sender, `§cError You are not registered yet. Wait a few seconds and try again.`);
 			if (cursor.module == cmd_module.all || ply.cmd_module.includes(cmd_module.all) || ply.cmd_module.includes(cursor.module)) {
-				if (cursor.permission <= ply.permission) {
+				if (cursor.permission >= ply.permission) {
 					try {
 						cursor.func(args, player, ply)
 					} catch (error : any) {
@@ -65,12 +65,14 @@ async function subCommandExecuter(args: string[], data: ChatSendBeforeEvent, it:
 		}
 	}
 	else {
-		if (args.length < it + 1) {
-			subCommandExecuter(args, data, it + 1, cursor, pl);
+		log(`§c${args.length} < ${it + 1}`);
+		if (args.length > it + 1) {
+			return subCommandExecuter(args, data, it + 1, cursor, pl);
 		}
 		else {
 			// Initialize the form using BFActionFormData
-			const form = new BFActionFormData().title(args[it]);
+			const form = new BFActionFormData();
+			form.title(args[it]);
 			const listCmd = new Array<string>();
 			const player = pl ? pl : world.getPlayers({ name: data.sender.name })?.[0];
 		
@@ -88,12 +90,11 @@ async function subCommandExecuter(args: string[], data: ChatSendBeforeEvent, it:
 			}
 		
 			system.run(async () => {
-				// Call the show method of the form, which will use the queue system
-				const dataForm = await form.show(player);
-				if (dataForm.canceled)
-					return;
-				args[++it] = listCmd[dataForm.selection!];
-				subCommandExecuter(args, data, it, cursor, player);
+					const dataForm = await form.show(player);
+					log(`§r§a§l$${args[it]} | ${listCmd[dataForm.selection!]} TEST`);
+					if (dataForm.canceled || dataForm.selection === undefined) return;
+					args[++it] = listCmd[dataForm.selection!];
+					return subCommandExecuter(args, data, it, cursor, player);
 			});
 		}
 	}
