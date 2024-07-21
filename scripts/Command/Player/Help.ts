@@ -18,12 +18,12 @@ addSubCommand(
 
 function help(args: string[], player: Player, ply: Ply) {
 	if (args.length <= 1) {
-		let msg = "\nlist of root commands:\n" + buildCursorMessage(ply, commands);
+		let msg = "\nlist of root commands:\n" + buildCursorMessage(ply, player, commands);
 		player.sendMessage(msg);
 	}
 	else {
 		if (commands.has(args[1])) {
-			recurUsageSubCommand(ply, commands.get(args[1]) as SubCommand, args, 2);
+			recurUsageSubCommand(ply, player, commands.get(args[1]) as SubCommand, args, 2);
 		}
 		else {
 			tellraw(player, `§cUnknown command. Try ${globalThis.prefix}help for a list of commands.`);
@@ -31,7 +31,7 @@ function help(args: string[], player: Player, ply: Ply) {
 	}
 }
 
-function recurUsageSubCommand(ply: Ply, subCommand: SubCommand, args: string[], i: number) {
+function recurUsageSubCommand(ply: Ply, player: Player, subCommand: SubCommand, args: string[], i: number) {
 	if (subCommand instanceof Command) {
 		if (subCommand.isEnable) {
 			if (subCommand.permission <= ply.permission) {
@@ -41,11 +41,11 @@ function recurUsageSubCommand(ply: Ply, subCommand: SubCommand, args: string[], 
 	}
 	else {
 		if (subCommand.has(args[i])) {
-			recurUsageSubCommand(ply, subCommand.get(args[i]) as SubCommand, args, i++);
+			recurUsageSubCommand(ply, player, subCommand.get(args[i]) as SubCommand, args, i++);
 		}
 		else {
 			if (args.length == i && subCommand instanceof Map) {
-				const msg = "list of subcommands:\n" + buildCursorMessage(ply, subCommand);
+				const msg = "list of subcommands:\n" + buildCursorMessage(ply, player, subCommand);
 				tellraw(ply.name, msg);
 			}
 			else
@@ -75,9 +75,9 @@ function buildMessage(command: Command, ply: Ply): string {
 	return "";
 }
 
-function buildCursorMessage(ply: Ply, cursor: Map<string, SubCommand>): string {
+function buildCursorMessage(ply: Ply, player: Player, cursor: Map<string, SubCommand>): string {
 	let msg = "";
-	let cmds = getSubCommandPerAlias(cursor, ply, true);
+	let cmds = getSubCommandPerAlias(cursor, ply, player, true);
 
 	cmds.seenCommands.forEach((v) => {
 		msg += `§7${globalThis.prefix + v.command}§r - [${v.aliases.join(", ")}] - §e§o${v.description}\n§r`;

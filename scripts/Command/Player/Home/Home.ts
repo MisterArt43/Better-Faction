@@ -18,6 +18,7 @@ addSubCommand(
 	false,
 	home,
 	[[]],
+	undefined,
 	3
 );
 

@@ -26,19 +26,20 @@ world.beforeEvents.chatSend.subscribe(data => {
 	}
 })
 
-async function subCommandExecuter(args: string[], data: ChatSendBeforeEvent, it: number = 0, cursor?: SubCommand, pl?: Player) {
+async function subCommandExecuter(args: string[], data: ChatSendBeforeEvent, it: number = 0, cursor?: SubCommand, player?: Player, ply?: Ply) {
 	log(`§a${data.sender.name} | ` + args.join(' | '));
 
 	if (cursor === undefined) cursor = commands.get(args[it]);
 	else if (!(cursor instanceof Command)) cursor = cursor.get(args[it]);
 
-	if (cursor === undefined)
+	player = player ? player : world.getPlayers({ name: data.sender.name })?.[0];
+	ply = ply ? ply : DB.db_player.get(data.sender.name)!;
+
+	if (cursor === undefined || cursor instanceof Command && cursor.externalCondition && !cursor.externalCondition(ply, player))
 		return tellraw(data.sender, `§cUnknown command. Try ${prefix}help for a list of commands.`);
 
 	if (cursor instanceof Command) {
 		if (cursor.isEnable) {
-			const ply = DB.db_player.get(data.sender.name);
-			const player = pl ? pl : world.getPlayers({ name: data.sender.name })?.[0];
 
 			if (ply === undefined || player === undefined)
 				return tellraw(data.sender, `§cError You are not registered yet. Wait a few seconds and try again.`);
@@ -67,16 +68,15 @@ async function subCommandExecuter(args: string[], data: ChatSendBeforeEvent, it:
 	else {
 		log(`§c${args.length} < ${it + 1}`);
 		if (args.length > it + 1) {
-			return subCommandExecuter(args, data, it + 1, cursor, pl);
+			return subCommandExecuter(args, data, it + 1, cursor, player, ply);
 		}
 		else {
 			// Initialize the form using BFActionFormData
 			const form = new BFActionFormData();
 			form.title(args[it]);
-			const player = pl ? pl : world.getPlayers({ name: data.sender.name })?.[0];
 		
 			// Populate form buttons
-			const listCmd = getSubCommandPerAlias(cursor, DB.db_player.get(player.name)!)
+			const listCmd = getSubCommandPerAlias(cursor, ply, player);
 			const keyArray = listCmd.seenCommands.sort((a, b) => b.priorityOrder - a.priorityOrder)
 				.map((cmd) => cmd.command)
 				.concat(listCmd.seenSubCommands.map((cmd) => cmd.keys[0]))
@@ -89,7 +89,7 @@ async function subCommandExecuter(args: string[], data: ChatSendBeforeEvent, it:
 					log(`§r§a§l$${args[it]} | ${keyArray[dataForm.selection!]} TEST`);
 					if (dataForm.canceled || dataForm.selection === undefined) return;
 					args[++it] = keyArray[dataForm.selection!];
-					return subCommandExecuter(args, data, it, cursor, player);
+					return subCommandExecuter(args, data, it, cursor, player, ply);
 			});
 		}
 	}
@@ -105,8 +105,10 @@ export class Command {
 		public aliases: string[],
 		public isEnable: boolean,
 		public isUI: boolean,
+		public func: CommandFunction,
 		public priorityOrder = 0,
-		public func: CommandFunction) {}
+		public externalCondition?: (ply: Ply, player: Player) => boolean,
+	) {}
 }
 
 type CommandFunction = (args: string[], player: Player, ply: Ply) => void;
@@ -123,6 +125,7 @@ export function addSubCommand(
 	isUI: boolean,
 	func: CommandFunction,
 	subCommandPath?: string[] | string[][],
+	externalCondition?: (ply: Ply, player: Player) => boolean,
 	priorityOrder = 0) { // [string | string[]] can contain alias of subcommand with same reference
 		let cmd = new Command(
 			command,
@@ -133,8 +136,9 @@ export function addSubCommand(
 			aliases,
 			isEnable,
 			isUI,
+			func,
 			priorityOrder,
-			func
+			externalCondition,
 		);
 		if (!commands) {
 			commands = new Map<string, SubCommand>();
@@ -177,12 +181,12 @@ export function addSubCommand(
 	})
 }
 
-export function getSubCommandPerAlias(cursor: Map<string, SubCommand>, ply: Ply, includeLoop = false): { seenCommands: Command[], seenSubCommands: { keys: string[], value: SubCommand }[] } {
+export function getSubCommandPerAlias(cursor: Map<string, SubCommand>, ply: Ply, player: Player, includeLoop = false): { seenCommands: Command[], seenSubCommands: { keys: string[], value: SubCommand }[] } {
 	let seenCommands = new Array<Command>();
 	let seenSubCommands = new Array<{ keys: string[], value: SubCommand }>();
 
 	for (const [key, value] of cursor) {
-		if (!havePermissionForSubCommand(ply, value)) continue;
+		if (!havePermissionForSubCommand(ply, player, value)) continue;
 		if (value instanceof Command) {
 			//log(value.command + " " + value.isEnable + " " + value.permission + " (" + Object.keys(cmd_permission)[value.permission] + ") >= " + ply.permission + " (" + Object.keys(cmd_permission)[ply.permission] + ")")
 			if (value.isEnable === false || value.permission < ply.permission) continue;
@@ -206,16 +210,16 @@ export function getSubCommandPerAlias(cursor: Map<string, SubCommand>, ply: Ply,
 	return { seenCommands, seenSubCommands };
 }
 
-export function havePermissionForSubCommand(ply: Ply, subCommand: SubCommand) : boolean {
+export function havePermissionForSubCommand(ply: Ply, player: Player, subCommand: SubCommand) : boolean {
 	if (subCommand instanceof Command) {
+		if (subCommand.externalCondition && !subCommand.externalCondition(ply, player))
+			return false;
 		return ply.permission <= subCommand.permission;
 	}
 	else {
 		for (const [key, value] of subCommand) {
-			if (value instanceof Command)
-				return ply.permission <= value.permission;
-			else if (value !== subCommand)
-				return havePermissionForSubCommand(ply, value);
+			if ((value instanceof Map && value !== subCommand) || value instanceof Command)
+				return havePermissionForSubCommand(ply, player, value);
 		}
 	}
 	return false;

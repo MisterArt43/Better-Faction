@@ -6,6 +6,7 @@ import { translate } from "../../Object/tool/lang";
 import { factionRank } from "../../Object/faction/Faction";
 import { addSubCommand } from "../CommandManager";
 import { cmd_module, cmd_permission } from "../../Object/database/db_map";
+import { Vector_3 } from "../../Object/tool/object/Vector";
 
 addSubCommand(
 	"sethome",

@@ -109,11 +109,7 @@ export class Faction {
 	}
 
 	setFhome(location: Vector_3 | Vector3) {
-		this.Fhome = new Vector_3(
-			Math.ceil(location.x + 0.0001) - 1, 
-			Math.ceil(location.y - 0.4999), 
-			Math.ceil(location.z + 0.0001) - 1
-		);
+		this.Fhome = new Vector_3(location).normalize();
 	}
 	
 	remove_to_update_faction() {

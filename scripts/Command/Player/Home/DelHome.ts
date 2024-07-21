@@ -20,6 +20,7 @@ addSubCommand(
 	false,
 	delhome,
     [[]],
+    undefined,
     2
 );
 
