@@ -7,6 +7,7 @@ import { Faction, factionRank, faction_member } from "../../Object/faction/Facti
 import { ActionFormData } from "@minecraft/server-ui";
 import { addSubCommand } from "../CommandManager";
 import { cmd_module, cmd_permission } from "../../Object/database/db_map";
+import { haveNoFaction } from "./_UtilsFaction";
 
 addSubCommand(
     "join",
@@ -18,7 +19,8 @@ addSubCommand(
     true,
     true,
     Factionjoin,
-    [["faction", "f"]]
+    [["faction", "f"]],
+    haveNoFaction
 );
 
 async function Factionjoin(args: string[], player: Player, ply: Ply) {

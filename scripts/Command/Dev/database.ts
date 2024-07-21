@@ -40,58 +40,64 @@ function db(args: string[], player: Player, ply: Ply) {
         }
         case "player" : {
             let i = 0;
-            if (args.length == 3 && args[2].match(/[0-9]/g)) {
-                i = parseInt(args[2]);
+            if (args.length == 4 && args[3].match(/[0-9]/g)) {
+                i = parseInt(args[3]);
             }
+            log("i : " + i + " args3 : " + args[3]);
             if (DB.db_player.size - 1 >= i) {
                 log(colorizeJSON(JSON.stringify(Array.from(DB.db_player.values())[i], null, 8)));
                 i++;
             }
             log("§6 Length : " + DB.db_player.size);
+            break;
         }
         case "warp" : {
             let i = 0;
-            if (args.length == 3 && args[2].match(/[0-9]/g)) {
-                i = parseInt(args[2]);
+            if (args.length == 4 && args[3].match(/[0-9]/g)) {
+                i = parseInt(args[3]);
             }
             if (DB.db_warp.size - 1 >= i) {
                 log(colorizeJSON(JSON.stringify(Array.from(DB.db_warp.values())[i], null, 8)));
                 i++;
             }
             log("§6 Length : " + DB.db_warp.size);
+            break;
         }
         case "delay" : {
             let i = 0;
-            if (args.length == 3 && args[2].match(/[0-9]/g)) {
-                i = parseInt(args[2]);
+            if (args.length == 4 && args[3].match(/[0-9]/g)) {
+                i = parseInt(args[3]);
             }
             if (DB.db_delay.size - 1 >= i) {
                 log(colorizeJSON(JSON.stringify(Array.from(DB.db_delay.values())[i], null, 8)));
                 i++;
             }
             log("§6 Length : " + DB.db_delay.size);
+            break;
         }
         case "display" : {
             let i = 0;
-            if (args.length == 3 && args[2].match(/[0-9]/g)) {
-                i = parseInt(args[2]);
+            if (args.length == 4 && args[3].match(/[0-9]/g)) {
+                i = parseInt(args[3]);
             }
             if (DB.db_display.size() - 1 >= i) {
                 log(colorizeJSON(JSON.stringify(Array.from(DB.db_display.values())[i], null, 8)));
                 i++;
             }
             log("§6 Length : " + DB.db_display.size);
+            break;
         }
         case "faction" : {
             let i = 0;
-            if (args.length == 3 && args[2].match(/[0-9]/g)) {
-                i = parseInt(args[2]);
+            if (args.length == 4 && args[3].match(/[0-9]/g)) {
+                i = parseInt(args[3]);
             }
             if (DB.db_faction.size - 1 >= i) {
                 log(colorizeJSON(JSON.stringify(Array.from(DB.db_faction.values())[i], null, 8)));
                 i++;
             }
             log("§6 Length : " + DB.db_faction.size);
+            break;
         }
     }
 }

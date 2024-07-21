@@ -7,6 +7,7 @@ import { factionRank } from "../../Object/faction/Faction";
 import { addSubCommand } from "../CommandManager";
 import { cmd_module, cmd_permission } from "../../Object/database/db_map";
 import { Vector_3 } from "../../Object/tool/object/Vector";
+import { haveFaction, isLeader } from "./_UtilsFaction";
 
 addSubCommand(
 	"sethome",
@@ -18,7 +19,8 @@ addSubCommand(
 	true,
 	false,
 	factionSetHome,
-	[["faction", "f"]]
+	[["faction", "f"]],
+	isLeader
 )
 
 function factionSetHome(args: string[], player: Player, ply: Ply) {

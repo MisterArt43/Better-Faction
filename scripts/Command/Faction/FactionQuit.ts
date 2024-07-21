@@ -7,6 +7,7 @@ import { Chunk } from "../../Object/chunk/Chunk";
 import { translate } from "../../Object/tool/lang";
 import { addSubCommand } from "../CommandManager";
 import { cmd_module, cmd_permission } from "../../Object/database/db_map";
+import { haveFaction } from "./_UtilsFaction";
 
 addSubCommand(
 	"quit",
@@ -18,7 +19,8 @@ addSubCommand(
 	true,
 	false,
 	Factionquit,
-	[["faction", "f"]]
+	[["faction", "f"]],
+	haveFaction
 )
 
 async function Factionquit(args: string[], player: Player, ply: Ply) {

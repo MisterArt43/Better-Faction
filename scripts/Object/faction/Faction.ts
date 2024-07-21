@@ -75,7 +75,8 @@ export class Faction {
 							log("§cError: Mismatch data in db_faction, try deleting the database and restarting the server. Contact the developer.");
 							return;
 						}
-						let faction = JSON.parse(hexToText(db.join(""))) as Faction;
+						const factionObj = JSON.parse(hexToText(db.join(""))) as Faction;
+						let faction = Faction.fromObject(factionObj);
 						
 						// Update db_faction map
 						const existingObject = db_faction.get(faction.name);
@@ -100,6 +101,10 @@ export class Faction {
 			const end = Date.now();
 			log("§7db_faction loaded in " + ((end - start) / 1000) + " second(s)");
 		}
+	}
+
+	public static fromObject(faction: Faction) : Faction {
+		return Object.assign(new Faction(faction.name, faction.owner), faction);
 	}
 
 	isAtLeastRank(member: faction_member | faction_member['name'], fRank: (typeof factionRank[keyof typeof factionRank])) {

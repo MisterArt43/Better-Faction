@@ -6,6 +6,7 @@ import { translate } from "../../Object/tool/lang";
 import { addSubCommand } from "../CommandManager";
 import { cmd_module, cmd_permission } from "../../Object/database/db_map";
 import { Delay } from "../../Object/player/Delay";
+import { haveFaction, isFhomeEnable } from "./_UtilsFaction";
 
 addSubCommand(
 	"home",
@@ -17,7 +18,8 @@ addSubCommand(
 	true,
 	false,
 	Factionhome,
-	[["faction", "f"]]
+	[["faction", "f"]],
+	isFhomeEnable
 )
 
 function Factionhome(args: string[], player: Player, ply: Ply) {

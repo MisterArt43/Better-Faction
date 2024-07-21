@@ -7,6 +7,7 @@ import { Faction, factionRank, faction_member } from "../../Object/faction/Facti
 import { addSubCommand } from "../CommandManager";
 import { cmd_module, cmd_permission } from "../../Object/database/db_map";
 import { ActionFormData, ModalFormData } from "@minecraft/server-ui";
+import { haveFaction, isAtLeastOfficer } from "./_UtilsFaction";
 
 addSubCommand(
 	"invite",
@@ -18,7 +19,8 @@ addSubCommand(
 	true,
 	true,
 	Factioninvite,
-	[["faction", "f"]]
+	[["faction", "f"]],
+	isAtLeastOfficer
 );
 
 // ---------------------------------- //

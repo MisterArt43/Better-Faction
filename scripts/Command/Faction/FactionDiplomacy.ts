@@ -8,6 +8,7 @@ import { ActionFormData, ModalFormData } from "@minecraft/server-ui";
 import { UI_find_faction } from "../../Object/tool/find_factions_UI";
 import { addSubCommand } from "../CommandManager";
 import { cmd_module, cmd_permission } from "../../Object/database/db_map";
+import { isLeader } from "./_UtilsFaction";
 
 addSubCommand(
 	"diplomacy",
@@ -19,7 +20,8 @@ addSubCommand(
 	true,
 	true,
 	FactionAlly,
-	[["f", "faction"]]
+	[["f", "faction"]],
+	isLeader
 )
 
 function FactionAlly(args: string[], player: Player, ply: Ply) {

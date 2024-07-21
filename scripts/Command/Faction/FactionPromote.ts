@@ -7,6 +7,7 @@ import { translate } from "../../Object/tool/lang";
 import { ModalFormData } from "@minecraft/server-ui";
 import { addSubCommand } from "../CommandManager";
 import { cmd_module, cmd_permission } from "../../Object/database/db_map";
+import { haveFaction, isAtLeastOfficer } from "./_UtilsFaction";
 
 addSubCommand(
 	"promote",
@@ -18,7 +19,8 @@ addSubCommand(
 	true,
 	true,
 	Factionpromote,
-	[["faction", "f"]]
+	[["faction", "f"]],
+	isAtLeastOfficer
 )
 
 function Factionpromote(args: string[], player: Player, ply: Ply) {

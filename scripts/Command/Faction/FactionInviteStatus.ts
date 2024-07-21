@@ -6,6 +6,7 @@ import { translate } from "../../Object/tool/lang";
 import { factionRank } from "../../Object/faction/Faction";
 import { addSubCommand } from "../CommandManager";
 import { cmd_module, cmd_permission } from "../../Object/database/db_map";
+import { haveFaction, isAtLeastOfficer } from "./_UtilsFaction";
 
 addSubCommand(
 	"InviteStatus",
@@ -17,14 +18,15 @@ addSubCommand(
 	true,
 	false,
 	FactionInviteStatus,
-	[["faction", "f"]]
+	[["faction", "f"]],
+	isAtLeastOfficer
 );
 
 function FactionInviteStatus(args: string[], player: Player, ply: Ply) {
 	if (args.length === 2) {
 		const fac = DB.db_faction.get(ply.faction_name ?? "");
 		if (fac === undefined) return tellraw(player, translate(ply.lang)?.error_no_faction ?? "no translation");
-		if (fac.isAtLeastRank(player.name, factionRank.Leader)) return tellraw(player, translate(ply.lang)?.error_cant_do_that ?? "no translation");
+		if (fac.isAtLeastRank(player.name, factionRank.Officer)) return tellraw(player, translate(ply.lang)?.error_cant_do_that ?? "no translation");
 		
 		fac.remove_to_update_faction();
 		if (fac.isOpen === true)

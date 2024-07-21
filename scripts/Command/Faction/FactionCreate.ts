@@ -8,6 +8,7 @@ import { Vector_3 } from "../../Object/tool/object/Vector";
 import { addSubCommand } from "../CommandManager";
 import { cmd_module, cmd_permission } from "../../Object/database/db_map";
 import { ModalFormData } from "@minecraft/server-ui";
+import { haveNoFaction } from "./_UtilsFaction";
 
 addSubCommand(
 	"create",
@@ -19,7 +20,8 @@ addSubCommand(
 	true,
 	true,
 	factionCreate,
-	[["faction", "f"]]
+	[["faction", "f"]],
+	haveNoFaction,
 );
 
 function factionCreate(args: string[], player: Player, ply: Ply) {

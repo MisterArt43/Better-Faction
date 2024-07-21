@@ -7,6 +7,21 @@ import { Faction, factionRank } from "../../Object/faction/Faction";
 import { ActionFormData, ModalFormData } from "@minecraft/server-ui";
 import { addSubCommand } from "../CommandManager";
 import { cmd_module, cmd_permission } from "../../Object/database/db_map";
+import { haveFaction } from "./_UtilsFaction";
+
+addSubCommand(
+	"bank",
+	"add or remove money from the faction bank\n §7You need to be at least officer to remove money",
+	`${globalThis.prefix}faction bank [<add/remove> <amount>]`,
+	["bank", "b"],
+	cmd_module.faction,
+	cmd_permission.member,
+	true,
+	true,
+	FactionBank,
+	[["faction", "f"]],
+	haveFaction
+)
 
 
 function FactionBank(args: string[], player: Player, ply: Ply) {
@@ -126,18 +141,3 @@ async function FactionBankRemoveUI(player: Player, ply: Ply, fac: Faction) {
 		tellraw(player, translate(ply.lang)?.error_bank_money ?? "no translation");
 	}
 }
-
-export {};
-
-addSubCommand(
-	"bank",
-	"add or remove money from the faction bank\n §7You need to be at least officer to remove money",
-	`${globalThis.prefix}faction bank [<add/remove> <amount>]`,
-	["bank", "b"],
-	cmd_module.faction,
-	cmd_permission.member,
-	true,
-	true,
-	FactionBank,
-	[["faction", "f"]]
-)
