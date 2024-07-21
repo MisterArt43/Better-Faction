@@ -73,27 +73,22 @@ async function subCommandExecuter(args: string[], data: ChatSendBeforeEvent, it:
 			// Initialize the form using BFActionFormData
 			const form = new BFActionFormData();
 			form.title(args[it]);
-			const listCmd = new Array<string>();
 			const player = pl ? pl : world.getPlayers({ name: data.sender.name })?.[0];
 		
 			// Populate form buttons
-			for (const [key, value] of cursor) {
-				if (value instanceof Command && !listCmd.includes(value.command)) {
-					if (!value.isUI)
-						continue;
-					form.button(value.command);
-					listCmd.push(value.command);
-				} else if (!listCmd.includes(key)) {
-					form.button(key);
-					listCmd.push(key);
-				}
-			}
+			const listCmd = getSubCommandPerAlias(cursor, DB.db_player.get(player.name)!)
+			const keyArray = listCmd.seenCommands.sort((a, b) => b.priorityOrder - a.priorityOrder)
+				.map((cmd) => cmd.command)
+				.concat(listCmd.seenSubCommands.map((cmd) => cmd.keys[0]))
+			keyArray.forEach((key) => {
+				form.button(key);
+			});
 		
 			system.run(async () => {
 					const dataForm = await form.show(player);
-					log(`§r§a§l$${args[it]} | ${listCmd[dataForm.selection!]} TEST`);
+					log(`§r§a§l$${args[it]} | ${keyArray[dataForm.selection!]} TEST`);
 					if (dataForm.canceled || dataForm.selection === undefined) return;
-					args[++it] = listCmd[dataForm.selection!];
+					args[++it] = keyArray[dataForm.selection!];
 					return subCommandExecuter(args, data, it, cursor, player);
 			});
 		}
@@ -110,6 +105,7 @@ export class Command {
 		public aliases: string[],
 		public isEnable: boolean,
 		public isUI: boolean,
+		public priorityOrder = 0,
 		public func: CommandFunction) {}
 }
 
@@ -126,7 +122,8 @@ export function addSubCommand(
 	isEnable: boolean,
 	isUI: boolean,
 	func: CommandFunction,
-	subCommandPath?: string[] | string[][]) { // [string | string[]] can contain alias of subcommand with same reference
+	subCommandPath?: string[] | string[][],
+	priorityOrder = 0) { // [string | string[]] can contain alias of subcommand with same reference
 		let cmd = new Command(
 			command,
 			module,
@@ -136,6 +133,7 @@ export function addSubCommand(
 			aliases,
 			isEnable,
 			isUI,
+			priorityOrder,
 			func
 		);
 		if (!commands) {
@@ -147,6 +145,7 @@ export function addSubCommand(
 	if (subCommandPath !== undefined) {
 		// create path in the map (keep same reference)
 		for (const path of subCommandPath) {
+			if (path.length === 0) continue;
 			if (path instanceof Array) {
 				const newMap = new Map<string, SubCommand>();
 				path.forEach(p => {
@@ -176,6 +175,50 @@ export function addSubCommand(
 	cmd.aliases.forEach(alias => {
 		cursor.set(alias, cmd);
 	})
+}
+
+export function getSubCommandPerAlias(cursor: Map<string, SubCommand>, ply: Ply, includeLoop = false): { seenCommands: Command[], seenSubCommands: { keys: string[], value: SubCommand }[] } {
+	let seenCommands = new Array<Command>();
+	let seenSubCommands = new Array<{ keys: string[], value: SubCommand }>();
+
+	for (const [key, value] of cursor) {
+		if (!havePermissionForSubCommand(ply, value)) continue;
+		if (value instanceof Command) {
+			//log(value.command + " " + value.isEnable + " " + value.permission + " (" + Object.keys(cmd_permission)[value.permission] + ") >= " + ply.permission + " (" + Object.keys(cmd_permission)[ply.permission] + ")")
+			if (value.isEnable === false || value.permission < ply.permission) continue;
+			if (!seenCommands.includes(value)) {
+				seenCommands.push(value);
+			}
+		} else {
+			if (!includeLoop && value === cursor) continue;
+			// Same Value NOT SAME KEYS !!!!
+			if (seenSubCommands.some((v) => v.value === value)) {
+				seenSubCommands.forEach((v) => {
+					if (v.value === value) {
+						v.keys.push(key);
+					}
+				});
+			} else {
+				seenSubCommands.push({ keys: [key], value: value });
+			}
+		}
+	}
+	return { seenCommands, seenSubCommands };
+}
+
+export function havePermissionForSubCommand(ply: Ply, subCommand: SubCommand) : boolean {
+	if (subCommand instanceof Command) {
+		return ply.permission <= subCommand.permission;
+	}
+	else {
+		for (const [key, value] of subCommand) {
+			if (value instanceof Command)
+				return ply.permission <= value.permission;
+			else if (value !== subCommand)
+				return havePermissionForSubCommand(ply, value);
+		}
+	}
+	return false;
 }
 
 export var commands : Map<string, SubCommand> = new Map<string, SubCommand>();

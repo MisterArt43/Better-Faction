@@ -18,7 +18,9 @@ addSubCommand(
 	cmd_permission.member,
 	true,
 	false,
-	delhome
+	delhome,
+    [[]],
+    2
 );
 
 function removeHomeFromPly(ply: Ply, home: Home): void {

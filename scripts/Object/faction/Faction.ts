@@ -108,7 +108,7 @@ export class Faction {
 		return member?.permission <= fRank || false;
 	}
 
-	setFhome(location: Vector_3) {
+	setFhome(location: Vector_3 | Vector3) {
 		this.Fhome = new Vector_3(
 			Math.ceil(location.x + 0.0001) - 1, 
 			Math.ceil(location.y - 0.4999), 

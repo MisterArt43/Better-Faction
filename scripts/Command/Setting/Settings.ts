@@ -1,4 +1,4 @@
-import { Player } from "@minecraft/server";
+import { Player, system } from "@minecraft/server";
 import { DB } from "../../Object/database/database";
 import { BFModalFormData } from "../../Object/formQueue/formQueue";
 import { Ply } from "../../Object/player/Ply";
@@ -190,5 +190,50 @@ function set_refresh_tick_ui(args: string[], player: Player, ply: Ply) {
 			DB.db_map.refreshTick = res.formValues![0] as number;
 			await Server.runCommandAsync("scoreboard players set \"$db_map(" + textToHex(JSON.stringify(DB.db_map)) + ")\" database 1");
 			tellraw(ply.name, "§eNew Refresh Tick: " + DB.db_map.refreshTick);
+		});
+}
+
+addSubCommand(
+	"home_limit",
+	"Set the home limit. Default is " + DB.db_map.homeLimit,
+	`${globalThis.prefix}set home_limit`,
+	["home_limit", "homelimit", "hl"],
+	cmd_module.commoncommand,
+	cmd_permission.admin,
+	true,
+	true,
+	set_home_limit_ui,
+	[["set", "setting"]]
+)
+
+function set_home_limit_ui(args: string[], player: Player, ply: Ply) {
+	const form = new BFModalFormData();
+		form.title("Home Limit")
+		.textField("§eLimit", DB.db_map.homeLimit.toString(), DB.db_map.homeLimit.toString())
+		.toggle("§eApply to all player", false)
+		form.show(player).then(async res => {
+			if (res.canceled ||( res.formValues![0] as string).match(/[0-9]/g) == null || (res.formValues![0] == DB.db_map.homeLimit && !res.formValues![1])) return;
+			await Server.runCommandAsync("scoreboard players reset \"$db_map(" + textToHex(JSON.stringify(DB.db_map)) + ")\" database");
+			DB.db_map.homeLimit = parseInt(res.formValues![0] as string);
+			await Server.runCommandAsync("scoreboard players set \"$db_map(" + textToHex(JSON.stringify(DB.db_map)) + ")\" database 1");
+			tellraw(ply.name, "§eNew Home Limit: " + DB.db_map.homeLimit);
+			if (res.formValues![1]) {
+				const nb = parseInt(res.formValues![0] as string);
+				system.run(async () => {
+					let index = 0;
+					for (const player of Array.from(DB.db_player.values())) {
+						if (player.homeLimit != nb) {
+							player.remove_to_update_player();
+							player.homeLimit = nb;
+							player.add_to_update_player();
+						}
+						if (index % 10 === 0) {
+							await Server.runCommandAsync(`title @a[tag=log] actionbar §eEditing Player Database Progression : §a${Math.floor(index / DB.db_player.size * 100)}%`);
+							await sleep(2);
+						}
+						index++;
+					}
+				})
+			}
 		});
 }

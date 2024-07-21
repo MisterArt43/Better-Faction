@@ -15,7 +15,9 @@ addSubCommand(
 	cmd_permission.member,
 	true,
 	false,
-	sethome
+	sethome,
+	[[]],
+	5
 )
 
 function sethome(args: string[], player: Player, ply: Ply) {

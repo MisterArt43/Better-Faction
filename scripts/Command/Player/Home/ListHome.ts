@@ -15,7 +15,9 @@ addSubCommand(
 	cmd_permission.member,
 	true,
 	false,
-	listhome
+	listhome,
+	[[]],
+	3
 )
 
 function listhome(args: string[], player: Player, ply: Ply) {

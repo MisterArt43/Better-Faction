@@ -1,4 +1,4 @@
-import { Dimension, DimensionLocation, MinecraftDimensionTypes, Vector2, Vector3 } from "@minecraft/server";
+import { Dimension, DimensionLocation, DimensionType, MinecraftDimensionTypes, Vector2, Vector3 } from "@minecraft/server";
 
 export class Vector_2 {
 	public x: number;
@@ -40,6 +40,20 @@ export class Vector_3 extends Vector_2 {
 		return this;
 	}
 
+	updatePos(location: Vector3) {
+		this.x = location.x;
+		this.y = location.y;
+		this.z = location.z;
+		return this;
+	}
+
+	normalize() {
+		this.x = Math.ceil(this.x + 0.0001) - 1;
+        this.y = Math.floor(this.y + 0.4999);
+        this.z = Math.ceil(this.z + 0.0001) - 1;
+		return this;
+	}
+
 	toString() : string {
 		return `${this.x}, ${this.y}, ${this.z}`
 	}
@@ -60,6 +74,12 @@ export class Vector_3_Dim extends Vector_3 {
 			super(x.x, x.y, x.z);
 			this.dim = x.dimension.id;
 		}
+
+		return this;
+	}
+
+	updateDim(dimension: Dimension) {
+		this.dim = dimension.id;
 		return this;
 	}
 

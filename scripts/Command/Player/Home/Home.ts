@@ -16,7 +16,9 @@ addSubCommand(
 	cmd_permission.member,
 	true,
 	false,
-	home
+	home,
+	[[]],
+	3
 );
 
 function home(args: string[], player: Player, ply: Ply) {
@@ -27,9 +29,7 @@ function home(args: string[], player: Player, ply: Ply) {
 		const ahome = DB.db_player.get(player.name)?.home.find((h) => h.getName() === name);
 		if (ahome != undefined) {
                 ply.remove_to_update_player();
-                ply.back.x = Math.ceil(player.location.x + 0.0001) - 1;
-                ply.back.y = Math.floor(player.location.y + 0.4999);
-                ply.back.z = Math.ceil(player.location.z + 0.0001) - 1;
+				ply.back.updatePos(player.location).normalize().updateDim(player.dimension);
                 ply.add_to_update_player();
 			runCommandDim(`tp \"${player.name}\" ${ahome.getX()} ${ahome.getY()} ${ahome.getZ()}`, ahome.getDim());
 			tpsound(player);
