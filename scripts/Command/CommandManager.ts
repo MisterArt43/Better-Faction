@@ -72,8 +72,8 @@ async function subCommandExecuter(args: string[], data: ChatSendBeforeEvent, it:
 		}
 		else {
 			// Initialize the form using BFActionFormData
-			const form = new BFActionFormData();
-			form.title(args[it]);
+			const form = new BFActionFormData()
+				.title(args[it]);
 		
 			// Populate form buttons
 			const listCmd = getSubCommandPerAlias(cursor, ply, player);

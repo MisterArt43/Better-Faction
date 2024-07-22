@@ -37,7 +37,7 @@ function WManageCloseUI(player: Player, ply: Ply) {
     .button("List All Warp")
     .button("Find A Warp")
     .show(player).then(async res => {
-        if (res.canceled || !res.selection) return
+        if (res.canceled || res.selection === undefined) return
 
         if (res.selection === 0) {
             const form = new BFActionFormData()
@@ -47,7 +47,7 @@ function WManageCloseUI(player: Player, ply: Ply) {
                 form.button(w.isOpen ? "§a" : "§c" + w.name)
             }
             form.show(player).then(async res => {
-                if (res.canceled || !res.selection) return Wclose(["w", "e", "c"], player, ply);
+                if (res.canceled || res.selection === undefined) return Wclose(["w", "e", "c"], player, ply);
                 const warp = DB.db_warp.get(lstW[res.selection].name)
                 if (!warp) return log("§cError Cannot find Warp [WcloseUI]")
                 WcloseUI(warp, player, ply);

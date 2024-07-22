@@ -6,6 +6,7 @@ import { runCommandDim, sleep, tpsound } from "../../Object/tool/tools";
 import { ActionFormData } from "@minecraft/server-ui";
 import { cmd_module, cmd_permission } from "../../Object/database/db_map";
 import { addSubCommand } from "../CommandManager";
+import { WarpNotEmpty } from "./_UtilsWarp";
 
 addSubCommand(
 	"teleport",
@@ -17,7 +18,8 @@ addSubCommand(
 	true,
 	true,
 	warpUI,
-	[['warp', 'w']]
+	[['warp', 'w']],
+	WarpNotEmpty
 )
 
 async function getAccessWarpList(player: Player, ply: Ply) {
