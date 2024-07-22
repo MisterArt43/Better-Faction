@@ -5,6 +5,7 @@ import { addSubCommand } from "../CommandManager";
 import { cmd_module, cmd_permission } from "../../Object/database/db_map";
 import { ActionFormData, ModalFormData } from "@minecraft/server-ui";
 import { find_warp_UI } from "../../Object/tool/find_waps_UI";
+import { WarpNotEmpty } from "./_UtilsWarp";
 
 addSubCommand(
 	"access",
@@ -16,7 +17,8 @@ addSubCommand(
 	true,
 	true,
 	warpEditAccessUI,
-	[["warp", "w"], ["edit", "e"]]
+	[["warp", "w"], ["edit", "e"]],
+	WarpNotEmpty
 )
 
 async function warpEditAccessUI(args: string[], player: Player, ply: Ply) {

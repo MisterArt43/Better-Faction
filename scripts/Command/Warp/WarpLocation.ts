@@ -6,6 +6,7 @@ import { cmd_module, cmd_permission } from "../../Object/database/db_map";
 import { ActionFormData, ModalFormData } from "@minecraft/server-ui";
 import { DB } from "../../Object/database/database";
 import { find_warp_UI } from "../../Object/tool/find_waps_UI";
+import { WarpNotEmpty } from "./_UtilsWarp";
 
 addSubCommand(
 	"location",
@@ -17,7 +18,8 @@ addSubCommand(
 	true,
 	true,
 	editWarpLocation,
-	[["warp", "w"], ["edit", "e"]]
+	[["warp", "w"], ["edit", "e"]],
+	WarpNotEmpty
 )
 
 function editWarpLocation(args: string[], player: Player, ply: Ply) {

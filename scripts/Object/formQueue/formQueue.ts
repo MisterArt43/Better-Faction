@@ -1,6 +1,6 @@
 import { ActionFormData, ActionFormResponse, FormCancelationReason, MessageFormData, MessageFormResponse, ModalFormData, ModalFormResponse } from "@minecraft/server-ui";
 import { DB } from "../database/database";
-import { Player } from "@minecraft/server";
+import { Player, RawMessage } from "@minecraft/server";
 import { log } from "../tool/tools";
 
 type FormResponse = ActionFormResponse | ModalFormResponse | MessageFormResponse;
@@ -93,6 +93,21 @@ export class BFActionFormData extends ActionFormData {
         super();
         this.show = showMiddleware(this.show);
     }
+
+    title(titleText: RawMessage | string): BFActionFormData {
+        super.title(titleText);
+        return this;
+    }
+
+    body(titleText: RawMessage | string): BFActionFormData {
+        super.body(titleText);
+        return this;
+    }
+
+    button(titleText: RawMessage | string, iconPath?: string): BFActionFormData {
+        super.button(titleText, iconPath);
+        return this;
+    }
 }
 
 export class BFModalFormData extends ModalFormData {
@@ -100,11 +115,61 @@ export class BFModalFormData extends ModalFormData {
         super();
         this.show = showMiddleware(this.show);
     }
+
+    title(titleText: RawMessage | string): BFModalFormData {
+        super.title(titleText);
+        return this;
+    }
+
+    textField(label: RawMessage | string, placeholderText: RawMessage | string, defaultValue?: RawMessage | string): BFModalFormData {
+        super.textField(label, placeholderText, defaultValue);
+        return this;
+    }
+
+    dropdown(label: RawMessage | string, options: (RawMessage | string)[], defaultValueIndex?: number): BFModalFormData {
+        super.dropdown(label, options, defaultValueIndex);
+        return this;
+    }
+
+    slider(label: RawMessage | string, minimumValue: number, maximumValue: number, valueStep: number, defaultValue?: number): BFModalFormData {
+        super.slider(label, minimumValue, maximumValue, valueStep, defaultValue);
+        return this;
+    }
+
+    toggle(label: RawMessage | string, defaultValue?: boolean): BFModalFormData {
+        super.toggle(label, defaultValue);
+        return this;
+    }
+
+    submitButton(submitButtonText: RawMessage | string): BFModalFormData {
+        super.submitButton(submitButtonText);
+        return this;
+    }
 }
 
 export class BFMessageFormData extends MessageFormData {
     constructor() {
         super();
         this.show = showMiddleware(this.show);
+    }
+
+    title(titleText: RawMessage | string): BFMessageFormData {
+        super.title(titleText);
+        return this;
+    }
+
+    body(bodyText: RawMessage | string): BFMessageFormData {
+        super.body(bodyText);
+        return this;
+    }
+
+    button1(text: RawMessage | string): BFMessageFormData {
+        super.button1(text);
+        return this;
+    }
+
+    button2(text: RawMessage | string): BFMessageFormData {
+        super.button2(text);
+        return this;
     }
 }
