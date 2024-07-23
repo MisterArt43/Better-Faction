@@ -56,10 +56,7 @@ async function Factionquit(args: string[], player: Player, ply: Ply) {
 				pl.add_to_update_player();
 			}
 
-			fac.claim.forEach((c) => {
-				let chunk = DB.db_chunk.get(c.x + "," + c.y + Server.id); // y = z
-				if (chunk !== undefined) Chunk.remove_chunk(chunk);
-			});
+			fac.deleteAllChunk();
 
 			Faction.remove_faction(fac);
 		} else {

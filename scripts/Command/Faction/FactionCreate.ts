@@ -40,10 +40,7 @@ function factionCreateCmd(Fname: string, player: Player, ply: Ply) {
 		if (DB.db_faction.has(Fname)) return tellraw(player, translate(ply.lang)?.error_have_name ?? "no translation");
 		let FacObject = new Faction(Fname, player.name);
 		if (player.dimension.id === "minecraft:overworld") {
-			FacObject.Fhome = new Vector_3(
-				Math.ceil(player.location.x + 0.0001) - 1,
-				Math.ceil(player.location.y - 0.4999),
-				Math.ceil(player.location.z + 0.0001) - 1);
+			FacObject.Fhome = new Vector_3(player.location).normalize();
 		}
 		Faction.add_faction(FacObject);
 		ply.remove_to_update_player();

@@ -159,7 +159,7 @@ export function getTypedKeys<T extends object>(obj: T): (keyof T)[] {
 }
 
 export function canBeParseInt(value: string) {
-	return 
+	return !isNaN(parseInt(value, 10)) && parseInt(value, 10).toString() === value;
 }
 
 

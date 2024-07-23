@@ -26,12 +26,12 @@ export class DB {
 		await DB_Map.initDB_map();
 		this.db_map = db_map;
 		Ply.initDB_player();
-		Faction.initDB_faction();
-		Chunk.initDB_chunk();
+		const facPromise = Faction.initDB_faction();
 		Warp.initDB_warp();
 		Display.initDB_display();
 		Admin.initDB_admin();
 		Delay.initDB_delay();
+		Chunk.initDB_chunk(facPromise);
 
 		this.db_player = db_player;
 		this.db_player_online = db_player_online;

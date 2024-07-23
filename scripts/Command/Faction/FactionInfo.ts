@@ -101,7 +101,7 @@ function buildFactionInfoMessage(ply: Ply, fac: Faction): string {
 - Members         : ${fac.playerList.length}/${fac.memberLimit}§r
 - Bank            : ${fac.bank}§r
 - Power           : ${fac.power}/${DB.db_map.powerLimit.max * fac.playerList.length}§r
-- Claim           : ${fac.claim.length}\n\n§eMembers :§r
+- Claim           : ${fac.claim.size}\n\n§eMembers :§r
 `;
 	if (fac.playerList.find(p => p.name === ply.name)) {
 		message += `

@@ -6,7 +6,7 @@ import { ChunkPlayerPermission } from "./ChunkPlayerPermission";
 import { ChunkRankPermission } from "./ChunkRankPermission";
 import { Ply } from "../player/Ply";
 import { Server, hexToText, log, textToHex } from "../tool/tools";
-import { factionRank } from "../faction/Faction";
+import { db_faction, factionRank } from "../faction/Faction";
 
 
 export class Chunk {
@@ -65,12 +65,12 @@ export class Chunk {
 		})
 	}
 
-	static async initDB_chunk() {
+	static async initDB_chunk(wait_db_faction: Promise<void>) {
 		if (db_chunk.size === 0) {
 			const objectiveName = "db_chunk";
 			await Server.runCommandAsync(`scoreboard objectives add ${objectiveName} dummy`);
 			const start = Date.now();
-
+			await wait_db_faction;
 			try {
 				const objective = world.scoreboard.getObjective(objectiveName) ?? world.scoreboard.addObjective("db_chunk", "");
 				const sc = objective.getScores();
@@ -87,7 +87,7 @@ export class Chunk {
 					const batchEnd = batchStart + batchSize;
 					const batch = batchEnd < nbParticipants ? sc.slice(batchStart, batchEnd) : sc.slice(batchStart);
 
-					const updateDbPlayerPromises = batch.map(async (score) => {
+					const updateDbChunkPromises = batch.map(async (score) => {
 						const db = score.participant.displayName.match(/(?<=\$db_chunk\()[0-9a-f\s]+(?=\))/g);
 						if (!db) {
 							log("§cError: Mismatch data in db_chunk, try deleting the database and restarting the server. Contact the developer.");
@@ -96,7 +96,8 @@ export class Chunk {
 						const chunk = JSON.parse(hexToText(db.join(""))) as Chunk;
 
 						// Update db_chunk map
-						const existingChunk = db_chunk.get(`${chunk.x},${chunk.z + chunk.dimension}`);
+						const key = `${chunk.x},${chunk.z + chunk.dimension}`
+						const existingChunk = db_chunk.get(key);
 
 						if (existingChunk) {
 							// Update existing chunk data
@@ -108,7 +109,14 @@ export class Chunk {
 								objective.removeParticipant(score.participant);
 								return;
 							}
-							db_chunk.set(`${chunk.x},${chunk.z + chunk.dimension}`, chunk);
+							const faction = db_faction.get(chunk.faction_name)
+							if (faction === undefined) {
+								log("§cError: Faction chunk data is undefined for this chunk : " + key);
+								objective.removeParticipant(score.participant);
+								return;
+							}
+							faction.claim.set(key, chunk);
+							db_chunk.set(key, chunk);
 							const GC = db_group_chunk.get(chunk.group + chunk.faction_name);
 							if (GC === undefined) {
 								db_group_chunk.set(chunk.group + chunk.faction_name, [chunk]);
@@ -121,7 +129,7 @@ export class Chunk {
 					});
 					// Update progress bar
 					loadDatabase.chunk = progressBar + (batchEnd * percentageUnit).toFixed(2) + "%";
-					await Promise.all(updateDbPlayerPromises);
+					await Promise.all(updateDbChunkPromises);
 				}
 				loadDatabase.chunk = progressBar + "100%";
 			} catch (e) {
@@ -135,15 +143,18 @@ export class Chunk {
 	
 	static add_chunk(chunk: Chunk) {
 		if (db_chunk.has(chunk.x + "," + chunk.z)) return log(`§cDuplicate chunk found, fixing ${chunk.x}, ${chunk.z}`);
+
 		Server.runCommandAsync("scoreboard players set \"$db_chunk(" + textToHex(JSON.stringify(chunk)) + ")\" db_chunk 1");
 		db_chunk.set(chunk.x + "," + chunk.z + chunk.dimension, chunk); //to rework because unefficient when updating
-		log(JSON.stringify(Array.from(db_chunk.keys()), null, 2));
+		db_faction.get(chunk.faction_name)!.claim.set(chunk.x + "," + chunk.z + chunk.dimension, chunk);
 	}
 
 	static remove_chunk(chunk: Chunk) {
 		if (!db_chunk.has(chunk.x + "," + chunk.z + chunk.dimension)) log(`§cERROR: try to remove a chunk that doesn't exist, ${chunk.x}, ${chunk.z}, possible duplication in the database`);
+
 		Server.runCommandAsync("scoreboard players reset \"$db_chunk(" + textToHex(JSON.stringify(chunk)) + ")\" db_chunk");
 		db_chunk.delete(chunk.x + "," + chunk.z + chunk.dimension);
+		db_faction.get(chunk.faction_name)!.claim.delete(chunk.x + "," + chunk.z + chunk.dimension);
 	}
 
 	add_to_update_chunk() {
