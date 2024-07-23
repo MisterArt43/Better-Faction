@@ -153,7 +153,6 @@ export class Chunk {
 	remove_to_update_chunk() {
 		Server.runCommandAsync("scoreboard players reset \"$db_chunk(" + textToHex(JSON.stringify(this)) + ")\" db_chunk");
 	}
-
 }
 
 export let db_chunk: Map<string, Chunk> = new Map<string, Chunk>();
