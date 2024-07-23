@@ -1,4 +1,4 @@
-import { Player, world } from "@minecraft/server";
+import { DimensionLocation, Player, world } from "@minecraft/server";
 import { Server, hexToText, log, sleep, textToHex } from "../tool/tools"
 import { Vector_3_Dim } from "../tool/object/Vector";
 import { DB } from "../database/database";
@@ -9,6 +9,8 @@ export class Warp {
 	public message: string;
 	public displayMessageOnTp: boolean;
 	public creator: Player['name'];
+	public creationDate: number;
+	public editionDate: number;
 	public allow: string[];
 	public deny: string[];
 	public isOpen: boolean;
@@ -18,19 +20,17 @@ export class Warp {
 	public log: WarpDelay[];
 
 	constructor(Wname: string, player: Player) {
+		const date = Date.now()
 		this.name = Wname;
 		this.message = "";
 		this.displayMessageOnTp = false;
 		this.creator = player.name;
+		this.creationDate = date;
+		this.editionDate = date;
 		this.allow = new Array();
 		this.deny = new Array();
 		this.isOpen = true;
-		this.pos = new Vector_3_Dim(
-			Math.ceil(player.location.x + 0.0001) - 1,
-			Math.ceil(player.location.y - 0.4999),
-			Math.ceil(player.location.z + 0.0001) - 1,
-			player.dimension.id
-		);
+		this.pos = new Vector_3_Dim({ ...player.location, dimension: player.dimension }).normalize();
 		this.delay = DB.db_map.warpDelay;
 		this.runCommandAsync = new Array();
 		this.log = new Array();

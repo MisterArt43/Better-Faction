@@ -54,6 +54,10 @@ export class Vector_3 extends Vector_2 {
 		return this;
 	}
 
+	/**
+	 * 
+	 * @returns {string} '0, 0, 0'
+	 */
 	toString() : string {
 		return `${this.x}, ${this.y}, ${this.z}`
 	}

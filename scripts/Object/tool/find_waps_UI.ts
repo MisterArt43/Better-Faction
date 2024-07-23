@@ -1,7 +1,7 @@
 import { Player } from "@minecraft/server";
 import { Warp, db_warp } from "../warp/Warp";
-import { ActionFormData } from "@minecraft/server-ui";
 import { sleep } from "./tools";
+import { BFActionFormData } from "../formQueue/formQueue";
 
 export async function find_warp_UI(player: Player, showCoords: boolean = false) : Promise<Warp | undefined> {
 	const list_w = await getWarpList();
@@ -18,7 +18,7 @@ export async function find_warp_UI(player: Player, showCoords: boolean = false) 
 	let currentWarp : Warp;
 	while (1)
 	{
-		let form = new ActionFormData()
+		let form = new BFActionFormData()
 		.body("Select a warp")
 		page[current_page].forEach(w => form.button(w.pos.getDimColor() + w.name + showCoords ? ("\n§r" + w.pos.toString()) : ""));
 		if (page.length !== current_page + 1)

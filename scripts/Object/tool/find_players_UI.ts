@@ -1,8 +1,8 @@
 import { Player } from "@minecraft/server";
 import { Ply } from "../player/Ply";
-import { ModalFormData } from "@minecraft/server-ui";
 import { sleep, tellraw } from "./tools";
 import { DB } from "../database/database";
+import { BFModalFormData } from "../formQueue/formQueue";
 
 export async function UI_find_player(pl: Player): Promise<Ply | undefined> {
     const searchOptions = await getSearchOptions(pl);
@@ -25,7 +25,7 @@ export async function UI_find_player(pl: Player): Promise<Ply | undefined> {
 }
 
 async function getSearchOptions(pl: Player): Promise<{ searchInOnlinePlayers: boolean; searchKeyword: string } | undefined> {
-    return await new ModalFormData()
+    return await new BFModalFormData()
         .textField("Enter the start of the player name", "Player name")
         .toggle("Search in online player only", false)
         .show(pl)
@@ -66,7 +66,7 @@ async function getPlayerList(searchInOnlinePlayers: boolean, searchKeyword: stri
 
 
 async function selectPlayer(pl: Player, playerList: string[]): Promise<Ply | undefined> {
-    return await new ModalFormData()
+    return await new BFModalFormData()
         .title("Player list")
         .dropdown("Select a player", playerList)
         .show(pl)

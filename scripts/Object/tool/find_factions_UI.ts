@@ -3,6 +3,7 @@ import { ModalFormData } from "@minecraft/server-ui";
 import { sleep, tellraw } from "./tools";
 import { DB } from "../database/database";
 import { Faction } from "../faction/Faction";
+import { BFModalFormData } from "../formQueue/formQueue";
 
 export async function UI_find_faction(pl: Player): Promise<Faction | undefined> {
     const searchOptions = await getSearchOptions(pl);
@@ -68,7 +69,7 @@ async function getFactionList(searchInOnlineFactions: boolean, searchKeyword: st
 
 
 async function selectFaction(pl: Player, FactionList: string[]): Promise<Faction | undefined> {
-    return await new ModalFormData()
+    return await new BFModalFormData()
         .title("Faction list")
         .dropdown("Select a faction", FactionList)
         .show(pl)
