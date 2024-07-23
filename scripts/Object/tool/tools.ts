@@ -158,6 +158,10 @@ export function getTypedKeys<T extends object>(obj: T): (keyof T)[] {
     return Object.keys(obj) as (keyof T)[];
 }
 
+export function canBeParseInt(value: string) {
+	return 
+}
+
 
 // -------------------------- //
 //       COMMAND TOOLS        //
