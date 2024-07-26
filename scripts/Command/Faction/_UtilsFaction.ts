@@ -47,3 +47,37 @@ export function isAtLeastOfficer( ply: Ply, player: Player) : boolean {
 	}
 	return false;
 }
+
+export function factionDbNotEmty( ply: Ply, player: Player) : boolean {
+	if (DB.db_faction.size > 0) {
+		return true;
+	}
+	return false;
+}
+
+export function haveNoFactionAndFactionDbNotEmpty( ply: Ply, player: Player) : boolean {
+	if (DB.db_faction.size > 0 && ply.faction_name === null) {
+		return true;
+	}
+	return false;
+}
+
+export function isAtLeastOfficerAndHaveMoreThanOneMember( ply: Ply, player: Player) : boolean {
+	if (ply.faction_name === null) {
+		return false;
+	}
+	if (DB.db_faction.get(ply.faction_name)!.playerList.length === 1){
+		return false;
+	}
+	return isAtLeastOfficer(ply, player);
+}
+
+export function isLeaderAndCanSetHome( ply: Ply, player: Player) : boolean {
+	if (ply.faction_name === null) {
+		return false;
+	}
+	if (!DB.db_faction.get(ply.faction_name)!.isFhome) {
+		return false;
+	}
+	return isLeader(ply, player);
+}

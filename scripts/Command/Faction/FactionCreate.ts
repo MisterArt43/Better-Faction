@@ -7,8 +7,8 @@ import { Faction } from "../../Object/faction/Faction";
 import { Vector_3 } from "../../Object/tool/object/Vector";
 import { addSubCommand } from "../CommandManager";
 import { cmd_module, cmd_permission } from "../../Object/database/db_map";
-import { ModalFormData } from "@minecraft/server-ui";
 import { haveNoFaction } from "./_UtilsFaction";
+import { BFModalFormData } from "../../Object/formQueue/formQueue";
 
 addSubCommand(
 	"create",
@@ -56,7 +56,7 @@ function factionCreateCmd(Fname: string, player: Player, ply: Ply) {
 function factionCreateUI(player: Player, ply: Ply) {
 	const fac = DB.db_faction.get(ply.faction_name ?? "");
 	if (fac !== undefined) return tellraw(player, "§cYou are already in a faction");
-	new ModalFormData()
+	new BFModalFormData()
 		.title("Faction Create")
 		.textField("Faction Name", "faction name")
 		.show(player).then(res => {

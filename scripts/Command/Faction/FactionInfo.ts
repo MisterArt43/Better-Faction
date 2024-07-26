@@ -9,6 +9,7 @@ import { addDateZ, formatCreationFullDate } from "../../Object/tool/dateTools";
 import { UI_find_faction } from "../../Object/tool/find_factions_UI";
 import { addSubCommand } from "../CommandManager";
 import { cmd_module, cmd_permission } from "../../Object/database/db_map";
+import { factionDbNotEmty } from "./_UtilsFaction";
 
 addSubCommand(
 	"info",
@@ -20,7 +21,8 @@ addSubCommand(
 	true,
 	true,
 	FactionInfo,
-	[["faction", "f"]]
+	[["faction", "f"]],
+	factionDbNotEmty
 )
 
 // ---------------------------------- //

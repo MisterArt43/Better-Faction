@@ -7,7 +7,7 @@ import { Faction, factionRank, faction_member } from "../../Object/faction/Facti
 import { ActionFormData } from "@minecraft/server-ui";
 import { addSubCommand } from "../CommandManager";
 import { cmd_module, cmd_permission } from "../../Object/database/db_map";
-import { haveFaction, isAtLeastOfficer } from "./_UtilsFaction";
+import { isAtLeastOfficerAndHaveMoreThanOneMember } from "./_UtilsFaction";
 
 addSubCommand(
 	"kick",
@@ -20,7 +20,7 @@ addSubCommand(
 	true,
 	FactionKick,
 	[["faction", "f"]],
-	isAtLeastOfficer
+	isAtLeastOfficerAndHaveMoreThanOneMember
 )
 
 function FactionKick(args: string[], player: Player, ply: Ply) {

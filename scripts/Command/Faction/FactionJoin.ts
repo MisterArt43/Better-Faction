@@ -1,5 +1,5 @@
 import { Player } from "@minecraft/server";
-import { concatFacName, concatenateArgs, sleep, tellraw } from "../../Object/tool/tools";
+import { concatFacName, sleep, tellraw } from "../../Object/tool/tools";
 import { Ply } from "../../Object/player/Ply";
 import { DB } from "../../Object/database/database";
 import { translate } from "../../Object/tool/lang";
@@ -7,7 +7,7 @@ import { Faction, factionRank, faction_member } from "../../Object/faction/Facti
 import { ActionFormData } from "@minecraft/server-ui";
 import { addSubCommand } from "../CommandManager";
 import { cmd_module, cmd_permission } from "../../Object/database/db_map";
-import { haveNoFaction } from "./_UtilsFaction";
+import { haveNoFactionAndFactionDbNotEmpty } from "./_UtilsFaction";
 
 addSubCommand(
     "join",
@@ -20,7 +20,7 @@ addSubCommand(
     true,
     Factionjoin,
     [["faction", "f"]],
-    haveNoFaction
+    haveNoFactionAndFactionDbNotEmpty
 );
 
 async function Factionjoin(args: string[], player: Player, ply: Ply) {
