@@ -54,27 +54,6 @@ function recurUsageSubCommand(ply: Ply, player: Player, subCommand: SubCommand, 
 	}
 }
 
-function recursiveSubCommand(ply: Ply, subCommand: SubCommand): string {
-	if (subCommand instanceof Command)
-		return buildMessage(subCommand, ply);
-	else {
-		let msg = "";
-		for (const [key, value] of subCommand) {
-			msg += recursiveSubCommand(ply, value);
-		}
-		return msg;
-	}
-}
-
-function buildMessage(command: Command, ply: Ply): string {
-	if (command.isEnable) {
-		if (command.permission <= ply.permission) {
-			return `§7${command.command}§r\n`;
-		}
-	}
-	return "";
-}
-
 function buildCursorMessage(ply: Ply, player: Player, cursor: Map<string, SubCommand>): string {
 	let msg = "";
 	let cmds = getSubCommandPerAlias(cursor, ply, player, true);
