@@ -86,7 +86,8 @@ async function subCommandExecuter(args: string[], data: ChatSendBeforeEvent, it:
 		
 			system.run(async () => {
 					const dataForm = await form.show(player);
-					log(`§r§a§l$${args[it]} | ${keyArray[dataForm.selection!]} TEST`);
+					if (dataForm.selection !== undefined)
+						log(`§r§a§l$${args[it]} | ${keyArray[dataForm.selection!]}`);
 					if (dataForm.canceled || dataForm.selection === undefined) return;
 					args[++it] = keyArray[dataForm.selection!];
 					return subCommandExecuter(args, data, it, cursor, player, ply);
