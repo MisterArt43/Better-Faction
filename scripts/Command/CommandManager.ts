@@ -2,9 +2,8 @@ import { ChatSendBeforeEvent, Player, system, world } from "@minecraft/server";
 import { DB } from "../Object/database/database";
 import { cmd_module, cmd_permission } from "../Object/database/db_map";
 import { Ply } from "../Object/player/Ply";
-import { log, sleep, tellraw } from "../Object/tool/tools";
+import { log, tellraw } from "../Object/tool/tools";
 import { customChat } from "../Chat/CustomChat";
-import { ActionFormData, ActionFormResponse, FormCancelationReason } from "@minecraft/server-ui";
 import { BFActionFormData } from "../Object/formQueue/formQueue";
 
 world.beforeEvents.chatSend.subscribe(data => {
@@ -14,10 +13,11 @@ world.beforeEvents.chatSend.subscribe(data => {
 				data.sender.nameTag = data.sender.name;
 			}
 			const msg = data.message.substring(prefix.length).replace(/@"/g, "\"").trim();
+			log(`§a${data.sender.name} | ` + (msg.match(/[\""].+?[\""]|[^ ]+/g) ?? []).join(' | '))
 			subCommandExecuter(msg.match(/[\""].+?[\""]|[^ ]+/g) ?? [], data);
 			data.cancel = true;
 		}
-		else if (DB.db_map.default_cmd_module.includes(cmd_module.chat)) {
+		else if (DB.db_map.default_cmd_module.includes(cmd_module.chat) || DB.db_map.default_cmd_module.includes(cmd_module.all)) {
 			customChat(data);
 			data.cancel = true;
 		}
@@ -27,8 +27,6 @@ world.beforeEvents.chatSend.subscribe(data => {
 })
 
 async function subCommandExecuter(args: string[], data: ChatSendBeforeEvent, it: number = 0, cursor?: SubCommand, player?: Player, ply?: Ply) {
-	log(`§a${data.sender.name} | ` + args.join(' | '));
-
 	if (cursor === undefined) cursor = commands.get(args[it]);
 	else if (!(cursor instanceof Command)) cursor = cursor.get(args[it]);
 
@@ -46,7 +44,10 @@ async function subCommandExecuter(args: string[], data: ChatSendBeforeEvent, it:
 			if (cursor.module == cmd_module.all || ply.cmd_module.includes(cmd_module.all) || ply.cmd_module.includes(cursor.module)) {
 				if (cursor.permission >= ply.permission) {
 					try {
-						cursor.func(args, player, ply)
+						if (cursor.isUI)
+							system.run(() => cursor.func(args, player, ply));
+						else
+							cursor.func(args, player, ply)
 					} catch (error : any) {
 						if (error instanceof Error) {
 							log(`§cError: ${error.message}\n\n${error.stack}\n`);
@@ -66,7 +67,6 @@ async function subCommandExecuter(args: string[], data: ChatSendBeforeEvent, it:
 		}
 	}
 	else {
-		log(`§c${args.length} < ${it + 1}`);
 		if (args.length > it + 1) {
 			return subCommandExecuter(args, data, it + 1, cursor, player, ply);
 		}
@@ -163,11 +163,6 @@ export function addSubCommand(
 				log("§cError: subCommandPath must be an array of string or an array of array of string. like this : [['warp', 'w'], ['edit', 'e']]");
 				throw new Error("subCommandPath must be an array of string or an array of array of string. like this : [['warp', 'w'], ['edit', 'e']]");
 			}
-			// else {
-			// 	if (!cursor.has(path))
-			// 		cursor.set(path, new Map<string, SubCommand>)
-			// 	cursor = cursor.get(path) as Map<string, SubCommand>;
-			// }
 		}
 	}
 	while (true) {
@@ -186,6 +181,9 @@ export function getSubCommandPerAlias(cursor: Map<string, SubCommand>, ply: Ply,
 	let seenSubCommands = new Array<{ keys: string[], value: SubCommand }>();
 
 	for (const [key, value] of cursor) {
+		// if (key !== 'faction' ) continue;
+		// if (key === 'faction' || key === 'f')
+			// log(havePermissionForSubCommand(ply, player, value) + " " + key);
 		if (!havePermissionForSubCommand(ply, player, value)) continue;
 		if (value instanceof Command) {
 			//log(value.command + " " + value.isEnable + " " + value.permission + " (" + Object.keys(cmd_permission)[value.permission] + ") >= " + ply.permission + " (" + Object.keys(cmd_permission)[ply.permission] + ")")
@@ -212,14 +210,17 @@ export function getSubCommandPerAlias(cursor: Map<string, SubCommand>, ply: Ply,
 
 export function havePermissionForSubCommand(ply: Ply, player: Player, subCommand: SubCommand) : boolean {
 	if (subCommand instanceof Command) {
-		if (subCommand.externalCondition && !subCommand.externalCondition(ply, player))
+		//log("command : " + subCommand.command + "ply_perm: " + Object.keys(cmd_permission)[ply.permission] + " <= cmd_perm: " + Object.keys(cmd_permission)[subCommand.permission]);
+		if (subCommand.externalCondition !== undefined && !subCommand.externalCondition(ply, player)) {
 			return false;
+		}
 		return ply.permission <= subCommand.permission;
 	}
 	else {
 		for (const [key, value] of subCommand) {
-			if ((value instanceof Map && value !== subCommand) || value instanceof Command)
-				return havePermissionForSubCommand(ply, player, value);
+			if ((value instanceof Map && value !== subCommand) || value instanceof Command) //avoid loop (all -> all -> all -> ...) 
+				if (havePermissionForSubCommand(ply, player, value))
+					return true;
 		}
 	}
 	return false;
