@@ -5,7 +5,9 @@ import { cmd_module, cmd_permission } from "../../Object/database/db_map";
 import { log, sleep } from "../../Object/tool/tools";
 import { DB } from "../../Object/database/database";
 
-const isDebug = false;
+let isDebug = (ply: Ply, player: Player) => {
+    return true;
+}
 
 addSubCommand(
     "player",
@@ -14,15 +16,16 @@ addSubCommand(
     ["player", "p"],
     cmd_module.dev,
     cmd_permission.admin,
-    isDebug,
+    true,
     false,
     UT_DB_Player,
-    [["manage"], ["ut", "UT", "unittest", "unitTEST"]]
+    [["manage"], ["ut", "UT", "unittest", "unitTEST"]],
+    isDebug
 )
 
-function UT_DB_Player(args: string[], player: Player, ply: Ply) {
+async function UT_DB_Player(args: string[], player: Player, ply: Ply) {
     const nb_test = 10000;
-    const batchSize = 25;
+    const batchSize = 100;
     for (let i = 1; i < nb_test; i++) {
         let newPl = new Ply({
             name: "player" + i,
@@ -35,7 +38,7 @@ function UT_DB_Player(args: string[], player: Player, ply: Ply) {
         Ply.add_player(newPl)
         if (i % batchSize === 0) {
             log("§g" + batchSize + " Player added, now at " + i)
-            sleep(1);
+            await sleep(1);
         }
     
         if (i < nb_test / 100)

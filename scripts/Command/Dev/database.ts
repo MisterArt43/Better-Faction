@@ -51,6 +51,18 @@ function db(args: string[], player: Player, ply: Ply) {
             log("§6 Length : " + DB.db_player.size);
             break;
         }
+        case "online" : {
+            let i = 0;
+            if (args.length == 4 && args[3].match(/[0-9]/g)) {
+                i = parseInt(args[3]);
+            }
+            if (DB.db_player_online.size - 1 >= i) {
+                log(colorizeJSON(JSON.stringify(Array.from(DB.db_player_online.values())[i], null, 8)));
+                i++;
+            }
+            log("§6 Length : " + DB.db_player_online.size);
+            break;
+        }
         case "warp" : {
             let i = 0;
             if (args.length == 4 && args[3].match(/[0-9]/g)) {

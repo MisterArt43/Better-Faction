@@ -1,4 +1,4 @@
-import { DimensionLocation, world } from "@minecraft/server";
+import { DimensionLocation, system, world } from "@minecraft/server";
 import { Home } from "./Home";
 import { DB } from "../database/database";
 import { Vector_3_Dim } from "../tool/object/Vector";
@@ -118,7 +118,7 @@ export class Ply {
 				const sc = objective.getScores();
 				
 				const nbParticipants = sc.length;
-				const batchSize = 61 >>> 0;
+				const batchSize = 83 >>> 0;
 				const batchNumber = Math.ceil(nbParticipants / batchSize);
 	
 				const progressBar = "§a[DB] §7loading db_player... §e";
@@ -181,12 +181,16 @@ export class Ply {
 
 	remove_to_update_player() {
 		if (this === undefined) return;
-		Server.runCommandAsync("scoreboard players reset \"$db_player(" + textToHex(JSON.stringify(this)) + ")\" db_player");
+		const scoreboard = world.scoreboard.getObjective("db_player")!;
+		scoreboard.removeParticipant(`$db_player(${textToHex(JSON.stringify(this))})`);
+		// Server.runCommandAsync("scoreboard players reset \"$db_player(" + textToHex(JSON.stringify(this)) + ")\" db_player");
 	}
 
 	add_to_update_player() {
 		if (this === undefined) return;
-		Server.runCommandAsync("scoreboard players set \"$db_player(" + textToHex(JSON.stringify(this)) + ")\" db_player 1");
+		const scoreboard = world.scoreboard.getObjective("db_player")!;
+		scoreboard.addScore(`$db_player(${textToHex(JSON.stringify(this))})`, 1);
+		// Server.runCommandAsync("scoreboard players set \"$db_player(" + textToHex(JSON.stringify(this)) + ")\" db_player 1");
 	}
 
 
@@ -197,12 +201,20 @@ export class Ply {
 			Ply.remove_player(db_player.get(player.name));
 		}
 		db_player.set(player.name, player);
-		Server.runCommandAsync("scoreboard players set \"$db_player(" + textToHex(JSON.stringify(player)) + ")\" db_player 1");
+		const scoreboard = world.scoreboard.getObjective("db_player")!;
+		system.run(() => {
+			scoreboard.addScore(`$db_player(${textToHex(JSON.stringify(player))})`, 1);
+		});
+		// Server.runCommandAsync("scoreboard players set \"$db_player(" + textToHex(JSON.stringify(player)) + ")\" db_player 1");
 	}
 
 	static remove_player(player: Ply | undefined) {
 		if (player === undefined) return;
-		Server.runCommandAsync("scoreboard players reset \"$db_player(" + textToHex(JSON.stringify(player)) + ")\" db_player");
+		const scoreboard = world.scoreboard.getObjective("db_player")!;
+		system.run(() => {
+		scoreboard.removeParticipant(`$db_player(${textToHex(JSON.stringify(player))})`);
+		});
+		// Server.runCommandAsync("scoreboard players reset \"$db_player(" + textToHex(JSON.stringify(player)) + ")\" db_player");
 		db_player.delete(player.name);
 	}
 }

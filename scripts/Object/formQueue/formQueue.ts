@@ -1,6 +1,6 @@
 import { ActionFormData, ActionFormResponse, FormCancelationReason, MessageFormData, MessageFormResponse, ModalFormData, ModalFormResponse } from "@minecraft/server-ui";
 import { DB } from "../database/database";
-import { Player, RawMessage } from "@minecraft/server";
+import { Player, RawMessage, world } from "@minecraft/server";
 import { log } from "../tool/tools";
 
 type FormResponse = ActionFormResponse | ModalFormResponse | MessageFormResponse;
@@ -50,7 +50,10 @@ export async function processQueue(player: Player) {
 export function addToQueue(playerName: string, formFunc: (player: Player) => Promise<FormResponse>) {
     if (!DB.db_player_online.has(playerName)) {
         log("§7[formQueue] §cThis player is not online");
-        return Promise.reject("Player is not online");
+        if (world.getPlayers({ name: playerName }).length > 0)
+            DB.db_player_online.set(playerName, DB.db_player.get(playerName)!);
+        else
+            return Promise.reject("Player is not online");
     }
 
     return new Promise<FormResponse>((resolve, reject) => {
@@ -66,7 +69,10 @@ export function addToQueue(playerName: string, formFunc: (player: Player) => Pro
 export function addToQueueFront(playerName: string, formFunc: (player: Player) => Promise<FormResponse>) {
     if (!DB.db_player_online.has(playerName)) {
         log("§7[formQueue] §cThis player is not online");
-        return;
+        if (world.getPlayers({ name: playerName }).length > 0)
+            DB.db_player_online.set(playerName, DB.db_player.get(playerName)!);
+        else
+            return Promise.reject("Player is not online");
     }
 
     return new Promise<FormResponse>((resolve, reject) => {

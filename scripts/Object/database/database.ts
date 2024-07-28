@@ -8,7 +8,6 @@ import { Warp, db_warp } from "../warp/Warp";
 import { Display, db_display } from "../display/Display";
 import { Delay, db_delay } from "../player/Delay";
 import { log, sleep } from "../tool/tools";
-import { commands } from "../../Command/CommandManager";
 
 export class DB {
 	public static db_map : DB_Map;
@@ -22,16 +21,17 @@ export class DB {
 	public static db_delay : Map<string, Delay>;
 
 	public static async initialize() {
+		const time = Date.now();
 		log("§7§l[DB] §r§aInitializing databases...");
 		await DB_Map.initDB_map();
 		this.db_map = db_map;
-		Ply.initDB_player();
+		const plyPromise = Ply.initDB_player();
 		const facPromise = Faction.initDB_faction();
-		Warp.initDB_warp();
-		Display.initDB_display();
-		Admin.initDB_admin();
-		Delay.initDB_delay();
-		Chunk.initDB_chunk(facPromise);
+		const warpPromise = Warp.initDB_warp();
+		const displayPromise = Display.initDB_display();
+		const AdminPromise = Admin.initDB_admin();
+		const delayPromise = Delay.initDB_delay();
+		const chunkPromise = Chunk.initDB_chunk(facPromise);
 
 		this.db_player = db_player;
 		this.db_player_online = db_player_online;
@@ -47,6 +47,12 @@ export class DB {
 		import('../../Command/Commands').then((module) => {
 			const end = Date.now();
 			log("§7§l[CMD] §r§aCommands loaded in " + (end - start) + "ms");
+		});
+
+		Promise.all([plyPromise, facPromise, warpPromise, displayPromise, AdminPromise, delayPromise, chunkPromise]).then(async () => {
+			const end = Date.now();
+			await sleep(1);
+			world.sendMessage("§7§l[Better Faction]§r§e loaded in §s" + ((end - time) / 1000) + "§e second(s)");
 		});
 	}
 	// public static db_shop = db_Shop;

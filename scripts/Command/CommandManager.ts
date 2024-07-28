@@ -146,7 +146,7 @@ export function addSubCommand(
 			commands.set("all", commands);
 		}
 	let cursor = commands;
-	log("Add new command: " + command);
+	// log("Add new command: " + command);
 	if (subCommandPath !== undefined) {
 		// create path in the map (keep same reference)
 		for (const path of subCommandPath) {

@@ -313,7 +313,11 @@ system.runInterval(async () => {
 							}
 							if (refreshCalc3)
 							{
-								let delay = DB.db_delay.get(player.name);
+								if (!DB.db_player_online.has(p.name)) {
+									log("§8Issue with " + p.name + " not in the online database, Fixing it...")
+									DB.db_player_online.set(p.name, player);
+								}
+									let delay = DB.db_delay.get(player.name);
 								if (delay !== undefined) {
 									if (delay.check_time()) tellraw(player.name, "§7You aren't in combat anymore");
 								}
