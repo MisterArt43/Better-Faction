@@ -448,5 +448,3 @@ function set_rule_code(args: string[], player: Player, ply: Ply) {
 			tellraw(ply.name, "§eIs Rule Code: " + DB.db_map.ruleCode.isRuleCode.toString() + "\n §eis Auto Generate: " + DB.db_map.ruleCode.isAutoGen.toString() + "\n §eNew Code: '" + DB.db_map.ruleCode.code + "'");
 		});
 }
-
-

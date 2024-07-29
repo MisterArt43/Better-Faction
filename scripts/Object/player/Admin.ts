@@ -52,7 +52,7 @@ export class Admin {
 						await sleep(1)
 					}
 				})
-				log("db_admin loaded")
+				log("§8db_admin loaded")
 			}
 			catch (e) {
 				log("§7[DB] can't find any databse for db_admin, creating a new one " + e);

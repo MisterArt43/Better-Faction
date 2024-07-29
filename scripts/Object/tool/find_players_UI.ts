@@ -1,6 +1,6 @@
 import { Player } from "@minecraft/server";
 import { Ply } from "../player/Ply";
-import { sleep, tellraw } from "./tools";
+import { log, sleep, tellraw } from "./tools";
 import { DB } from "../database/database";
 import { BFModalFormData } from "../formQueue/formQueue";
 
@@ -71,7 +71,7 @@ async function selectPlayer(pl: Player, playerList: string[]): Promise<Ply | und
         .dropdown("Select a player", playerList)
         .show(pl)
         .then(async (res) => {
-            if (res.canceled || !res.formValues || typeof res.formValues[0] !== "string") return undefined;
+            if (res.canceled || !res.formValues || typeof res.formValues[0] !== "number") return undefined;
             return DB.db_player.get(playerList[res.formValues[0] as unknown as number]);
         });
 }

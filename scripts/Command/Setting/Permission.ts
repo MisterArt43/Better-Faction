@@ -10,8 +10,8 @@ import { addSubCommand } from "../CommandManager";
 addSubCommand(
     "permission",
     "Edit player permission (give right to use Admin, helper, owner,... command)",
-    `${globalThis.prefix}`,
-    ["permission", "perm", "p"],
+    `${globalThis.prefix}set permission`,
+    ["permission", "perm"],
     cmd_module.commoncommand,
     cmd_permission.admin,
     true,
