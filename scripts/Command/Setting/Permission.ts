@@ -32,9 +32,9 @@ async function managePermission(args: string[], player: Player, ply: Ply) {
             if (res.canceled) return;
 
             if (res.selection === 0)
-                return generateEditPermForm(player, ply, (player: Player, ply: Ply) => { return ply.permission === cmd_permission.admin});
+                return generateEditPermForm(player, ply, (pl: Ply) => { return pl.permission === cmd_permission.admin});
             else if (res.selection === 1)
-                return generateEditPermForm(player, ply, (player: Player, ply: Ply) => { return ply.permission !== cmd_permission.member});
+                return generateEditPermForm(player, ply, (pl: Ply) => { return pl.permission !== cmd_permission.member});
             else
                 manageplayerPerm(player, ply);
         }) 
@@ -60,23 +60,27 @@ async function manageplayerPerm(player: Player, ply: Ply) {
         })
 }
 
-type Condition = (player : Player, ply: Ply) => boolean
+type Condition = (ply: Ply) => boolean
 
 async function generateEditPermForm(player: Player, ply: Ply, condition: Condition) {
-    const PlayerList = Array.from(db_player.values());
     const FilteredList : Ply[] = new Array();
     
     const form = new BFModalFormData().title("Edit Permission");
     
     let i = 0;
-    for (const pl of PlayerList) {
-        if (condition(player, pl)) {
-            if (ply.permission < pl.permission || ply.permission >= cmd_permission.owner) {
+    let nbOwner = 0;
+    for (const [key, pl] of db_player) {
+        if (pl.permission <= cmd_permission.owner) nbOwner++;
+        if (condition(pl)) {
+            if (ply.permission < pl.permission || ply.permission <= cmd_permission.owner) {
                 form.dropdown(pl.name, permissionText, pl.permission)
                 FilteredList.push(pl);
             }
         }
-        if (++i % 25 === 0) await sleep(1);
+        if (++i % 500 === 0) {
+            await sleep(1);
+            tellraw(player, "please wait... " + i + "/" + db_player.size + " player permission loaded");
+        }
     }
 
     form.show(player).then(async res => {
@@ -84,6 +88,14 @@ async function generateEditPermForm(player: Player, ply: Ply, condition: Conditi
         for (let i = 0; i < FilteredList.length; i++) {
             if (res.formValues[i] as number !== FilteredList[i].permission) {
                 let editPly = DB.db_player.get(FilteredList[i].name)!;
+                if (editPly.permission <= cmd_permission.owner) {
+                    if (res.formValues[i] as number >= cmd_permission.owner && nbOwner === 1) {
+                            tellraw(player, "§cyou need at least one owner in the server, keeping " + editPly.name + " as owner");
+                            continue;
+                    }
+                    nbOwner--;
+                }
+                if (editPly.permission > cmd_permission.owner && res.formValues[i] as number <= cmd_permission.owner) nbOwner++;
                 editPly.remove_to_update_player();
                 editPly.permission = res.formValues[i] as (typeof cmd_permission[keyof typeof cmd_permission]);
                 editPly.add_to_update_player();

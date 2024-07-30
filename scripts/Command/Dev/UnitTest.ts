@@ -15,7 +15,7 @@ addSubCommand(
     "+manage ut player",
     ["player", "p"],
     cmd_module.dev,
-    cmd_permission.admin,
+    cmd_permission.dev,
     true,
     false,
     UT_DB_Player,

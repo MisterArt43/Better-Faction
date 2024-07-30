@@ -69,7 +69,7 @@ system.runInterval(() => {
 			if (DB.db_player_online.size !== 0) {
 				for (const [key, p] of DB.db_player_online) {
 					p.remove_to_update_player();
-					p.timePlayed += 5;
+					p.timePlayed += 10;
 					if (p.power < DB.db_map.powerLimit.max && p.lastPowerRegen + DB.db_map.timeToRegenPower * 60 < p.timePlayed) {
 						log("power regen for " + p.name + " : " + p.power + " -> " + (p.power + 1));
 						p.power++;
@@ -86,7 +86,7 @@ system.runInterval(() => {
 		if (er instanceof Error)
 			log("error in runInterval : " + er.toString() + "\n" + er.stack);
 	}
-}, 100)
+}, 200)
 
 system.runInterval(async () => {
 	if (isLoaded && curTick > START_TICK) {
