@@ -26,7 +26,7 @@ world.beforeEvents.chatSend.subscribe(data => {
 	}
 })
 
-async function subCommandExecuter(args: string[], data: ChatSendBeforeEvent, it: number = 0, cursor?: SubCommand, player?: Player, ply?: Ply) {
+export async function subCommandExecuter(args: string[], data: ChatSendBeforeEvent, it: number = 0, cursor?: SubCommand, player?: Player, ply?: Ply) {
 	if (cursor === undefined) cursor = commands.get(args[it]);
 	else if (!(cursor instanceof Command)) cursor = cursor.get(args[it]);
 

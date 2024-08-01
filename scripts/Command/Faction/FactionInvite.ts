@@ -13,7 +13,7 @@ addSubCommand(
 	"invite",
 	"Invite a player to your faction.",
 	`${globalThis.prefix}faction invite <player>`,
-	["invite", "i"],
+	["invite", "invit", "inv"],
 	cmd_module.faction,
 	cmd_permission.member,
 	true,

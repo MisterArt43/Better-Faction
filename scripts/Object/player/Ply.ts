@@ -216,6 +216,7 @@ export class Ply {
 		});
 		// Server.runCommandAsync("scoreboard players reset \"$db_player(" + textToHex(JSON.stringify(player)) + ")\" db_player");
 		db_player.delete(player.name);
+		if (db_player_online.has(player.name)) db_player_online.delete(player.name);
 	}
 }
 
