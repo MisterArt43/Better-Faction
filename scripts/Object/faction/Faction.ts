@@ -1,7 +1,7 @@
 import { Player, Vector3, world } from "@minecraft/server";
 import { DB } from "../database/database";
 import { Vector_2, Vector_3 } from "../tool/object/Vector";
-import { Server, hexToText, log, textToHex } from "../tool/tools";
+import { Server, hexToText, log, sleep, textToHex } from "../tool/tools";
 import { Chunk } from "../chunk/Chunk";
 
 
@@ -23,6 +23,7 @@ export class Faction {
 	public Fhome: Vector_3 | null;
 	public isOpen: boolean;
 	public claim: Map<string, Chunk>;
+	[key: string]: any;
 
 	/**
 	 * @param {string} Fname 
@@ -103,6 +104,36 @@ export class Faction {
 			log("§7db_faction loaded in " + ((end - start) / 1000) + " second(s)");
 		}
 		return;
+	}
+
+	static async UpdateDB() {
+		if (db_faction.size > 0 && isLoaded === false) {
+			let counter = 1;
+			for (let obj of db_faction.values()) {
+				obj.remove_to_update_faction();
+				let new_obj = new Faction("UPDATE", "update")
+				let old_key = Object.keys(obj);
+				let new_key = Object.keys(new_obj);
+				let old_value = Object.values(obj);
+
+				for (let i = 0; i < new_key.length; i++) {
+					for (let j = 0; j < old_key.length; j++) {
+						if (new_key[i] === old_key[j]) {
+							new_obj[new_key[i]] = old_value[j];
+							break;
+						}
+					}
+				}
+				//log("\n§cOld => §7" + JSON.stringify(obj) + "\n§aNew => §7" + JSON.stringify(new_obj));
+				new_obj.add_to_update_faction();
+				obj = new_obj;
+				if (counter++ % 37 === 0) await sleep(1);
+			};
+			log("§8[Faction] §7Database Updated");
+		}
+		else {
+			log("cannot update database")
+		}
 	}
 
 	public jsonString(obj: Faction): string {

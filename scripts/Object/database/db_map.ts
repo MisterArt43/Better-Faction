@@ -1,4 +1,5 @@
-import { Server, getMap, hexToText, log, textToHex } from "../tool/tools";
+import { Server, getMap, hexToText, log, sleep, textToHex } from "../tool/tools";
+// Database Module for Application Preferences : DB MAP.
 
 declare global {
 	var version: string;
@@ -62,6 +63,7 @@ export class DB_Map {
 	public powerLimit: powerLimit;
 	public defaultPower: number;
 	public timeToRegenPower: number;
+	[key: string]: any;
 
 	constructor() {
 		this.v = version,
@@ -127,6 +129,35 @@ export class DB_Map {
 			}
 		}
 		return db_map ?? new DB_Map();
+	}
+
+	static async UpdateDB() {
+		if (db_map !== undefined && isLoaded === false) {
+			await sleep(5);
+			await Server.runCommandAsync("scoreboard objectives remove database");
+			await sleep(2);
+			await Server.runCommandAsync("scoreboard objectives add database dummy");
+			let new_obj = new DB_Map();
+			let old_key = Object.keys(db_map);
+			let new_key = Object.keys(new_obj);
+			let old_value = Object.values(db_map);
+			for (let i = 0; i < new_key.length; i++) {
+				for (let j = 0; j < old_key.length; j++) {
+					if (new_key[i] == "v") {
+						new_obj[new_key[i]] = version;
+						break;
+					}
+					else if (new_key[i] == old_key[j]) {
+						new_obj[new_key[i]] = old_value[j];
+						break;
+					}
+				}
+			}
+			log("§8[MAP] §7Database Updated");
+		}
+		else {
+			log("cannot update database")
+		}
 	}
 }
 
