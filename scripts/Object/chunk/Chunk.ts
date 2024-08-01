@@ -5,7 +5,7 @@ import { ChunkPermission } from "./ChunkPermission";
 import { ChunkPlayerPermission } from "./ChunkPlayerPermission";
 import { ChunkRankPermission } from "./ChunkRankPermission";
 import { Ply } from "../player/Ply";
-import { Server, hexToText, log, textToHex } from "../tool/tools";
+import { Server, hexToText, log, sleep, textToHex } from "../tool/tools";
 import { db_faction, factionRank } from "../faction/Faction";
 
 
@@ -14,14 +14,15 @@ export class Chunk {
 	public z: number;
 	public owner: Player['name'];
 	public faction_name: string;
-	public date: Date;
+	public date: number;
 	public defaultPermission: ChunkPermission;
 	public permission: ChunkPlayerPermission[];
 	public rankPermission: ChunkRankPermission[];
 	public dimension: string;
 	public group: string;
+	[key: string]: any;
 
-	constructor(xChunk: number, zChunk: number, owner: Player['name'], date: Date, faction: string, dimensionID: string, chunkPermission?: ChunkPermission, group?: string) {
+	constructor(xChunk: number, zChunk: number, owner: Player['name'], date: number, faction: string, dimensionID: string, chunkPermission?: ChunkPermission, group?: string) {
 		if (db_chunk.get(xChunk + "," + zChunk + dimensionID) !== undefined) {throw log("§7§l(constructor chunk) §r§cchunk already exist");}
 		this.x = xChunk;
 		this.z = zChunk;
@@ -41,6 +42,36 @@ export class Chunk {
 		this.dimension = dimensionID;
 		this.group = group ? group : "none";
 		return this;
+	}
+
+	static async UpdateDB() {
+		if (db_chunk.size > 0 && isLoaded === false) {
+			let counter = 1;
+			for (let obj of db_chunk.values()) {
+				obj.remove_to_update_display();
+				let new_obj = new Chunk(0,0,"update", Date.now(), "Admin", "overworld");
+				let old_key = Object.keys(obj);
+				let new_key = Object.keys(new_obj);
+				let old_value = Object.values(obj);
+
+				for (let i = 0; i < new_key.length; i++) {
+					for (let j = 0; j < old_key.length; j++) {
+						if (new_key[i] === old_key[j]) {
+							new_obj[new_key[i]] = old_value[j];
+							break;
+						}
+					}
+				}
+				//log("\n§cOld => §7" + JSON.stringify(obj) + "\n§aNew => §7" + JSON.stringify(new_obj));
+				new_obj.add_to_update_faction();
+				obj = new_obj;
+				if (counter++ % 37 === 0) await sleep(1);
+			};
+			log("§8[Display] §7Database Updated");
+		}
+		else {
+			log("cannot update database")
+		}
 	}
 
 

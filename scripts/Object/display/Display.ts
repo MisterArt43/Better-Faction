@@ -1,5 +1,5 @@
 import { world } from "@minecraft/server";
-import { Server, hexToText, log } from "../tool/tools";
+import { Server, hexToText, log, sleep, textToHex } from "../tool/tools";
 import { DB } from "../database/database";
 
 
@@ -51,6 +51,7 @@ export class Display {
 	public tag: string;
 	public text: string;
 	public type: (typeof displayTypes[keyof typeof displayTypes]);
+	[key: string]: any;
 
 	constructor(tag: string, text: string, type: (typeof displayTypes[keyof typeof displayTypes])) {
 		this.tag = tag;
@@ -112,6 +113,50 @@ export class Display {
 
 		const end = Date.now();
 		log("§7db_display loaded in " + ((end - start) / 1000) + " second(s)");
+	}
+
+	static async UpdateDB() {
+		if (db_display.size() > 0 && isLoaded === false) {
+			let counter = 1;
+			for (let obj of db_display.values()) {
+				obj.remove_to_update_display();
+				let new_obj = new Display("update", "update", "title");
+				let old_key = Object.keys(obj);
+				let new_key = Object.keys(new_obj);
+				let old_value = Object.values(obj);
+
+				for (let i = 0; i < new_key.length; i++) {
+					for (let j = 0; j < old_key.length; j++) {
+						if (new_key[i] === old_key[j]) {
+							new_obj[new_key[i]] = old_value[j];
+							break;
+						}
+					}
+				}
+				//log("\n§cOld => §7" + JSON.stringify(obj) + "\n§aNew => §7" + JSON.stringify(new_obj));
+				new_obj.add_to_update_faction();
+				obj = new_obj;
+				if (counter++ % 37 === 0) await sleep(1);
+			};
+			log("§8[Display] §7Database Updated");
+		}
+		else {
+			log("cannot update database")
+		}
+	}
+
+	remove_to_update_display() {
+		if (this === undefined) return;
+		const scoreboard = world.scoreboard.getObjective("db_display")!;
+		scoreboard.removeParticipant(`$db_display(${textToHex(JSON.stringify(this))})`);
+		// Server.runCommandAsync("scoreboard players reset \"$db_display(" + textToHex(JSON.stringify(this)) + ")\" db_display");
+	}
+
+	add_to_update_display() {
+		if (this === undefined) return;
+		const scoreboard = world.scoreboard.getObjective("db_display")!;
+		scoreboard.addScore(`$db_display(${textToHex(JSON.stringify(this))})`, 1);
+		// Server.runCommandAsync("scoreboard players set \"$db_display(" + textToHex(JSON.stringify(this)) + ")\" db_display 1");
 	}
 }
 
