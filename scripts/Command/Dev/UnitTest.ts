@@ -1,5 +1,5 @@
 import { Player } from "@minecraft/server";
-import { addSubCommand, subCommandExecuter } from "../CommandManager";
+import { addSubCommand, Command, commands, SubCommand, subCommandExecuter } from "../CommandManager";
 import { Ply, db_player, db_player_online } from "../../Object/player/Ply";
 import { cmd_module, cmd_permission } from "../../Object/database/db_map";
 import { colorizeJSON, log, sleep } from "../../Object/tool/tools";
@@ -62,7 +62,7 @@ addSubCommand(
 )
 
 async function UT_DB_Faction(args: string[], player: Player, ply: Ply) {
-    const nb_test = 3;
+    const nb_test = 1;
     const batchSize = 1;
     
     const nb_player_multiplier = 7;
@@ -94,43 +94,56 @@ async function UT_DB_Faction(args: string[], player: Player, ply: Ply) {
         await subCommandExecuter(["faction", "create", "faction" + i], { message: "", sender: player, cancel: false }, undefined, undefined, player, playerList.slice(i * nb_player_multiplier, (i + 1) * nb_player_multiplier)[0])
 
         if (i % batchSize === 0) {
-            log("§g" + batchSize + " Faction added, now at §a" + i + 1 + "§g created by §e" + playerList.slice(i * nb_player_multiplier, (i + 1) * nb_player_multiplier)[0].name)
             await sleep(2);
         }
-
-
-        for (let j = 0; j < nb_player_multiplier; j++) {
-            await subCommandExecuter(["faction", "invite", db_player.get("player"+(i * nb_player_multiplier + j))!.name], { message: "", sender: player, cancel: false }, undefined, undefined, player, playerList.slice(i * nb_player_multiplier, (i + 1) * nb_player_multiplier)[0])
-            log("§g" + db_player.get("player"+(i * nb_player_multiplier + j))!.name + " invited to faction" + i)
+        
+        for (let j = 1; j < nb_player_multiplier; j++) {
+                ((commands.get("faction") as Map<string, SubCommand>).get("invite") as Command).func(
+                ["faction", "invite", "player" + (i * nb_player_multiplier + j)],
+                player,
+                playerList.slice(i * nb_player_multiplier, (i + 1) * nb_player_multiplier)[0]
+            );
         }
     }
 
-    log("result of the first faction : " + colorizeJSON(JSON.stringify(db_faction.get("faction0"), null, 8)))
+    log("result of the first faction (inviteList) : " + colorizeJSON(JSON.stringify(db_faction.get("Faction0")?.invitList)))
 
     await sleep(10);
     for (let i = 0; i < nb_test; i++) {
-        for (let j = 0; j < nb_player_multiplier; j++) {
-            await subCommandExecuter(["faction", "join", "faction" + i], { message: "", sender: player, cancel: false }, undefined, undefined, player, playerList.slice(i * nb_player_multiplier, (i + 1) * nb_player_multiplier)[0])
-            log("§g" + db_player.get("player"+(i * nb_player_multiplier + j))!.name + " joined faction" + i)
+        for (let j = 1; j < nb_player_multiplier; j++) {
+            ((commands.get("faction") as Map<string, SubCommand>).get("join") as Command).func(
+                ["faction", "join", "Faction" + i],
+                player,
+                playerList.slice(i * nb_player_multiplier, (i + 1) * nb_player_multiplier)[j]
+            );
         }
     }
 
-    log("result of the first faction : " + colorizeJSON(JSON.stringify(db_faction.get("faction0"), null, 8)))
+    log("result of the first faction (playerList) : " + colorizeJSON(JSON.stringify(db_faction.get("Faction0")?.playerList)))
 
     await sleep(10);
     for (let i = 0; i < nb_test; i++) {
-        await subCommandExecuter(["faction", "quit"], { message: "", sender: player, cancel: false }, undefined, undefined, player, playerList.slice(i * nb_player_multiplier, (i + 1) * nb_player_multiplier)[0])
-        log("§g" + db_player.get("player"+(i * nb_player_multiplier))!.name + " quit faction" + i)
+        ((commands.get("faction") as Map<string, SubCommand>).get("quit") as Command).func(
+            ["faction", "quit"],
+            player,
+            playerList.slice(i * nb_player_multiplier, (i + 1) * nb_player_multiplier)[0])
     }
 
-    log("faction still exist : " + db_faction.has("faction0"))
+    log(`§afaction still exist (should be §cfalse§a) : ${(db_faction.has("Faction0")) ? "§atrue" : "§cfalse"}`)
+
+    if (db_faction.has("Faction0")) {
+        for (let i = 0; i < nb_test; i++) {
+            Faction.remove_faction(db_faction.get("Faction" + i)!)
+            log("§gFaction" + i + " force removed")
+        }
+    }
 
     await sleep(10);
-    log("deleting all player")
+    log("§gdeleting all player")
     for (let i = 0; i < nb_player; i++) {
         const pl = db_player.get("player" + i)
         Ply.remove_player(pl!)
     }
 
-    log("all player as been deleted");
+    log("§gall player as been deleted");
 }

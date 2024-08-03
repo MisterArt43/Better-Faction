@@ -38,7 +38,7 @@ function factionCreateCmd(Fname: string, player: Player, ply: Ply) {
 	if (Fname.match(/^([0-9a-zA-Z ]){1,40}$/) && Fname != "Admin") {//nom des claims Admin
 		if (ply.faction_name != null) return tellraw(player, translate(ply.lang)?.error_faction_create ?? "no translation");
 		if (DB.db_faction.has(Fname)) return tellraw(player, translate(ply.lang)?.error_have_name ?? "no translation");
-		let FacObject = new Faction(Fname, player.name);
+		let FacObject = new Faction(Fname, ply.name);
 		if (player.dimension.id === "minecraft:overworld") {
 			FacObject.Fhome = new Vector_3(player.location).normalize();
 		}

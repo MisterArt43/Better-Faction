@@ -67,8 +67,8 @@ function cmdFactionJoin(args: string[], player: Player, ply: Ply) {
         const fac = DB.db_faction.get(name);
 
         if (fac !== undefined) {
-            const newMember = new faction_member(player.name, factionRank.Visitor);
-            const inviteIndex = fac.invitList.findIndex((p) => p === player.name);
+            const newMember = new faction_member(ply.name, factionRank.Visitor);
+            const inviteIndex = fac.invitList.findIndex((p) => p === ply.name);
 
             if (fac.isOpen) {
                 updatePlayerJoinFaction(player, ply, fac, newMember);
@@ -93,7 +93,7 @@ function cmdFactionJoin(args: string[], player: Player, ply: Ply) {
 
 function updatePlayerJoinFaction(player: Player, ply: Ply, fac: Faction, newMember: faction_member) {
     if (fac.playerList.length < fac.memberLimit) {
-        broadcastRemoveInvite(player.name);
+        broadcastRemoveInvite(ply.name);
         fac.remove_to_update_faction();
         fac.playerList.push(newMember);
         fac.add_to_update_faction();
@@ -101,7 +101,7 @@ function updatePlayerJoinFaction(player: Player, ply: Ply, fac: Faction, newMemb
         ply.faction_name = fac.name;
         ply.add_to_update_player();
         for (const p of fac.playerList) {
-            tellraw(p.name, translate(DB.db_player.get(p.name)!.lang, player.name)?.faction_join ?? "no translation");
+            tellraw(p.name, translate(DB.db_player.get(p.name)!.lang, ply.name)?.faction_join ?? "no translation");
         }
     }
     else {

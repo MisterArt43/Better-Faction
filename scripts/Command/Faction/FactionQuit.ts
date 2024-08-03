@@ -27,7 +27,7 @@ async function Factionquit(args: string[], player: Player, ply: Ply) {
 	const fac = DB.db_faction.get(ply.faction_name ?? "");
 	if (fac) {
 		if (fac.playerList.find(p => p.name === ply.name && p.permission === factionRank.Leader)) {
-			log(`§e${ply.name}§r has disbanded the faction §e${fac.name}§r.`);
+			log(`§g${ply.name}§e has disbanded the faction §g${fac.name}§e.`);
 			let i = 1;
 			for (const [key, faction] of DB.db_faction) {
 				const allyIndex = faction.ally.findIndex(a => a === fac.name);
