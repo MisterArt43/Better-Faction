@@ -144,28 +144,14 @@ system.runInterval(async () => {
 					}
 				}
 				if (refreshCalc) {
-					let admin = DB.db_admin.get(p.name);
-					if (DB.db_map.lockAdmin && p.hasTag(globalThis.adminTag)) {
-						if (admin === undefined) {
-							p.removeTag(globalThis.adminTag);
-							log(`§7${p.name} had Admin tag but was not register in the Admin database.`);
-						}
-						else if (!p.hasTag("pswd:" + admin.passphrase)) {
-							p.removeTag(globalThis.adminTag);
-							log(`§7${p.name} had Admin tag, was register in the Admin database, but don't have the passphrase tag §d` + "pswd:" + admin.passphrase);
-						}
-					}
+					const isAdmin = player ? player.permission <= cmd_permission.admin : false
 					if (p.hasTag("ban") && player !== undefined) {
-						if (player.isunban || (admin !== undefined && p.hasTag("pswd:" + admin.passphrase))) {
-							try {
-								p.removeTag("ban");
-							}
-							finally {
-								player.remove_to_update_player();
-								player.isunban = false;
-								is_edit = true;
-								log("§7" + player.name + " unbanned.")
-							}
+						if (player.isunban || (isAdmin)) {
+							p.removeTag("ban");
+							player.remove_to_update_player();
+							player.isunban = false;
+							is_edit = true;
+							log("§7" + player.name + " unbanned.")
 						}
 						else {
 							Server.runCommandAsync(`kick "${p.name}" §c•> You are ban`);
@@ -328,14 +314,6 @@ system.runInterval(async () => {
 					}
 				}
 				if (is_edit) player?.add_to_update_player(); // Add player to update queue if edited
-				if (curTick % 200 === 0) {
-					if (DB.db_admin.size == 0 && DB.db_map.lockAdmin == true) {
-						log("§7admin database is lock but nobody is inside ? unlocking it");
-						Server.runCommandAsync("scoreboard players reset \"$db_map(" + textToHex(JSON.stringify(DB.db_map)) + ")\" database");
-						DB.db_map.lockAdmin = false;
-						Server.runCommandAsync("scoreboard players set \"$db_map(" + textToHex(JSON.stringify(DB.db_map)) + ")\" database 1");
-					}
-				}
 			}
 			const end = Date.now();
 			loadDatabase.refreshTime = (end - start) + " ms";
