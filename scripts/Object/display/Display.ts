@@ -1,10 +1,22 @@
-import { world } from "@minecraft/server";
+import { system, world } from "@minecraft/server";
 import { Server, hexToText, log, sleep, textToHex } from "../tool/tools";
 import { DB } from "../database/database";
 
 
 function display_size(): number {
 	return db_display.db_display_actionbar.size + db_display.db_display_title.size + (db_display.db_display_rule ? 1 : 0);
+}
+
+function display_delete(display: Display) {
+	if (display.type === displayTypes.title)
+		return db_display.db_display_title.delete(display.tag)
+	if (display.type === displayTypes.actionbar)
+		return db_display.db_display_actionbar.delete(display.tag)
+	if (display.type === displayTypes.rule && db_display.db_display_rule) {
+		db_display.db_display_rule = null;
+		return true
+	}
+	return false
 }
 
 function display_values(): Display[] {
@@ -31,6 +43,17 @@ function display_getter_tag(tag: string): Display[] {
 	return displayList;
 }
 
+function display_getter_by_type_tag(tag: string, type: Display['type']): Display | undefined {
+	if (type === displayTypes.title) {
+		return DB.db_display.db_display_title.get(tag);
+	} else if (type === displayTypes.actionbar) {
+		return DB.db_display.db_display_actionbar.get(tag);
+	} else if (type === displayTypes.rule) {
+		return DB.db_display.db_display_rule ? DB.db_display.db_display_rule : undefined;
+	}
+	else return undefined;
+}
+
 function display_setter_tag(key: Display['tag'], display: Display) {
 	if (display.type === displayTypes.title) {
 		DB.db_display.db_display_title.set(key, display);
@@ -39,6 +62,17 @@ function display_setter_tag(key: Display['tag'], display: Display) {
 	} else if (display.type === displayTypes.rule) {
 		DB.db_display.db_display_rule = display;
 	}
+}
+
+function display_has_tag(key: Display['tag'], type: Display['type']) {
+	if (type === displayTypes.title) {
+		return DB.db_display.db_display_title.has(key);
+	} else if (type === displayTypes.actionbar) {
+		return DB.db_display.db_display_actionbar.has(key);
+	} else if (type === displayTypes.rule) {
+		return !!DB.db_display.db_display_rule;
+	}
+	else return false;
 }
 
 export const displayTypes = {
@@ -145,6 +179,30 @@ export class Display {
 		}
 	}
 
+	static add_display(display: Display | undefined) {
+		if (display === undefined || display.type !== "title") return;
+		if (db_display.has(display.tag, display.type)) {
+			log(`§cDuplicate display found, fixing ${display.tag}`);
+			Display.remove_display(db_display.getByType(display.tag, display.type));
+		}
+		db_display.set(display.tag, display);
+		const scoreboard = world.scoreboard.getObjective("db_display")!;
+		system.run(() => {
+			scoreboard.addScore(`$db_display(${textToHex(JSON.stringify(display))})`, 1);
+		});
+		// Server.runCommandAsync("scoreboard players set \"$db_display(" + textToHex(JSON.stringify(display)) + ")\" db_display 1");
+	}
+
+	static remove_display(display: Display | undefined) {
+		if (display === undefined) return;
+		const scoreboard = world.scoreboard.getObjective("db_display")!;
+		system.run(() => {
+			scoreboard.removeParticipant(`$db_display(${textToHex(JSON.stringify(display))})`);
+		});
+		// Server.runCommandAsync("scoreboard players reset \"$db_display(" + textToHex(JSON.stringify(display)) + ")\" db_display");
+		db_display.delete(display);
+	}
+
 	remove_to_update_display() {
 		if (this === undefined) return;
 		const scoreboard = world.scoreboard.getObjective("db_display")!;
@@ -161,11 +219,14 @@ export class Display {
 }
 
 export const db_display = {
-    db_display_title: new Map<Display['tag'], Display>(),
-    db_display_actionbar: new Map<Display['tag'], Display>(),
-    db_display_rule: null as Display | null,
-    get: display_getter_tag,
-    set: display_setter_tag,
-    size: display_size,
+	db_display_title: new Map<Display['tag'], Display>(),
+	db_display_actionbar: new Map<Display['tag'], Display>(),
+	db_display_rule: null as Display | null,
+	get: display_getter_tag,
+	getByType: display_getter_by_type_tag,
+	set: display_setter_tag,
+	has: display_has_tag,
+	size: display_size,
+	delete: display_delete,
 	values: display_values
 };
