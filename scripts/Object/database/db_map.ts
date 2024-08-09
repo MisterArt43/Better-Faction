@@ -63,6 +63,7 @@ export class DB_Map {
 	public powerLimit: powerLimit;
 	public defaultPower: number;
 	public timeToRegenPower: number;
+	public canClaimInOtherDimension: boolean;
 	[key: string]: any;
 
 	constructor() {
@@ -91,7 +92,8 @@ export class DB_Map {
 		this.default_cmd_module = [cmd_module.all],
 		this.defaultPower = 5,
 		this.powerLimit = new powerLimit(),
-		this.timeToRegenPower = 60
+		this.timeToRegenPower = 60,
+		this.canClaimInOtherDimension = false
 	}
 
 	static async initDB_map() : Promise<DB_Map> {

@@ -23,6 +23,8 @@ export class Faction {
 	public Fhome: Vector_3 | null;
 	public isOpen: boolean;
 	public claim: Map<string, Chunk>;
+	public groupClaim: Map<string, Map<string, Chunk>>;
+	public canClaimInOtherDimension: boolean;
 	[key: string]: any;
 
 	/**
@@ -47,6 +49,8 @@ export class Faction {
 		this.Fhome = null;
 		this.isOpen = false;
 		this.claim = new Map();
+		this.groupClaim = new Map();
+		this.canClaimInOtherDimension = DB.db_map.canClaimInOtherDimension;
 	}
 
 	static async initDB_faction() {
@@ -138,7 +142,7 @@ export class Faction {
 
 	public jsonString(obj: Faction): string {
 		return JSON.stringify(obj, (key, value) => {
-			if (key === "claim") {
+			if (key === "claim" || key === "groupClaim") {
 				return undefined;
 			}
 			return value;

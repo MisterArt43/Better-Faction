@@ -1,4 +1,4 @@
-import { ChatSendBeforeEvent, Player, world } from "@minecraft/server";
+import { ChatSendBeforeEvent, Player, system, world } from "@minecraft/server";
 import { DB } from "../Object/database/database";
 import { findFirstTagStartWith, findTagsStartWithV2, tellraw } from "../Object/tool/tools";
 import { Faction } from "../Object/faction/Faction";
@@ -17,9 +17,11 @@ export function customChat(data: ChatSendBeforeEvent) {
 	if (player.isMute)
 		return tellraw(data.sender, "§cYou are muted");
 
-	player.remove_to_update_player();
-	player.lastMessage = data.message.trim();
-	player.add_to_update_player();
+	system.run(() => {
+		player.remove_to_update_player();
+		player.lastMessage = data.message.trim();
+		player.add_to_update_player();
+	})
 
     processMessage(data, player);
 }

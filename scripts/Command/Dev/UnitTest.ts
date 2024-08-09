@@ -2,7 +2,7 @@ import { Player } from "@minecraft/server";
 import { addSubCommand, Command, commands, SubCommand, subCommandExecuter } from "../CommandManager";
 import { Ply, db_player, db_player_online } from "../../Object/player/Ply";
 import { cmd_module, cmd_permission } from "../../Object/database/db_map";
-import { colorizeJSON, log, sleep } from "../../Object/tool/tools";
+import { canBeParseInt, colorizeJSON, log, sleep } from "../../Object/tool/tools";
 import { DB } from "../../Object/database/database";
 import { db_faction, Faction } from "../../Object/faction/Faction";
 
@@ -62,11 +62,13 @@ addSubCommand(
 )
 
 async function UT_DB_Faction(args: string[], player: Player, ply: Ply) {
-    const nb_test = 1;
-    const batchSize = 1;
+    const nb_test = canBeParseInt(args[3]) ? parseInt(args[3], 10) : 1;
+    const batchSize = 10;
     
-    const nb_player_multiplier = 7;
+    const nb_player_multiplier = canBeParseInt(args[4]) ? parseInt(args[4], 10) : 7;
     const nb_player = nb_test * nb_player_multiplier;
+
+    const cleanDB = args[5] === "false" ? false : true;
 
     const playerList = new Array<Ply>();
 
@@ -94,7 +96,7 @@ async function UT_DB_Faction(args: string[], player: Player, ply: Ply) {
         await subCommandExecuter(["faction", "create", "faction" + i], { message: "", sender: player, cancel: false }, undefined, undefined, player, playerList.slice(i * nb_player_multiplier, (i + 1) * nb_player_multiplier)[0])
 
         if (i % batchSize === 0) {
-            await sleep(2);
+            await sleep(1);
         }
         
         for (let j = 1; j < nb_player_multiplier; j++) {
@@ -103,6 +105,9 @@ async function UT_DB_Faction(args: string[], player: Player, ply: Ply) {
                 player,
                 playerList.slice(i * nb_player_multiplier, (i + 1) * nb_player_multiplier)[0]
             );
+            if (j % batchSize === 0) {
+                await sleep(1);
+            }
         }
     }
 
@@ -116,17 +121,29 @@ async function UT_DB_Faction(args: string[], player: Player, ply: Ply) {
                 player,
                 playerList.slice(i * nb_player_multiplier, (i + 1) * nb_player_multiplier)[j]
             );
+            if (j % batchSize === 0) {
+                await sleep(1);
+            }
+        }
+        if (i % batchSize === 0) {
+            await sleep(1);
         }
     }
 
     log("result of the first faction (playerList) : " + colorizeJSON(JSON.stringify(db_faction.get("Faction0")?.playerList)))
 
+    if (cleanDB === false) {
+        log("§gFaction not removed, cleanDB is false")
+        return;
+    }
     await sleep(10);
     for (let i = 0; i < nb_test; i++) {
         ((commands.get("faction") as Map<string, SubCommand>).get("quit") as Command).func(
             ["faction", "quit"],
             player,
             playerList.slice(i * nb_player_multiplier, (i + 1) * nb_player_multiplier)[0])
+        if (i % batchSize === 0)
+            await sleep(1);
     }
 
     log(`§afaction still exist (should be §cfalse§a) : ${(db_faction.has("Faction0")) ? "§atrue" : "§cfalse"}`)
@@ -135,6 +152,8 @@ async function UT_DB_Faction(args: string[], player: Player, ply: Ply) {
         for (let i = 0; i < nb_test; i++) {
             Faction.remove_faction(db_faction.get("Faction" + i)!)
             log("§gFaction" + i + " force removed")
+            if (i % batchSize === 0)
+                await sleep(1);
         }
     }
 

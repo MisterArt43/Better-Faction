@@ -6,7 +6,6 @@ import { DB } from "../../Object/database/database";
 import { db_warp, Warp } from "../../Object/warp/Warp";
 import { db_delay, Delay } from "../../Object/player/Delay";
 import { db_display, Display } from "../../Object/display/Display";
-import { Admin, db_admin } from "../../Object/player/Admin";
 import { db_faction, Faction } from "../../Object/faction/Faction";
 import { colorizeJSON, log, Server } from "../../Object/tool/tools";
 import { BFActionFormData } from "../../Object/formQueue/formQueue";
@@ -31,7 +30,6 @@ function db(args: string[], player: Player, ply: Ply) {
     Warp.initDB_warp();
     Delay.initDB_delay();
     Display.initDB_display();
-    Admin.initDB_admin();
     Faction.initDB_faction();
 
     if (args.length < 2)
@@ -154,7 +152,6 @@ function resetDB(args: string[], player: Player, ply: Ply) {
         db_player.clear();
         db_player_online.clear();
         db_faction.clear();
-        db_admin.clear();
         db_chunk.clear();
         db_warp.clear();
         db_display.db_display_actionbar.clear();

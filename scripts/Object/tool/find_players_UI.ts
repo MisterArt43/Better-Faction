@@ -16,6 +16,7 @@ export async function UI_find_player(pl: Player): Promise<Ply | undefined> {
     if (!playerList) return undefined;
 
     const selectedPlayer = await selectPlayer(pl, playerList);
+    log(selectedPlayer + "");
 
     if (!selectedPlayer) {
         tellraw(pl, "§cPlayer not found");
@@ -48,7 +49,7 @@ async function getPlayerList(searchInOnlinePlayers: boolean, searchKeyword: stri
     for (const player of playerDB.values()) {
         const playerName = player.name.toLowerCase();
         if (playerName.startsWith(searchKeyword)) {
-            playerList.push(playerName);
+            playerList.push(player.name);
             if (playerList.length === 100) {
                 tellraw(pl, "§cToo many results, will only return the first 100");
                 await sleep(10);
@@ -71,7 +72,7 @@ async function selectPlayer(pl: Player, playerList: string[]): Promise<Ply | und
         .dropdown("Select a player", playerList)
         .show(pl)
         .then(async (res) => {
-            if (res.canceled || !res.formValues || typeof res.formValues[0] !== "number") return undefined;
+            if (res.canceled || !res.formValues) return undefined;
             return DB.db_player.get(playerList[res.formValues[0] as unknown as number]);
         });
 }

@@ -22,6 +22,9 @@ export class Chunk {
 	public group: string;
 	[key: string]: any;
 
+	/**
+	 * bitshift x and z by 4 before passing them to this constructor
+	 */
 	constructor(xChunk: number, zChunk: number, owner: Player['name'], date: number, faction: string, dimensionID: string, chunkPermission?: ChunkPermission, group?: string) {
 		if (db_chunk.get(xChunk + "," + zChunk + dimensionID) !== undefined) {throw log("§7§l(constructor chunk) §r§cchunk already exist");}
 		this.x = xChunk;
@@ -147,6 +150,12 @@ export class Chunk {
 								return;
 							}
 							faction.claim.set(key, chunk);
+							if (faction.groupClaim.has(chunk.group)) {
+								faction.groupClaim.get(chunk.group)!.set(key, chunk)
+							}
+							else {
+								faction.groupClaim.set(chunk.group, new Map<string, Chunk>().set(key, chunk));
+							}
 							db_chunk.set(key, chunk);
 							const GC = db_group_chunk.get(chunk.group + chunk.faction_name);
 							if (GC === undefined) {
