@@ -7,7 +7,7 @@ import { customChat } from "../Chat/CustomChat";
 import { BFActionFormData } from "../Object/formQueue/formQueue";
 
 world.beforeEvents.chatSend.subscribe(data => {
-	try {
+	if (isLoaded === false) return tellraw(data.sender, "§cScript is not loaded yet. Please wait a few seconds and try again.");
 		if (data.message.substring(0, DB.db_map.prefix.length) === prefix) {
 			if (data.sender.nameTag === undefined) {
 				data.sender.nameTag = data.sender.name;
@@ -21,9 +21,6 @@ world.beforeEvents.chatSend.subscribe(data => {
 			customChat(data);
 			data.cancel = true;
 		}
-	} catch (e) {
-		console.warn(`beforeChat: ${e}\n`)
-	}
 })
 
 export async function subCommandExecuter(args: string[], data: ChatSendBeforeEvent, it: number = 0, cursor?: SubCommand, player?: Player, ply?: Ply) {

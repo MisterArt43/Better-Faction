@@ -10,3 +10,5 @@ export * from './FactionKick'
 export * from './FactionPromote'
 export * from './FactionQuit'
 export * from './FactionSetHome'
+
+export * from './Claim/Index'

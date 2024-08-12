@@ -111,6 +111,18 @@ function db(args: string[], player: Player, ply: Ply) {
             log("§6 Length : " + DB.db_faction.size);
             break;
         }
+        case "chunk" : {
+            let i = 0;
+            if (args.length == 4 && args[3].match(/[0-9]/g)) {
+                i = parseInt(args[3]);
+            }
+            if (DB.db_chunk.size - 1 >= i) {
+                log(colorizeJSON(JSON.stringify(Array.from(DB.db_chunk.values())[i], null, 8)));
+                i++;
+            }
+            log("§6 Length : " + DB.db_chunk.size);
+            break;
+        }
     }
 }
 

@@ -1,5 +1,5 @@
 import * as MC from '@minecraft/server';
-import { DatabaseKey, database, loadDatabase, loadDatabaseStrings } from './conf_db';
+import { DatabaseKey, database, loadDatabase, loadDatabaseStrings } from '../../conf_db';
 
 export class ExtendedMap<K, V> extends Map<K, V> {
     dbName: string;

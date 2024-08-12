@@ -13,6 +13,7 @@
       "strict": true,
       "allowUnreachableCode": true,
       "allowUnusedLabels": true,
+      "allowJs": true,
       "noImplicitAny": true,
       "noImplicitReturns": false,
       "noImplicitUseStrict": false,
