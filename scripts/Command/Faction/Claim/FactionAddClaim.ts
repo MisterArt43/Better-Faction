@@ -62,13 +62,9 @@ function AddClaimChunk(args: string[], player: Player, ply: Ply) {
 }
 
 function AddClaimUI(player: Player, ply: Ply, fac: Faction) {
-	const setGroupName = new Set<string>();
-	Array.from(fac.claim.values()).map((chunk) => setGroupName.add(chunk.group));
-	const listGroupName = Array.from(setGroupName);
+	const listGroupName = Array.from(fac.groupClaim.keys());
 	if (listGroupName.length === 0) listGroupName.push("none");
 
-	log(JSON.stringify(listGroupName));
-	
 	new BFModalFormData()
 	.title("Add Claim " + (player.location.x >> 4) + " " + (player.location.z >> 4))
 	.dropdown("claim group", listGroupName)
