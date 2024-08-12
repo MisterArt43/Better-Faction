@@ -9,10 +9,10 @@ import { cmd_module, cmd_permission } from "../../Object/database/db_map";
 import { haveFaction, isAtLeastOfficer } from "./_UtilsFaction";
 
 addSubCommand(
-	"InviteStatus",
-	"Open or close the faction to invite. (if open, everyone can join)",
+	"open",
+	"Open or close the faction to invite. (if open, everyone can join without invite)",
 	`${globalThis.prefix}faction open`,
-	["InviteStatus", "invitestatus", "is", "open", "close"],
+	["open", "close"],
 	cmd_module.faction,
 	cmd_permission.member,
 	true,
