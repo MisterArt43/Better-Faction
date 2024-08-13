@@ -1,7 +1,7 @@
 import { EntityHealthComponent, Player, system, world } from "@minecraft/server";
-import { Server, findFirstTagStartWith, findTagsStartWithV2, log, tellraw, textToHex } from "../Object/tool/tools";
+import { Server, findFirstTagStartWith, findTagsStartWithV2, log, tellraw } from "../Object/tool/tools";
 import { DB } from "../Object/database/database";
-import { Ply, Tpa } from "../Object/player/Ply";
+import { Ply } from "../Object/player/Ply";
 import { Display } from "../Object/display/Display";
 import { translate } from "../Object/tool/lang";
 import { Faction } from "../Object/faction/Faction";
@@ -241,7 +241,11 @@ system.runInterval(async () => {
 												}
 											}
 										})
-										p.runCommandAsync(`titleraw @s ${display.type} {"rawtext":[{"text":"§r${formated_display}"}]}`);
+										if (display.type === "title")
+											p.onScreenDisplay.setTitle(JSON.parse(`{"rawtext":[{"text":"§r${formated_display}"}]}`));
+										else if (display.type === "actionbar")
+											p.onScreenDisplay.setActionBar(JSON.parse(`{"rawtext":[{"text":"§r${formated_display}"}]}`));
+										// p.runCommandAsync(`titleraw @s ${display.type} {"rawtext":[{"text":"§r${formated_display}"}]}`);
 									}
 									catch (er) {
 										if (er instanceof Error)
