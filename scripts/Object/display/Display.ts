@@ -180,7 +180,7 @@ export class Display {
 	}
 
 	static add_display(display: Display | undefined) {
-		if (display === undefined || display.type !== "title") return;
+		if (display === undefined) return;
 		if (db_display.has(display.tag, display.type)) {
 			log(`§cDuplicate display found, fixing ${display.tag}`);
 			Display.remove_display(db_display.getByType(display.tag, display.type));
