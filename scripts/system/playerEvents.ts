@@ -2,6 +2,8 @@ import { world } from "@minecraft/server";
 import { DB } from "../Object/database/database";
 import { log } from "../Object/tool/tools";
 import { formatCreationDayTime } from "../Object/tool/dateTools";
+import { factionRank } from "../Object/faction/Faction";
+import { cmd_permission } from "../Object/database/db_map";
 
 world.afterEvents.playerJoin.subscribe(data => {
 	const date = Date.now();
@@ -23,5 +25,121 @@ world.afterEvents.playerLeave.subscribe((data) => {
 		ply.remove_to_update_player();
 		ply.lastConnect = date;
 		ply.add_to_update_player();
+	}
+});
+
+
+world.beforeEvents.explosion.subscribe((data) => {
+	data.getImpactedBlocks().forEach((block) => {
+		const xChunk = (block.location.x >> 4).toFixed(0);
+		const zChunk = (block.location.z >> 4).toFixed(0);
+		const chunk = DB.db_chunk.get(xChunk + "," + zChunk + data.dimension.id);
+		if (chunk !== undefined && chunk.faction_name === "Admin") {
+			data.cancel = true;
+			return;
+		}
+	});
+});
+
+
+world.beforeEvents.playerBreakBlock.subscribe((data) => {
+	const player = DB.db_player.get(data.player.name);
+	if (!player) {
+		data.cancel = true;
+		return;
+	}
+	if (player.permission <= cmd_permission.admin) return;
+	const xChunk = (data.block.location.x >> 4).toFixed(0);
+	const zChunk = (data.block.location.z >> 4).toFixed(0);
+	const chunk = DB.db_chunk.get(xChunk + "," + zChunk + data.dimension.id);
+	if (chunk !== undefined) {
+		if (chunk.faction_name !== player.faction_name) {
+			if (chunk.permission.length !== 0 && 
+				(chunk.permission.find((p) => p.name === player.name)?.permission?.getCanBreak() ?? false)) {
+			}
+		}
+		else {
+			if (chunk?.rankPermission.length !== 0 ?? false) {
+				const faction = DB.db_faction.get(player.faction_name);
+				if (faction !== undefined) {
+					const rank = faction.playerList.find((p) => p.name === player.name)!.permission;
+					const permission = chunk.rankPermission.find((p) => p.rank === rank);
+					if (permission?.permission?.getCanBreak() ?? false) {
+						return;
+					}
+				}
+			}
+		}
+		if (chunk.defaultPermission.getCanBreak()) return //log("default permission OK");
+		data.cancel = true;
+	}
+});
+
+world.beforeEvents.playerPlaceBlock.subscribe((data) => {
+	const player = DB.db_player.get(data.player.name);
+	if (!player) {
+		data.cancel = true;
+		return;
+	}
+	if (player.permission <= cmd_permission.admin) return;
+	const xChunk = (data.block.location.x >> 4).toFixed(0);
+	const zChunk = (data.block.location.z >> 4).toFixed(0);
+	const chunk = DB.db_chunk.get(xChunk + "," + zChunk + data.dimension.id);
+	if (chunk !== undefined) {
+		if (chunk.faction_name !== player.faction_name) {
+			if (chunk.permission.length !== 0 && 
+				(chunk.permission.find((p) => p.name === player.name)?.permission?.getCanPlace() ?? false)) {
+				return;
+			}
+		}
+		else {
+			if (chunk?.rankPermission.length !== 0 ?? false) {
+				const faction = DB.db_faction.get(player.faction_name);
+				if (faction !== undefined) {
+					const rank = faction.playerList.find((p) => p.name === player.name)!.permission;
+					const permission = chunk.rankPermission.find((p) => p.rank === rank);
+					if (permission?.permission?.getCanPlace() ?? false) {
+						return;
+					}
+				}
+			}
+		}
+		if (chunk.defaultPermission.getCanPlace()) return;
+		data.cancel = true;
+	}
+});
+
+world.beforeEvents.playerInteractWithBlock.subscribe((data) => {
+	log("interact")
+	const player = DB.db_player.get(data.player.name);
+	if (!player) {
+		data.cancel = true;
+		return;
+	}
+	if (player.permission <= cmd_permission.admin) return;
+	const xChunk = (data.block.location.x >> 4).toFixed(0);
+	const zChunk = (data.block.location.z >> 4).toFixed(0);
+	const chunk = DB.db_chunk.get(xChunk + "," + zChunk + data.player.dimension.id);
+	if (chunk !== undefined) {
+		if (chunk.faction_name !== player.faction_name) {
+			if (chunk.permission.length !== 0 && 
+				(chunk.permission.find((p) => p.name === player.name)?.permission?.getCanInteract() ?? false)) {
+				return;
+			}
+		}
+		else {
+			if (chunk?.rankPermission.length !== 0 ?? false) {
+				const faction = DB.db_faction.get(player.faction_name);
+				if (faction !== undefined) {
+					const rank = faction.playerList.find((p) => p.name === player.name)!.permission;
+					const permission = chunk.rankPermission.find((p) => p.rank === rank);
+					if (permission?.permission?.getCanInteract() ?? false) {
+						return;
+					}
+				}
+			}
+		}
+		if (chunk.defaultPermission.getCanInteract()) return;
+		data.cancel = true;
 	}
 });

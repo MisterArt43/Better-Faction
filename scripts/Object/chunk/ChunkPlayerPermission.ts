@@ -1,8 +1,8 @@
 import { ChunkPermission } from "./ChunkPermission";
 
 export class ChunkPlayerPermission {
-	private name: string;
-	private permission: ChunkPermission;
+	public name: string;
+	public permission: ChunkPermission;
 
 	constructor(name: string, permission: ChunkPermission) {
 		this.name = name;
