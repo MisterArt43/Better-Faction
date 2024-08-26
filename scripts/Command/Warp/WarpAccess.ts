@@ -3,9 +3,9 @@ import { Ply } from "../../Object/player/Ply";
 import { Warp } from "../../Object/warp/Warp";
 import { addSubCommand } from "../CommandManager";
 import { cmd_module, cmd_permission } from "../../Object/database/db_map";
-import { ActionFormData, ModalFormData } from "@minecraft/server-ui";
 import { find_warp_UI } from "../../Object/tool/find_waps_UI";
 import { WarpNotEmpty } from "./_UtilsWarp";
+import { BFActionFormData, BFModalFormData } from "../../Object/formQueue/formQueue";
 
 addSubCommand(
 	"access",
@@ -24,7 +24,7 @@ addSubCommand(
 async function warpEditAccessUI(args: string[], player: Player, ply: Ply) {
 	let currentWarp = await find_warp_UI(player, true);
 	if (!currentWarp) return player.sendMessage("This warp doesn't exist");
-	new ActionFormData()
+	new BFActionFormData()
 	.title("Edit Warp Access")
 	.body("summery of what is Access : \nWith this UI you can filter who can access this warp by adding or removing tags to the allowed or denied list, see more in " + globalThis.prefix + "help")
 	.button("§aAdd§f/§cRemove §aAllowed Tag")
@@ -41,7 +41,7 @@ async function warpEditAccessUI(args: string[], player: Player, ply: Ply) {
 }
 
 function warpEditAddOrRemoveAccessTagUI(player: Player, ply: Ply, warp: Warp, type: "allow" | "deny") {
-	new ActionFormData()
+	new BFActionFormData()
 	.title("Edit Warp Access")
 	.button("§aAdd " + type + " tag")
 	.button("§cRemove " + type + " tag")
@@ -61,7 +61,7 @@ function warpEditAddOrRemoveAccessTagUI(player: Player, ply: Ply, warp: Warp, ty
 }
 
 function warpEditAddAccessTag(player: Player, ply: Ply, warp: Warp, type: "allow" | "deny") {
-	new ModalFormData()
+	new BFModalFormData()
 	.title("Edit Warp Access")
 	.textField("Tag", "tag")
 	.show(player).then(res => {
@@ -76,7 +76,7 @@ function warpEditAddAccessTag(player: Player, ply: Ply, warp: Warp, type: "allow
 }
 
 function warpEditRemoveAccessTag(player: Player, ply: Ply, warp: Warp, type: "allow" | "deny") {
-	const form = new ActionFormData()
+	const form = new BFActionFormData()
 	.title("Edit Warp Access")
 	.body("Select a tag to remove")
 	warp[type].forEach(tag => form.button(tag));

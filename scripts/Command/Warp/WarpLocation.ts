@@ -3,10 +3,10 @@ import { Ply } from "../../Object/player/Ply";
 import { Warp, db_warp } from "../../Object/warp/Warp";
 import { addSubCommand } from "../CommandManager";
 import { cmd_module, cmd_permission } from "../../Object/database/db_map";
-import { ActionFormData, ModalFormData } from "@minecraft/server-ui";
 import { DB } from "../../Object/database/database";
 import { find_warp_UI } from "../../Object/tool/find_waps_UI";
 import { WarpNotEmpty } from "./_UtilsWarp";
+import { BFActionFormData, BFModalFormData } from "../../Object/formQueue/formQueue";
 
 addSubCommand(
 	"location",
@@ -24,7 +24,7 @@ addSubCommand(
 
 function editWarpLocation(args: string[], player: Player, ply: Ply) {
 	if (DB.db_warp.size > 0) {
-		const form = new ActionFormData()
+		const form = new BFActionFormData()
 		.body("select a warp")
 		const list_w = Array.from(DB.db_warp.values())
 		list_w.map(w => form.button(w.pos.getDimColor() + w.name))
@@ -41,7 +41,7 @@ async function editWarpLocationUI(player: Player, ply: Ply, list_w : Warp []) {
 	let currentWarp = await find_warp_UI(player, true);
 	if (!currentWarp) return player.sendMessage("This warp doesn't exist");
 	currentWarp.remove_to_update_warp();
-	new ModalFormData()
+	new BFModalFormData()
 		.title("Edit Warp Location")
 		.textField("Name", "warp name", currentWarp!.name)
 		.textField("X", "coordinate x", currentWarp!.pos.x.toString())

@@ -41,10 +41,7 @@ export async function subCommandExecuter(args: string[], data: ChatSendBeforeEve
 			if (cursor.module == cmd_module.all || ply.cmd_module.includes(cmd_module.all) || ply.cmd_module.includes(cursor.module)) {
 				if (cursor.permission >= ply.permission) {
 					try {
-						if (cursor.isUI)
-							system.run(() => cursor.func(args, player, ply));
-						else
-							cursor.func(args, player, ply)
+						system.run(() => cursor.func(args, player, ply));
 					} catch (error : any) {
 						if (error instanceof Error) {
 							log(`§cError: ${error.message}\n\n${error.stack}\n`);

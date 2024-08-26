@@ -2,11 +2,11 @@ import { Player, system, world } from "@minecraft/server";
 import { Ply } from "../../../Object/player/Ply";
 import { concatenateArgs, tellraw } from "../../../Object/tool/tools";
 import { DB } from "../../../Object/database/database";
-import { ActionFormData, ModalFormData } from "@minecraft/server-ui";
 import { translate } from "../../../Object/tool/lang";
 import { UI_find_player } from "../../../Object/tool/find_players_UI";
 import { addSubCommand } from "../../CommandManager";
 import { cmd_module, cmd_permission } from "../../../Object/database/db_map";
+import { BFActionFormData, BFModalFormData } from "../../../Object/formQueue/formQueue";
 
 addSubCommand(
 	"pay",
@@ -43,7 +43,7 @@ function Pui_pay(player: Player, ply: Ply) {
 	}
 
 	system.runTimeout(async () => {
-		const res = await new ActionFormData()
+		const res = await new BFActionFormData()
 			.title("§r§6Select Pay Method§r")
 			.button("§r§aOnline Player§r")
 			.button("§r§aSearch Player§r")
@@ -67,7 +67,7 @@ async function onlinePlayerSel(player: Player, ply: Ply) {
 		return;
 	}
 
-	const res = await new ModalFormData()
+	const res = await new BFModalFormData()
 		.title("§r§6Select Player§r")
 		.dropdown("§r§aPlayer List§r", onlinePlayers)
 		.textField(`§r§aMoney to transfer (limit: ${ply.money})§r`, "1")
@@ -86,7 +86,7 @@ async function searchPlayerSel(player: Player, ply: Ply) {
 		const target = await UI_find_player(player);
 		if (target === undefined) return;
 
-		const res = await new ModalFormData()
+		const res = await new BFModalFormData()
 			.title("§r§6Pay to " + target.name + "§r")
 			.textField(`§r§aMoney to transfer (limit: ${ply.money})§r`, "1")
 			.show(player);
@@ -101,7 +101,7 @@ async function searchPlayerSel(player: Player, ply: Ply) {
 }
 
 function enterPlayerNameSel(player: Player, ply: Ply) {
-	new ModalFormData()
+	new BFModalFormData()
 		.title("§r§6Pay§r")
 		.textField(`§r§aPlayer Name§r`, "")
 		.textField(`§r§aMoney to transfer (limit: ${ply.money})§r`, "1")

@@ -1,4 +1,4 @@
-import { Player } from "@minecraft/server";
+import { Player, system } from "@minecraft/server";
 import { Ply } from "../../../Object/player/Ply";
 import { concatenateArgs, tellraw } from "../../../Object/tool/tools";
 import { translate } from "../../../Object/tool/lang";
@@ -24,7 +24,7 @@ addSubCommand(
 function sethome(args: string[], player: Player, ply: Ply) {
 	if (args.length >= 2) {
 		let name = concatenateArgs(args, 1, (s) => s.replace(/"/g, ""));
-		if (ply.home.find((h) => h.getName() === name) != undefined) {
+		if (ply.home.find((h) => h.name === name) != undefined) {
 			tellraw(player, translate(ply.lang)?.error_have_home ?? "no translation");
 			return;
 		}
@@ -41,9 +41,11 @@ function sethome(args: string[], player: Player, ply: Ply) {
 			player.dimension.id
 		);
 
-		ply.remove_to_update_player();
-		ply.home.push(homeObject);
-		ply.add_to_update_player();
+		system.run(() => {
+			ply.remove_to_update_player();
+			ply.home.push(homeObject);
+			ply.add_to_update_player();
+		});
 
 		tellraw(player, translate(ply.lang, name)?.home_add ?? "no translation");
 	}

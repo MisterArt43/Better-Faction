@@ -3,9 +3,9 @@ import { Ply } from "../../Object/player/Ply";
 import { Warp, db_warp } from "../../Object/warp/Warp";
 import { addSubCommand } from "../CommandManager";
 import { cmd_module, cmd_permission } from "../../Object/database/db_map";
-import { ModalFormData } from "@minecraft/server-ui";
 import { concatenateArgs } from "../../Object/tool/tools";
 import { translate } from "../../Object/tool/lang";
+import { BFModalFormData } from "../../Object/formQueue/formQueue";
 
 addSubCommand(
 	"add",
@@ -48,7 +48,7 @@ function addWarpCommand(args: string[], player: Player, ply: Ply) {
 
 function addWarpUI(player: Player, ply: Ply) {
 	const dimensionTab = [MinecraftDimensionTypes.overworld, MinecraftDimensionTypes.nether, MinecraftDimensionTypes.theEnd]
-	new ModalFormData()
+	new BFModalFormData()
 		.title("Add Warp")
 		.textField("Name", "warp name")
 		.textField("X", "coordinate x", player.location.x.toString())

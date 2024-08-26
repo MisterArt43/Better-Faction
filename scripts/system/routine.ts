@@ -10,6 +10,8 @@ import { addDateZ, formatCreationDayTime } from "../Object/tool/dateTools";
 import { processQueue } from "../Object/formQueue/formQueue";
 import { cmd_permission } from "../Object/database/db_map";
 
+export * from "./playerEvents";
+
 let curTick = 0;
 const START_TICK = 20; //start 0.5 secondes after a "/reload"
 

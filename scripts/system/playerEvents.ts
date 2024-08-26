@@ -55,7 +55,7 @@ world.beforeEvents.playerBreakBlock.subscribe((data) => {
 	if (chunk !== undefined) {
 		if (chunk.faction_name !== player.faction_name) {
 			if (chunk.permission.length !== 0 && 
-				(chunk.permission.find((p) => p.name === player.name)?.permission?.getCanBreak() ?? false)) {
+				(chunk.permission.find((p) => p.name === player.name)?.permission?.canBreak ?? false)) {
 			}
 		}
 		else {
@@ -64,13 +64,13 @@ world.beforeEvents.playerBreakBlock.subscribe((data) => {
 				if (faction !== undefined) {
 					const rank = faction.playerList.find((p) => p.name === player.name)!.permission;
 					const permission = chunk.rankPermission.find((p) => p.rank === rank);
-					if (permission?.permission?.getCanBreak() ?? false) {
+					if (permission?.permission?.canBreak ?? false) {
 						return;
 					}
 				}
 			}
 		}
-		if (chunk.defaultPermission.getCanBreak()) return //log("default permission OK");
+		if (chunk.defaultPermission.canBreak) return //log("default permission OK");
 		data.cancel = true;
 	}
 });
@@ -88,7 +88,7 @@ world.beforeEvents.playerPlaceBlock.subscribe((data) => {
 	if (chunk !== undefined) {
 		if (chunk.faction_name !== player.faction_name) {
 			if (chunk.permission.length !== 0 && 
-				(chunk.permission.find((p) => p.name === player.name)?.permission?.getCanPlace() ?? false)) {
+				(chunk.permission.find((p) => p.name === player.name)?.permission?.canPlace ?? false)) {
 				return;
 			}
 		}
@@ -98,19 +98,18 @@ world.beforeEvents.playerPlaceBlock.subscribe((data) => {
 				if (faction !== undefined) {
 					const rank = faction.playerList.find((p) => p.name === player.name)!.permission;
 					const permission = chunk.rankPermission.find((p) => p.rank === rank);
-					if (permission?.permission?.getCanPlace() ?? false) {
+					if (permission?.permission?.canPlace ?? false) {
 						return;
 					}
 				}
 			}
 		}
-		if (chunk.defaultPermission.getCanPlace()) return;
+		if (chunk.defaultPermission.canPlace) return;
 		data.cancel = true;
 	}
 });
 
 world.beforeEvents.playerInteractWithBlock.subscribe((data) => {
-	log("interact")
 	const player = DB.db_player.get(data.player.name);
 	if (!player) {
 		data.cancel = true;
@@ -123,7 +122,7 @@ world.beforeEvents.playerInteractWithBlock.subscribe((data) => {
 	if (chunk !== undefined) {
 		if (chunk.faction_name !== player.faction_name) {
 			if (chunk.permission.length !== 0 && 
-				(chunk.permission.find((p) => p.name === player.name)?.permission?.getCanInteract() ?? false)) {
+				(chunk.permission.find((p) => p.name === player.name)?.permission?.canInteract ?? false)) {
 				return;
 			}
 		}
@@ -133,13 +132,13 @@ world.beforeEvents.playerInteractWithBlock.subscribe((data) => {
 				if (faction !== undefined) {
 					const rank = faction.playerList.find((p) => p.name === player.name)!.permission;
 					const permission = chunk.rankPermission.find((p) => p.rank === rank);
-					if (permission?.permission?.getCanInteract() ?? false) {
+					if (permission?.permission?.canInteract ?? false) {
 						return;
 					}
 				}
 			}
 		}
-		if (chunk.defaultPermission.getCanInteract()) return;
+		if (chunk.defaultPermission.canInteract) return;
 		data.cancel = true;
 	}
 });

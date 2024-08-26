@@ -1,5 +1,5 @@
 import { DimensionLocation, Player, world } from "@minecraft/server";
-import { Server, hexToText, log, sleep, textToHex } from "../tool/tools"
+import { Nether, Server, TheEnd, hexToText, log, sleep, textToHex } from "../tool/tools"
 import { Vector_3_Dim } from "../tool/object/Vector";
 import { DB } from "../database/database";
 
@@ -18,6 +18,25 @@ export class Warp {
 	public delay: number;
 	public runCommandAsync: string[];
 	public log: WarpDelay[];
+
+	public static fromObject(warp: Warp) : Warp {
+		const w = new Warp(warp.name, 
+			{name: warp.creator, location: {x: warp.pos.x, y: warp.pos.y, z: warp.pos.z}, dimension: (warp.pos.dim === "overworld" ? Server : warp.pos.dim === "nether" ? Nether : TheEnd)} as Player);
+		w.name = warp.name;
+		w.message = warp.message;
+		w.displayMessageOnTp = warp.displayMessageOnTp;
+		w.creator = warp.creator;
+		w.creationDate = warp.creationDate;
+		w.editionDate = warp.editionDate;
+		w.allow = warp.allow;
+		w.deny = warp.deny;
+		w.isOpen = warp.isOpen;
+		w.pos = Vector_3_Dim.fromObject(warp.pos);
+		w.delay = warp.delay;
+		w.runCommandAsync = warp.runCommandAsync;
+		w.log = warp.log;
+		return w;
+	}
 
 	constructor(Wname: string, player: Player) {
 		const date = Date.now()
@@ -120,7 +139,8 @@ export class Warp {
 							log("§cError: Mismatch data in db_warp, try deleting the database and restarting the server. Contact the developer.");
 							return;
 						}
-						let warp = JSON.parse(hexToText(db.join(""))) as Warp;
+						const warpObj = JSON.parse(hexToText(db.join(""))) as Warp;
+						const warp = Warp.fromObject(warpObj);
 						
 						// Update db_warp map
 						const existingObject = db_warp.get(warp.name);

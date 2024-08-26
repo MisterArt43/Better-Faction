@@ -2,7 +2,6 @@ import { Player } from "@minecraft/server";
 import { Ply } from "../../Object/player/Ply";
 import { DB } from "../../Object/database/database";
 import { factionRank } from "../../Object/faction/Faction";
-import { log } from "../../Object/tool/tools";
 
 export function haveFaction( ply: Ply, player: Player) : boolean {
 	if (ply.faction_name !== null) {

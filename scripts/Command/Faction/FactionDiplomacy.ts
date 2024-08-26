@@ -4,11 +4,11 @@ import { DB } from "../../Object/database/database";
 import { Faction, factionRank } from "../../Object/faction/Faction";
 import { translate } from "../../Object/tool/lang";
 import { sleep, tellraw } from "../../Object/tool/tools";
-import { ActionFormData, ModalFormData } from "@minecraft/server-ui";
 import { UI_find_faction } from "../../Object/tool/find_factions_UI";
 import { addSubCommand } from "../CommandManager";
 import { cmd_module, cmd_permission } from "../../Object/database/db_map";
 import { isLeader } from "./_UtilsFaction";
+import { BFActionFormData, BFModalFormData } from "../../Object/formQueue/formQueue";
 
 addSubCommand(
 	"diplomacy",
@@ -34,7 +34,7 @@ function FactionAlly(args: string[], player: Player, ply: Ply) {
 }
 
 async function FactionDiplomacyUI(player: Player, ply: Ply, fac: Faction) {
-	new ActionFormData()
+	new BFActionFormData()
 		.title("Diplomacy")
 		.button("Ally")
 		.button("Enemy")
@@ -47,7 +47,7 @@ async function FactionDiplomacyUI(player: Player, ply: Ply, fac: Faction) {
 }
 
 async function FactionDiplomacyMode(player: Player, ply: Ply, fac: Faction, type: "ally" | "enemy") {
-	const res = await new ActionFormData()
+	const res = await new BFActionFormData()
 		.title("Diplomacy " + type)
 		.button("add")
 		.button("list")
@@ -79,7 +79,7 @@ async function FactionDiplomacyAddUI(player: Player, ply: Ply, fac: Faction, typ
 }
 
 async function FactionDiplomacyListUI(player: Player, ply: Ply, fac: Faction, list: string[], type: "ally" | "enemy") {
-	let form = new ModalFormData()
+	let form = new BFModalFormData()
 		.title("Diplomacy " + type)
 	let i = 0;
 	for (let ally of list) {

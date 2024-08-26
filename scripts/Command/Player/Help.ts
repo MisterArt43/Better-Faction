@@ -1,8 +1,8 @@
-import { ChatSendAfterEvent, Player } from "@minecraft/server";
+import { Player } from "@minecraft/server";
 import { cmd_module, cmd_permission } from "../../Object/database/db_map";
-import { Command, SubCommand, addSubCommand, commands, getSubCommandPerAlias, havePermissionForSubCommand } from "../CommandManager";
+import { Command, SubCommand, addSubCommand, commands, getSubCommandPerAlias } from "../CommandManager";
 import { Ply } from "../../Object/player/Ply";
-import { log, tellraw } from "../../Object/tool/tools";
+import { tellraw } from "../../Object/tool/tools";
 
 addSubCommand(
 	"help",

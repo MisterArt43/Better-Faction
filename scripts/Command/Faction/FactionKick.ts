@@ -4,10 +4,10 @@ import { concatenateArgs, tellraw } from "../../Object/tool/tools";
 import { DB } from "../../Object/database/database";
 import { translate } from "../../Object/tool/lang";
 import { Faction, factionRank, faction_member } from "../../Object/faction/Faction";
-import { ActionFormData } from "@minecraft/server-ui";
 import { addSubCommand } from "../CommandManager";
 import { cmd_module, cmd_permission } from "../../Object/database/db_map";
 import { isAtLeastOfficerAndHaveMoreThanOneMember } from "./_UtilsFaction";
+import { BFActionFormData } from "../../Object/formQueue/formQueue";
 
 addSubCommand(
 	"kick",
@@ -61,7 +61,7 @@ function FactionKickCMD(args: string[], player: Player, ply: Ply, fac: Faction) 
 }
 
 async function FactionKickUI(player: Player, ply: Ply, fac: Faction) {
-	const form = new ActionFormData()
+	const form = new BFActionFormData()
 	.title("Select a player to kick")
 	const playerListCopy = [...fac.playerList];
 	for (const p of playerListCopy) {

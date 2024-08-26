@@ -5,9 +5,9 @@ import { Ply } from "../../../Object/player/Ply";
 import { DB } from "../../../Object/database/database";
 import { concatenateArgs, tellraw } from "../../../Object/tool/tools";
 import { translate } from "../../../Object/tool/lang";
-import { ModalFormData } from "@minecraft/server-ui";
 import { UI_find_player } from "../../../Object/tool/find_players_UI";
 import { Home } from "../../../Object/player/Home";
+import { BFModalFormData } from "../../../Object/formQueue/formQueue";
 
 addSubCommand(
 	"delhome",
@@ -32,15 +32,15 @@ function removeHomeFromPly(ply: Ply, home: Home): void {
 
 function handleHomeRemoval(ply: Ply, home: Home): void {
     removeHomeFromPly(ply, home);
-    tellraw(ply.name, translate(ply.lang, home.getName())?.home_remove ?? `§e•> "§a${arguments[1]}§e" removed.`);
+    tellraw(ply.name, translate(ply.lang, home.name)?.home_remove ?? `§e•> "§a${arguments[1]}§e" removed.`);
 }
 
 function removeHomeForPlayer(player: Player, target: Ply, homeName: string): void {
     if (player.hasTag(adminTag)) {
-        let home = target.home.find((h) => h.getName() === homeName);
+        let home = target.home.find((h) => h.name === homeName);
         if (home !== undefined) {
             removeHomeFromPly(target, home);
-            tellraw(player, translate(target.lang, home.getName(), target.name)?.admin_home_remove ?? `§e•> "§a${home.getName()}§e" removed for ${target.name}.`);
+            tellraw(player, translate(target.lang, home.name, target.name)?.admin_home_remove ?? `§e•> "§a${home.name}§e" removed for ${target.name}.`);
         } else {
             tellraw(player, translate(target.lang)?.error_find_home ?? "no translation");
         }
@@ -54,10 +54,10 @@ function deleteHomeModal(player: Player, target: Ply | undefined): void {
     system.runTimeout(async () => {
 		if (target === undefined) return;
         let copyHome = [...target.home];
-        let form = new ModalFormData().title("§cDelete home \n§7(check the home you want to delete)");
+        let form = new BFModalFormData().title("§cDelete home \n§7(check the home you want to delete)");
 
         copyHome.forEach((h) => {
-            form.toggle(h.getName() + " §b" + h.getX() + ", " + h.getY() + ", " + h.getZ() + " §e" + h.getDim(), false);
+            form.toggle(h.name + " §b" + h.x + ", " + h.y + ", " + h.z + " §e" + h.dim, false);
         });
 
         form.show(player).then((res) => {
@@ -68,7 +68,7 @@ function deleteHomeModal(player: Player, target: Ply | undefined): void {
             for (let i = 0; i < res.formValues.length; i++) {
                 if (res.formValues[i] === true) {
                     target.home.splice(target.home.indexOf(copyHome[i]), 1);
-                    tellraw(player, "§aHome §b" + copyHome[i].getName() + " §aof §b" + target.name + " §ahas been deleted.");
+                    tellraw(player, "§aHome §b" + copyHome[i].name + " §aof §b" + target.name + " §ahas been deleted.");
                 }
             }
             target.add_to_update_player();
@@ -79,7 +79,7 @@ function deleteHomeModal(player: Player, target: Ply | undefined): void {
 async function delhome(args: string[], player: Player, ply: Ply) {
     if (args.length >= 2) {
         let name = concatenateArgs(args, 1);
-        let home = ply.home.find((h) => h.getName() === name)
+        let home = ply.home.find((h) => h.name === name)
         if (home !== undefined) {
             handleHomeRemoval(ply, home);
         } else {

@@ -1,5 +1,4 @@
 import { Player } from "@minecraft/server";
-import { ModalFormData } from "@minecraft/server-ui";
 import { sleep, tellraw } from "./tools";
 import { DB } from "../database/database";
 import { Faction } from "../faction/Faction";
@@ -26,7 +25,7 @@ export async function UI_find_faction(pl: Player): Promise<Faction | undefined> 
 }
 
 async function getSearchOptions(pl: Player): Promise<{ searchAllFaction: boolean; searchKeyword: string } | undefined> {
-    const form = new ModalFormData()
+    const form = new BFModalFormData()
         .textField("Enter the start of the faction name", "Faction name")
     if (DB.db_faction.size < 100) form.toggle("show all faction", false)
     return await form.show(pl)

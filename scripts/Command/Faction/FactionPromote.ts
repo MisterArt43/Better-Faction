@@ -4,10 +4,10 @@ import { DB } from "../../Object/database/database";
 import { Faction, factionRank, faction_member } from "../../Object/faction/Faction";
 import { concatenateArgs, getTypedKeys, tellraw } from "../../Object/tool/tools";
 import { translate } from "../../Object/tool/lang";
-import { ModalFormData } from "@minecraft/server-ui";
 import { addSubCommand } from "../CommandManager";
 import { cmd_module, cmd_permission } from "../../Object/database/db_map";
 import { isAtLeastOfficerAndHaveMoreThanOneMember } from "./_UtilsFaction";
+import { BFModalFormData } from "../../Object/formQueue/formQueue";
 
 addSubCommand(
 	"promote",
@@ -93,7 +93,7 @@ function updateFactionPromote(player: Player, ply: Ply, target: faction_member, 
 // ---------------------------------- //
 
 async function FactionrankUI(player: Player, ply: Ply, fac: Faction) {
-    const form = new ModalFormData().title("Faction Promote - Select a player to promote");
+    const form = new BFModalFormData().title("Faction Promote - Select a player to promote");
 
     const plList = [...fac.playerList];
     const playerPerm = plList.find((p) => p.name === player.name)!.permission;

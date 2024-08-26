@@ -6,8 +6,8 @@ import { translate } from "../../Object/tool/lang";
 import { Faction, factionRank, faction_member } from "../../Object/faction/Faction";
 import { addSubCommand } from "../CommandManager";
 import { cmd_module, cmd_permission } from "../../Object/database/db_map";
-import { ActionFormData, ModalFormData } from "@minecraft/server-ui";
 import { haveFaction, isAtLeastOfficer } from "./_UtilsFaction";
+import { BFActionFormData, BFModalFormData } from "../../Object/formQueue/formQueue";
 
 addSubCommand(
 	"invite",
@@ -111,7 +111,7 @@ function listInvite(player: Player, ply: Ply, fac: Faction, factionMember: facti
 // ---------------------------------- //
 
 async function factionInviteUI(player: Player, ply: Ply, fac: Faction, factionMember: faction_member) {
-	const form = new ActionFormData()
+	const form = new BFActionFormData()
 		.title("Faction Invite")
 		.button("Invite a player")
 	if (fac.invitList.length > 0) {
@@ -131,7 +131,7 @@ async function factionInviteUI(player: Player, ply: Ply, fac: Faction, factionMe
 }
 
 async function clearInviteUI(player: Player, ply: Ply, fac: Faction, factionMember: faction_member) {
-	const form = new ModalFormData()
+	const form = new BFModalFormData()
 		.title("Faction Invite - Clear invites")
 	for (const p of fac.invitList) {
 		form.toggle(p, false);
@@ -158,7 +158,7 @@ async function clearInviteUI(player: Player, ply: Ply, fac: Faction, factionMemb
 }
 
 async function invitePlayerUI(player: Player, ply: Ply, fac: Faction, factionMember: faction_member) {
-	const form = new ModalFormData()
+	const form = new BFModalFormData()
 		.title("Faction Invite - Invite a player")
 		.textField("Player name", "player name")
 

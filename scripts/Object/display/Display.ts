@@ -186,8 +186,8 @@ export class Display {
 			Display.remove_display(db_display.getByType(display.tag, display.type));
 		}
 		db_display.set(display.tag, display);
-		const scoreboard = world.scoreboard.getObjective("db_display")!;
 		system.run(() => {
+			const scoreboard = world.scoreboard.getObjective("db_display")!;
 			scoreboard.addScore(`$db_display(${textToHex(JSON.stringify(display))})`, 1);
 		});
 		// Server.runCommandAsync("scoreboard players set \"$db_display(" + textToHex(JSON.stringify(display)) + ")\" db_display 1");
@@ -195,8 +195,8 @@ export class Display {
 
 	static remove_display(display: Display | undefined) {
 		if (display === undefined) return;
-		const scoreboard = world.scoreboard.getObjective("db_display")!;
 		system.run(() => {
+			const scoreboard = world.scoreboard.getObjective("db_display")!;
 			scoreboard.removeParticipant(`$db_display(${textToHex(JSON.stringify(display))})`);
 		});
 		// Server.runCommandAsync("scoreboard players reset \"$db_display(" + textToHex(JSON.stringify(display)) + ")\" db_display");

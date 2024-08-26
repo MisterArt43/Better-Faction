@@ -66,6 +66,10 @@ export class Vector_3 extends Vector_2 {
 export class Vector_3_Dim extends Vector_3 {
 	public dim : string;
 
+	public static fromObject(location: Vector_3_Dim) : Vector_3_Dim {
+		return new Vector_3_Dim(location.x, location.y, location.z, location.dim);
+	}
+
 	constructor(location : DimensionLocation)
 	constructor(x : number, y : number, z : number, dim : Dimension['id'])
 

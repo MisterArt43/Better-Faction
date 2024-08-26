@@ -8,7 +8,7 @@ import { BFModalFormData } from "../../../Object/formQueue/formQueue";
 import { addSubCommand } from "../../CommandManager";
 import { cmd_module, cmd_permission } from "../../../Object/database/db_map";
 import { isAtLeastOfficer } from "../_UtilsFaction";
-import { log, tellraw } from "../../../Object/tool/tools";
+import { tellraw } from "../../../Object/tool/tools";
 
 
 

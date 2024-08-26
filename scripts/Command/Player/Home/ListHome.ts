@@ -27,7 +27,7 @@ function listhome(args: string[], player: Player, ply: Ply) {
 
 	if (args.length === 1) {
 		const homes = ply.home;
-		const message = homes.map(h => `\n§e  -"§a${h.getName()}§e" ${h.getX()}, ${h.getY()}, ${h.getZ()} | ${h.getDim()}`).join("");
+		const message = homes.map(h => `\n§e  -"§a${h.name}§e" ${h.x}, ${h.y}, ${h.z} | ${h.dim}`).join("");
 		const translation = translate(ply.lang, message)?.home_list ?? "no translation";
 		handleError(message !== "" ? translation : translate(ply.lang)?.error_home_list ?? "no translation");
 	} else if (args.length >= 2) {
@@ -35,7 +35,7 @@ function listhome(args: string[], player: Player, ply: Ply) {
 			const name = concatenateArgs(args, 1, (s) => s.replace(/[@"]/g, ""));
 			const target = DB.db_player.get(name);
 			if (target !== undefined) {
-				const message = target.home.map(h => `\n§e  -"§a${h.getName()}§e" ${h.getX()}, ${h.getY()}, ${h.getZ()} | ${h.getDim()}`).join("");
+				const message = target.home.map(h => `\n§e  -"§a${h.name}§e" ${h.x}, ${h.y}, ${h.z} | ${h.dim}`).join("");
 				const translation = translate(ply.lang, message)?.home_list ?? "no translation";
 				handleError(message !== "" ? translation : translate(ply.lang)?.error_home_list ?? "no translation");
 			} else {

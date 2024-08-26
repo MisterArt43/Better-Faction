@@ -1,4 +1,3 @@
-import { ModalFormData } from "@minecraft/server-ui"
 import { Player, world } from "@minecraft/server";
 
 import { ChunkPermission } from "./ChunkPermission";
@@ -7,6 +6,7 @@ import { ChunkRankPermission } from "./ChunkRankPermission";
 import { Ply } from "../player/Ply";
 import { Server, hexToText, log, sleep, textToHex } from "../tool/tools";
 import { db_faction, factionRank } from "../faction/Faction";
+import { BFModalFormData } from "../formQueue/formQueue";
 
 
 export class Chunk {
@@ -79,11 +79,11 @@ export class Chunk {
 
 
 	async UI_chunkEditPermission(ply : Ply, pl : Player, permission : ChunkPermission, toDeleteOption : boolean) : Promise<ChunkPermission | boolean | undefined> {
-		let form = new ModalFormData()
+		let form = new BFModalFormData()
 		.title("Claim Edit")
-		.toggle("§eAllow Break", permission.getCanBreak())
-		.toggle("§eAllow Place", permission.getCanPlace())
-		.toggle("§eAllow Interact", permission.getCanInteract())
+		.toggle("§eAllow Break", permission.canBreak)
+		.toggle("§eAllow Place", permission.canPlace)
+		.toggle("§eAllow Interact", permission.canInteract)
 		if (toDeleteOption) form.toggle("§cDelete This Permission", false)
 		return await form.show(pl).then(res => {
 			if (res.canceled || res?.formValues === undefined)
@@ -91,9 +91,9 @@ export class Chunk {
 			if (typeof res.formValues[0] !== "boolean") return undefined;
 			if (typeof res.formValues[1] !== "boolean") return undefined;
 			if (typeof res.formValues[2] !== "boolean") return undefined;
-			permission.setCanBreak(res.formValues[0]);
-			permission.setCanPlace(res.formValues[1]);
-			permission.setCanInteract(res.formValues[2]);
+			permission.canBreak = (res.formValues[0]);
+			permission.canPlace = (res.formValues[1]);
+			permission.canInteract = (res.formValues[2]);
 			if (toDeleteOption && res.formValues[3]) return true;
 			return permission;
 		})

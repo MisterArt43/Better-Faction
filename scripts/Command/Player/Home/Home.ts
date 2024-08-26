@@ -1,4 +1,4 @@
-import { Player } from "@minecraft/server";
+import { Player, system } from "@minecraft/server";
 import { Ply } from "../../../Object/player/Ply";
 import { cmd_module, cmd_permission } from "../../../Object/database/db_map";
 import { DB } from "../../../Object/database/database";
@@ -27,12 +27,14 @@ function home(args: string[], player: Player, ply: Ply) {
 	if (Delay.isTpCanceled(player)) return;
 	if (args.length >= 2) {
 		const name = concatenateArgs(args, 1)
-		const ahome = DB.db_player.get(player.name)?.home.find((h) => h.getName() === name);
+		const ahome = DB.db_player.get(player.name)?.home.find((h) => h.name === name);
 		if (ahome != undefined) {
+			system.run(() => {
                 ply.remove_to_update_player();
 				ply.back.updatePos(player.location).normalize().updateDim(player.dimension);
                 ply.add_to_update_player();
-			runCommandDim(`tp \"${player.name}\" ${ahome.getX()} ${ahome.getY()} ${ahome.getZ()}`, ahome.getDim());
+			});
+			runCommandDim(`tp \"${player.name}\" ${ahome.x} ${ahome.y} ${ahome.z}`, ahome.dim);
 			tpsound(player);
 		}
 		else {

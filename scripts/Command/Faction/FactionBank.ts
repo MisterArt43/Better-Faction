@@ -4,10 +4,10 @@ import { DB } from "../../Object/database/database";
 import { tellraw } from "../../Object/tool/tools";
 import { translate } from "../../Object/tool/lang";
 import { Faction, factionRank } from "../../Object/faction/Faction";
-import { ActionFormData, ModalFormData } from "@minecraft/server-ui";
 import { addSubCommand } from "../CommandManager";
 import { cmd_module, cmd_permission } from "../../Object/database/db_map";
 import { haveFaction } from "./_UtilsFaction";
+import { BFActionFormData, BFModalFormData } from "../../Object/formQueue/formQueue";
 
 addSubCommand(
 	"bank",
@@ -71,7 +71,7 @@ function removeBankMoney(fac: Faction, money: number, ply: Ply, player: Player) 
 }
 
 async function FactionBankUI(player: Player, ply: Ply, fac: Faction) {
-	const form = new ActionFormData()
+	const form = new BFActionFormData()
 	.title("select action")
 	.body("§eCurrent bank Money: " + fac.bank)
 	.button("add")
@@ -87,7 +87,7 @@ async function FactionBankUI(player: Player, ply: Ply, fac: Faction) {
 }
 
 async function FactionBankAddUI(player: Player, ply: Ply, fac: Faction) {
-	const form = new ModalFormData()
+	const form = new BFModalFormData()
 	.title("add money")
 	.textField(`§ahow much money do you want to deposit?\n§eCurrent money: ${ply.money}`, "0", "0")
 
@@ -115,7 +115,7 @@ async function FactionBankAddUI(player: Player, ply: Ply, fac: Faction) {
 }
 
 async function FactionBankRemoveUI(player: Player, ply: Ply, fac: Faction) {
-	const form = new ModalFormData()
+	const form = new BFModalFormData()
 	.title("remove money")
 	.textField(`§ahow much money do you want to withdraw?\n§eCurrent bank money: ${fac.bank}`, "0", "0")
 
