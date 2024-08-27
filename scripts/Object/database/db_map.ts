@@ -197,6 +197,7 @@ export const cmd_module = {
 	claim: 10,
 	commoncommand: 11,
 	dev: 12,
+	display: 13,
 } as const;
 
 export const cmd_permission = {
