@@ -1,9 +1,9 @@
-import { world } from "@minecraft/server";
+import { Player, world } from "@minecraft/server";
 import { DB } from "../Object/database/database";
-import { log } from "../Object/tool/tools";
+import { log, tellraw } from "../Object/tool/tools";
 import { formatCreationDayTime } from "../Object/tool/dateTools";
-import { factionRank } from "../Object/faction/Faction";
 import { cmd_permission } from "../Object/database/db_map";
+import { Delay } from "../Object/player/Delay";
 
 world.afterEvents.playerJoin.subscribe(data => {
 	const date = Date.now();
@@ -142,3 +142,60 @@ world.beforeEvents.playerInteractWithBlock.subscribe((data) => {
 		data.cancel = true;
 	}
 });
+
+world.afterEvents.pistonActivate.subscribe(data => {
+	//find a way to block claim pushed block
+})
+
+world.afterEvents.entityDie.subscribe(data => {
+	let playerKiller = data.damageSource?.damagingEntity;
+	let playerKilled = data.deadEntity;
+	if (playerKilled instanceof Player) {
+		let pl = DB.db_player.get(playerKilled.name)!;
+		pl.remove_to_update_player();
+		pl.deathCount++;
+		if (pl.power > DB.db_map.powerLimit.min) pl.power--;
+		pl?.add_to_update_player();
+		if (playerKiller instanceof Player) {
+			let pl2 = DB.db_player.get(playerKiller.name)!;
+			pl2.remove_to_update_player();
+			pl2.killCount++;
+			pl2.add_to_update_player();
+			log(`§7[§cKill§7] §e${pl2.name} §7killed §e${pl.name}`)
+		}
+		else log(`§7[§cDeath§7] §e${pl.name} §7died`)
+	}
+});
+
+world.afterEvents.entityHurt.subscribe(data => {
+	if (!isLoaded) return;
+	if (data.hurtEntity.typeId === "minecraft:player") {
+		const player = world.getAllPlayers().find((p) => p.nameTag === data.hurtEntity.nameTag)!;
+		if (data.damage < 0) return
+		if (data.damageSource.damagingEntity?.typeId === "minecraft:player") {
+			if (DB.db_delay.has(player.name)) {
+				DB.db_delay.get(player.name)?.update_time(DB.db_map.playerHurtDelay);
+			}
+			else {
+				new Delay(player.name, DB.db_map.playerHurtDelay);
+			}
+		}
+		else {
+			if (DB.db_delay.has(player.name)) {
+				DB.db_delay.get(player.name)?.update_time(DB.db_map.randomHurtDelay);
+			}
+			else {
+				new Delay(player.name, DB.db_map.randomHurtDelay);
+			}
+		}
+	}
+});
+
+world.afterEvents.playerSpawn.subscribe(data => {
+	if (isLoaded) {
+		const pl = DB.db_player.get(data.player.name)!;
+		if (DB.db_map.v != version && pl.permission <= cmd_permission.admin) {
+			tellraw(data.player.name, "§7[DB] database version is different from the current version, ask a Owner to do " + globalThis.prefix + "update");
+		}
+	}
+})
