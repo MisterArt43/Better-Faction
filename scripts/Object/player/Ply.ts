@@ -54,9 +54,9 @@ export class Ply {
 		this.back = new Vector_3_Dim(location.x, location.y, location.z, dimension.id);
 		this.chat = "all";
 		this.isunban = false;
-		this.lang = DB.db_map?.defaultLang ?? "en";
-		this.UTC = DB.db_map?.UTC ?? 0;
-		this.cmd_module = DB.db_map?.default_cmd_module ?? [0];
+		this.lang = DB.db_map.defaultLang ?? "en";
+		this.UTC = DB.db_map.UTC ?? 0;
+		this.cmd_module = DB.db_map.default_cmd_module ?? [0];
 		this.deathCount = 0;
 		this.killCount = 0;
 		this.power = 5;
