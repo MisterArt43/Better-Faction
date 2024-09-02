@@ -77,6 +77,9 @@ function AddClaimUI(player: Player, ply: Ply, fac: Faction) {
 		if (ply.faction_name === null)
 			return tellraw(player, "You are not in a faction");
 
+		if (fac.power < fac.claim.size)
+			return tellraw(player, "The faction don't have enough power to claim")
+
 		const chunk = new Chunk(player.location.x >> 4, player.location.z >> 4, ply.name, Date.now(), fac.name, player.dimension.id, undefined, listGroupName[res.formValues[0] as number]);
 		Chunk.add_chunk(chunk);
 		tellraw(player, "§aClaim added");
