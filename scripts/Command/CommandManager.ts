@@ -27,8 +27,8 @@ export async function subCommandExecuter(args: string[], data: ChatSendBeforeEve
 	if (cursor === undefined) cursor = commands.get(args[it]);
 	else if (!(cursor instanceof Command)) cursor = cursor.get(args[it]);
 
-	player = player ? player : world.getPlayers({ name: data.sender.name })?.[0];
-	ply = ply ? ply : DB.db_player.get(data.sender.name)!;
+	if (!player) player = world.getPlayers({ name: data.sender.name })?.[0];
+	if (!ply) ply = DB.db_player.get(data.sender.name)!;
 
 	if (cursor === undefined || cursor instanceof Command && cursor.externalCondition && !cursor.externalCondition(ply, player))
 		return tellraw(data.sender, `§cUnknown command. Try ${prefix}help for a list of commands.`);
