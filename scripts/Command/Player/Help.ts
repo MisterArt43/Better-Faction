@@ -34,8 +34,8 @@ function help(args: string[], player: Player, ply: Ply) {
 function recurUsageSubCommand(ply: Ply, player: Player, subCommand: SubCommand, args: string[], i: number) {
 	if (subCommand instanceof Command) {
 		if (subCommand.isEnable) {
-			if (subCommand.permission <= ply.permission) {
-				tellraw(ply.name, `§7${subCommand.command}§r - §e${subCommand.description}\n§7Usage: ${subCommand.usage} §r\n§7Aliases: ${subCommand.aliases.join(", ")}\n`);	
+			if (ply.permission <= subCommand.permission) {
+				tellraw(player, `§7${subCommand.command}§r - §e${subCommand.description}\n§7Usage: ${subCommand.usage} §r\n§7Aliases: ${subCommand.aliases.join(", ")}\n`);	
 			}
 		}
 	}
@@ -46,10 +46,10 @@ function recurUsageSubCommand(ply: Ply, player: Player, subCommand: SubCommand, 
 		else {
 			if (args.length == i && subCommand instanceof Map) {
 				const msg = "list of subcommands:\n" + buildCursorMessage(ply, player, subCommand);
-				tellraw(ply.name, msg);
+				tellraw(player, msg);
 			}
 			else
-				tellraw(ply.name, `§cUnknown command. Try ${globalThis.prefix}help for a list of commands.`);
+				tellraw(player, `§cUnknown command. Try ${globalThis.prefix}help for a list of commands.`);
 		}
 	}
 }
