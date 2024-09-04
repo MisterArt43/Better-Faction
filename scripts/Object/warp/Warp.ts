@@ -1,4 +1,4 @@
-import { DimensionLocation, Player, world } from "@minecraft/server";
+import { Dimension, DimensionLocation, Player, world } from "@minecraft/server";
 import { Nether, Server, TheEnd, hexToText, log, sleep, textToHex } from "../tool/tools"
 import { Vector_3_Dim } from "../tool/object/Vector";
 import { DB } from "../database/database";
@@ -18,6 +18,7 @@ export class Warp {
 	public delay: number;
 	public runCommandAsync: string[];
 	public log: WarpDelay[];
+	[key: string]: any;
 
 	public static fromObject(warp: Warp) : Warp {
 		const w = new Warp(warp.name, 
@@ -166,6 +167,36 @@ export class Warp {
 			log("§7db_warp loaded in " + ((end - start) / 1000) + " second(s)");
 		}
 	} 
+
+	static async UpdateDB() {
+		if (db_warp.size > 0 && isLoaded === false) {
+			let counter = 1;
+			for (let obj of db_warp.values()) {
+				obj.remove_to_update_warp();
+				let new_obj = new Warp("undefined", { location: { x: 0, y: 0, z: 0 }, name: "updatePlayer", nameTag: "updatePlayer", dimension : {id: "overworld"}, id:"-1"} as Player);
+				let old_key = Object.keys(obj);
+				let new_key = Object.keys(new_obj);
+				let old_value = Object.values(obj);
+
+				for (let i = 0; i < new_key.length; i++) {
+					for (let j = 0; j < old_key.length; j++) {
+						if (new_key[i] === old_key[j]) {
+							new_obj[new_key[i]] = old_value[j];
+							break;
+						}
+					}
+				}
+				//log("\n§cOld => §7" + JSON.stringify(obj) + "\n§aNew => §7" + JSON.stringify(new_obj));
+				new_obj.add_to_update_warp();
+				obj = new_obj;
+				if (counter++ % 37 === 0) await sleep(1);
+			};
+			log("§8[Warp] §7Database Updated");
+		}
+		else {
+			log("cannot update database")
+		}
+	}
 }
 
 class WarpDelay {
