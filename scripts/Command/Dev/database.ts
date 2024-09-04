@@ -37,10 +37,11 @@ function db(args: string[], player: Player, ply: Ply) {
     switch (args[2]) {
         case "map" : {
             log(colorizeJSON(JSON.stringify(DB.db_map, null, 8)));
+            break;
         }
         case "player" : {
             let i = 0;
-            if (args.length == 4 && args[3].match(/[0-9]/g)) {
+            if (args.length === 4 && args[3].match(/[0-9]/g)) {
                 i = parseInt(args[3]);
             }
             log("i : " + i + " args3 : " + args[3]);
@@ -53,7 +54,7 @@ function db(args: string[], player: Player, ply: Ply) {
         }
         case "online" : {
             let i = 0;
-            if (args.length == 4 && args[3].match(/[0-9]/g)) {
+            if (args.length === 4 && args[3].match(/[0-9]/g)) {
                 i = parseInt(args[3]);
             }
             if (DB.db_player_online.size - 1 >= i) {
@@ -65,7 +66,7 @@ function db(args: string[], player: Player, ply: Ply) {
         }
         case "warp" : {
             let i = 0;
-            if (args.length == 4 && args[3].match(/[0-9]/g)) {
+            if (args.length === 4 && args[3].match(/[0-9]/g)) {
                 i = parseInt(args[3]);
             }
             if (DB.db_warp.size - 1 >= i) {
@@ -77,7 +78,7 @@ function db(args: string[], player: Player, ply: Ply) {
         }
         case "delay" : {
             let i = 0;
-            if (args.length == 4 && args[3].match(/[0-9]/g)) {
+            if (args.length === 4 && args[3].match(/[0-9]/g)) {
                 i = parseInt(args[3]);
             }
             if (DB.db_delay.size - 1 >= i) {
@@ -89,7 +90,7 @@ function db(args: string[], player: Player, ply: Ply) {
         }
         case "display" : {
             let i = 0;
-            if (args.length == 4 && args[3].match(/[0-9]/g)) {
+            if (args.length === 4 && args[3].match(/[0-9]/g)) {
                 i = parseInt(args[3]);
             }
             if (DB.db_display.size() - 1 >= i) {
@@ -101,7 +102,7 @@ function db(args: string[], player: Player, ply: Ply) {
         }
         case "faction" : {
             let i = 0;
-            if (args.length == 4 && args[3].match(/[0-9]/g)) {
+            if (args.length === 4 && args[3].match(/[0-9]/g)) {
                 i = parseInt(args[3]);
             }
             if (DB.db_faction.size - 1 >= i) {
@@ -113,7 +114,7 @@ function db(args: string[], player: Player, ply: Ply) {
         }
         case "chunk" : {
             let i = 0;
-            if (args.length == 4 && args[3].match(/[0-9]/g)) {
+            if (args.length === 4 && args[3].match(/[0-9]/g)) {
                 i = parseInt(args[3]);
             }
             if (DB.db_chunk.size - 1 >= i) {
