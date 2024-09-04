@@ -24,14 +24,14 @@ function tpahere(args: string[], player: Player, ply: Ply) {
 		let target = DB.db_player.get(name);
 		if (target != undefined) {
 			if (target.tpa != null && target.tpa.name === ply.name && target.tpa.type === TpaType.tpahere) {
+				tellraw(player, translate(ply.lang)?.error_tpa ?? "no translation");
+			}
+			else {
 				target.remove_to_update_player();
 				target.tpa = new Tpa(ply.name, TpaType.tpahere, DB.db_map.tpaDelay);
 				target.add_to_update_player();
 				tellraw(player, translate(ply.lang, target.name)?.tpa_send ?? "no translation");
 				tellraw(target.name, translate(ply.lang, ply.name, prefix)?.tpahere_get ?? "no translation")
-			}
-			else {
-				tellraw(player, translate(ply.lang)?.error_tpa ?? "no translation");
 			}
 		}
 		else {
