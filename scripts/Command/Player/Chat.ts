@@ -8,7 +8,7 @@ import { translate } from "../../Object/tool/lang";
 addSubCommand(
 	"chat",
 	"Chat control.",
-	`${globalThis.prefix}chat <on/off>`,
+	`${globalThis.prefix}chat (will go back to the public chat) \n${globalThis.prefix}chat <code> (you will join a private chat) \n${globalThis.prefix}chat <faction|ally|f|a> (you will join the faction or ally chat)`,
 	["chat"],
 	cmd_module.chat,
 	cmd_permission.member,
