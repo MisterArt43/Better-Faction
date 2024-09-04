@@ -1,4 +1,4 @@
-import { Player } from "@minecraft/server";
+import { Player, world } from "@minecraft/server";
 import { db_player, Ply } from "../../Object/player/Ply";
 import { cmd_module, cmd_permission } from "../../Object/database/db_map";
 import { sleep, tellraw } from "../../Object/tool/tools";
@@ -24,6 +24,10 @@ async function managePermission(args: string[], player: Player, ply: Ply) {
     if (ply.permission > cmd_permission.admin)
         return tellraw(player, "§cYou don't have permission to use this command")
 
+    if (args.length === 4) {
+        return CmdSetPerm(args, player, ply);
+    }
+
     new BFActionFormData().title("Select a method")
         .button("List all Admin")
         .button("Players with Permissions")
@@ -41,6 +45,56 @@ async function managePermission(args: string[], player: Player, ply: Ply) {
 }
 
 const permissionText : string[] = Object.keys(cmd_permission)
+
+async function CmdSetPerm(args: string[], player: Player, ply: Ply) {
+    if (args[2].startsWith("@")) {
+        switch (args[2]) {
+            case "@a": {
+                for (const [key, pl] of DB.db_player_online) {
+                    CmdSetPerm(["set", "permission", pl.name, args[3]], player, ply);
+                }
+                return;
+            }
+            case "@s": {
+                args[2] = player.name;
+                break
+            }
+        }
+    }
+    const target = db_player.get(args[2].replace(/[\"\']/g, ""));
+
+    if (target === undefined )
+        return tellraw(player, "§cPlayer not found");
+
+    if (ply.permission <= target.permission && ply.permission > cmd_permission.owner)
+        return tellraw(player, "§cYou don't have permission to change this player permission");
+
+    if (!permissionText.includes(args[3]))
+        return tellraw(player, "§cPermission not found, please use one of these: \n" + permissionText.join("\n- "));
+
+    if (target.permission === permissionText.indexOf(args[3]))
+        return tellraw(player, "§c" + target.name + " already have this permission");
+
+    if (target.permission <= cmd_permission.owner && permissionText.indexOf(args[3]) > cmd_permission.owner) {
+        let i = 0;
+        let nbOwner = 0;
+        for (const [key, pl] of db_player) {
+            if (pl.permission <= cmd_permission.owner) nbOwner++;
+            if (++i % 500 === 0) {
+                await sleep(1);
+                tellraw(player, "§7please wait... " + i + "/" + db_player.size + " player permission loaded");
+            }
+        }
+        if (nbOwner === 1)
+            return tellraw(player, "§cYou need at least one owner in the server");
+    }
+
+    target.remove_to_update_player();
+    target.permission = permissionText.indexOf(args[3]) as (typeof cmd_permission[keyof typeof cmd_permission]);
+    target.add_to_update_player();
+
+    tellraw(player, `§e${target.name} §ais now §e${args[3]}`);
+}
 
 async function manageplayerPerm(player: Player, ply: Ply) {
     const target = await UI_find_player(player);
@@ -79,7 +133,7 @@ async function generateEditPermForm(player: Player, ply: Ply, condition: Conditi
         }
         if (++i % 500 === 0) {
             await sleep(1);
-            tellraw(player, "please wait... " + i + "/" + db_player.size + " player permission loaded");
+            tellraw(player, "§7please wait... " + i + "/" + db_player.size + " player permission loaded");
         }
     }
 
