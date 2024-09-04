@@ -16,9 +16,9 @@ declare global {
 		refreshTime:string
 	};
 }
-globalThis.version = "2.0.4";
+globalThis.version = "2.0.5";
 globalThis.prefix = "+";
-globalThis.adminTag = "Admin";
+globalThis.adminTag = "Admin"; // deprecated
 globalThis.isLoaded = false;
 globalThis.loadDatabase = {
 	player:"§eloading...", 
