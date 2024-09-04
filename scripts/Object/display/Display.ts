@@ -168,7 +168,7 @@ export class Display {
 					}
 				}
 				//log("\n§cOld => §7" + JSON.stringify(obj) + "\n§aNew => §7" + JSON.stringify(new_obj));
-				new_obj.add_to_update_faction();
+				new_obj.add_to_update_display();
 				obj = new_obj;
 				if (counter++ % 37 === 0) await sleep(1);
 			};
