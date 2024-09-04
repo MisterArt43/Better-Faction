@@ -25,8 +25,8 @@ export class Chunk {
 	/**
 	 * bitshift x and z by 4 before passing them to this constructor
 	 */
-	constructor(xChunk: number, zChunk: number, owner: Player['name'], date: number, faction: string, dimensionID: string, chunkPermission?: ChunkPermission, group?: string) {
-		if (db_chunk.get(xChunk + "," + zChunk + dimensionID) !== undefined) {throw log("§7§l(constructor chunk) §r§cchunk already exist");}
+	constructor(xChunk: number, zChunk: number, owner: Player['name'], date: number, faction: string, dimensionID: string, chunkPermission?: ChunkPermission, group?: string, bypass?: boolean) {
+		if (bypass !== true && db_chunk.get(xChunk + "," + zChunk + dimensionID) !== undefined) {throw log("§7§l(constructor chunk) §r§cchunk already exist");}
 		this.x = xChunk;
 		this.z = zChunk;
 		this.owner = owner;
@@ -47,36 +47,25 @@ export class Chunk {
 		return this;
 	}
 
-	static async UpdateDB() {
-		if (db_chunk.size > 0 && isLoaded === false) {
-			let counter = 1;
-			for (let obj of db_chunk.values()) {
-				obj.remove_to_update_display();
-				let new_obj = new Chunk(0,0,"update", Date.now(), "Admin", "overworld");
-				let old_key = Object.keys(obj);
-				let new_key = Object.keys(new_obj);
-				let old_value = Object.values(obj);
+	public static fromObject(chunk: Chunk) : Chunk {
+		const c = new Chunk(chunk.x, chunk.z, chunk.owner, chunk.date, chunk.faction_name, chunk.dimension, chunk.defaultPermission, chunk.group, true);
+		c.x = chunk.x;
+		c.z = chunk.z;
+		c.owner = chunk.owner;
+		c.faction_name = chunk.faction_name;
+		c.date = chunk.date;
+		c.defaultPermission = new ChunkPermission(chunk.defaultPermission.canBreak, chunk.defaultPermission.canPlace, chunk.defaultPermission.canInteract);
+		c.permission = chunk.permission;
+		c.rankPermission = new Array();
+		for (let rank of chunk.rankPermission) {
+			c.rankPermission.push(new ChunkRankPermission(rank.rank, new ChunkPermission(rank.permission.canBreak, rank.permission.canPlace, rank.permission.canInteract)));
+		}
 
-				for (let i = 0; i < new_key.length; i++) {
-					for (let j = 0; j < old_key.length; j++) {
-						if (new_key[i] === old_key[j]) {
-							new_obj[new_key[i]] = old_value[j];
-							break;
-						}
-					}
-				}
-				//log("\n§cOld => §7" + JSON.stringify(obj) + "\n§aNew => §7" + JSON.stringify(new_obj));
-				new_obj.add_to_update_faction();
-				obj = new_obj;
-				if (counter++ % 37 === 0) await sleep(1);
-			};
-			log("§8[Display] §7Database Updated");
-		}
-		else {
-			log("cannot update database")
-		}
+		c.dimension = chunk.dimension;
+		c.group = chunk.group;
+
+		return c
 	}
-
 
 	async UI_chunkEditPermission(ply : Ply, pl : Player, permission : ChunkPermission, toDeleteOption : boolean) : Promise<ChunkPermission | boolean | undefined> {
 		let form = new BFModalFormData()
@@ -127,7 +116,8 @@ export class Chunk {
 							log("§cError: Mismatch data in db_chunk, try deleting the database and restarting the server. Contact the developer.");
 							return;
 						}
-						const chunk = JSON.parse(hexToText(db.join(""))) as Chunk;
+						const chunkObj = JSON.parse(hexToText(db.join(""))) as Chunk;
+						const chunk = this.fromObject(chunkObj);
 
 						// Update db_chunk map
 						const key = `${chunk.x},${chunk.z + chunk.dimension}`
@@ -180,6 +170,36 @@ export class Chunk {
 			log("§7db_chunk loaded in " + ((end - start) / 1000) + " second(s)");
 		}
 	}
+
+	static async UpdateDB() {
+		if (db_chunk.size > 0 && isLoaded === false) {
+			let counter = 1;
+			for (let obj of db_chunk.values()) {
+				obj.remove_to_update_chunk();
+				let new_obj = new Chunk(0,0,"update", Date.now(), "Admin", "overworld", undefined, undefined, true);
+				let old_key = Object.keys(obj);
+				let new_key = Object.keys(new_obj);
+				let old_value = Object.values(obj);
+
+				for (let i = 0; i < new_key.length; i++) {
+					for (let j = 0; j < old_key.length; j++) {
+						if (new_key[i] === old_key[j]) {
+							new_obj[new_key[i]] = old_value[j];
+							break;
+						}
+					}
+				}
+				//log("\n§cOld => §7" + JSON.stringify(obj) + "\n§aNew => §7" + JSON.stringify(new_obj));
+				new_obj.add_to_update_chunk();
+				obj = new_obj;
+				if (counter++ % 37 === 0) await sleep(1);
+			};
+			log("§8[Chunk] §7Database Updated");
+		}
+		else {
+			log("cannot update database")
+		}
+	}
 	
 	static add_chunk(chunk: Chunk) {
 		if (db_chunk.has(chunk.x + "," + chunk.z)) return log(`§cDuplicate chunk found, fixing ${chunk.x}, ${chunk.z}`);
@@ -198,11 +218,15 @@ export class Chunk {
 	}
 
 	add_to_update_chunk() {
-		Server.runCommandAsync("scoreboard players set \"$db_chunk(" + textToHex(JSON.stringify(this)) + ")\" db_chunk 1");
+		if (this === undefined) return;
+		const scoreboard = world.scoreboard.getObjective("db_chunk")!;
+		scoreboard.addScore(`$db_chunk(${textToHex(JSON.stringify(this))})`, 1);
 	}
 
 	remove_to_update_chunk() {
-		Server.runCommandAsync("scoreboard players reset \"$db_chunk(" + textToHex(JSON.stringify(this)) + ")\" db_chunk");
+		if (this === undefined) return;
+		const scoreboard = world.scoreboard.getObjective("db_chunk")!;
+		scoreboard.removeParticipant(`$db_chunk(${textToHex(JSON.stringify(this))})`);
 	}
 }
 
