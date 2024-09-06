@@ -62,8 +62,8 @@ export class Delay {
 	}
 
 	static isTpCanceled(player: Player) {
-		if (player.hasTag("tpCanceled") && !player.hasTag(adminTag)) {
-			tellraw(player, "§cYou can't accept a teleportation request in this area.");
+		if (player.hasTag("tpCanceled")) {
+			tellraw(player, "§cYou can't use teleportation commands in this area.");
 			return true;
 		}
 		return false;
