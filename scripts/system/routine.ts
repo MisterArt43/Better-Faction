@@ -95,7 +95,7 @@ system.runInterval(async () => {
 		const players = world.getPlayers()
 		if (players.length !== 0 && DB.db_map != undefined) {
 			const start = Date.now();
-			if (curTick % (DB.db_map.refreshTick + 1) === 0) Server.runCommandAsync("title @a[tag=debug] actionbar " + Math.round(curTick / 20) + " script is now running.\n§7> RefreshTime : §s" + loadDatabase.refreshTime);
+			if (curTick % (DB.db_map.refreshTick + 1) === 0) Server.runCommandAsync("title @a[tag=debug] actionbar " + Math.round(curTick / 20) + " s, script is now running.\n§7> RefreshTime : §s" + loadDatabase.refreshTime);
 			
 			//------------------------------------ warp delay
 			const is_second = curTick % 20 === 0;
