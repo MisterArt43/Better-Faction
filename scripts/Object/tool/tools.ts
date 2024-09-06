@@ -1,4 +1,6 @@
 import { Dimension, Player, RawMessage, system, world } from "@minecraft/server";
+import { formatCreationDayTime } from "./dateTools";
+import { DB } from "../database/database";
 
 
 // -------------------------- //
@@ -23,7 +25,15 @@ export function tellraw(selector : tellrawSelector, text : string) {
 	else
 		Server.runCommandAsync(`tellraw "${selector}" {"rawtext":[{"text":"§r${text.replace(/"/g, "\'")}"}]}`);
 }
-export function log(text : number | string) { Server.runCommandAsync(`tellraw @a[tag=log] {"rawtext":[{"text":"§7{log} §r${text.toString().replace(/"/g, "\'").replace(/\n/g, "§r\n")}"}]}`) }
+export let logData = new Array<String>();
+export function log(text : number | string) {
+	Server.runCommandAsync(`tellraw @a[tag=log] {"rawtext":[{"text":"§7{log} §r${text.toString().replace(/"/g, "\'").replace(/\n/g, "§r\n")}"}]}`)
+	const save_text = "§7[" + formatCreationDayTime(Date.now(), DB.db_map.UTC) + "] §r" + text.toString().replace(/"/g, "\'").replace(/\n/g, "§r\n");
+
+	logData.push(save_text);
+	if (logData.length > 100)
+		logData.shift();
+}
 
 const colors = {
 	reset: "§r",
