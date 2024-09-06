@@ -40,10 +40,13 @@ export async function subCommandExecuter(args: string[], data: ChatSendBeforeEve
 				return tellraw(data.sender, `§cError You are not registered yet. Wait a few seconds and try again.`);
 			if (cursor.module == cmd_module.all || ply.cmd_module.includes(cmd_module.all) || ply.cmd_module.includes(cursor.module)) {
 				if (cursor.permission >= ply.permission) {
+					if (cursor.command === "ping") //exception to get server ping
+						return cursor.func(args, player, ply);
 					try {
 						system.run(() => cursor.func(args, player, ply));
 					} catch (error : any) {
 						if (error instanceof Error) {
+							world.sendMessage("§7An error occur, check logs (/tag @s add log)")
 							log(`§cError: ${error.message}\n\n${error.stack}\n`);
 						}
 					}
