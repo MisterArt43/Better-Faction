@@ -23,7 +23,6 @@ addSubCommand(
 
 function listhome(args: string[], player: Player, ply: Ply) {
 	const handleError = (errorMessage: string) => tellraw(player, errorMessage);
-	const adminTag = globalThis.adminTag;
 
 	if (args.length === 1) {
 		const homes = ply.home;
@@ -31,7 +30,7 @@ function listhome(args: string[], player: Player, ply: Ply) {
 		const translation = translate(ply.lang, message)?.home_list ?? "no translation";
 		handleError(message !== "" ? translation : translate(ply.lang)?.error_home_list ?? "no translation");
 	} else if (args.length >= 2) {
-		if (player.hasTag(adminTag)) {
+		if (ply.permission <= cmd_permission.admin) {
 			const name = concatenateArgs(args, 1, (s) => s.replace(/[@"]/g, ""));
 			const target = DB.db_player.get(name);
 			if (target !== undefined) {

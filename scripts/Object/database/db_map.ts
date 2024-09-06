@@ -18,7 +18,6 @@ declare global {
 }
 globalThis.version = "2.0.5";
 globalThis.prefix = "+";
-globalThis.adminTag = "Admin"; // deprecated
 globalThis.isLoaded = false;
 globalThis.loadDatabase = {
 	player:"§eloading...", 
@@ -70,7 +69,7 @@ export class DB_Map {
 		this.v = version,
 		this.homeLimit = 3,
 		this.factionMemberLimit = 5,
-		this.scoreMoney = "money",
+		this.scoreMoney = "bf_money",
 		this.isFhome = false,
 		this.prefix = prefix,
 		this.customName = false,

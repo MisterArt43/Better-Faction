@@ -36,14 +36,10 @@ function handleHomeRemoval(ply: Ply, home: Home): void {
 }
 
 function removeHomeForPlayer(player: Player, target: Ply, homeName: string): void {
-    if (player.hasTag(adminTag)) {
-        let home = target.home.find((h) => h.name === homeName);
-        if (home !== undefined) {
-            removeHomeFromPly(target, home);
-            tellraw(player, translate(target.lang, home.name, target.name)?.admin_home_remove ?? `§e•> "§a${home.name}§e" removed for ${target.name}.`);
-        } else {
-            tellraw(player, translate(target.lang)?.error_find_home ?? "no translation");
-        }
+    let home = target.home.find((h) => h.name === homeName);
+    if (home !== undefined) {
+        removeHomeFromPly(target, home);
+        tellraw(player, translate(target.lang, home.name, target.name)?.admin_home_remove ?? `§e•> "§a${home.name}§e" removed for ${target.name}.`);
     } else {
         tellraw(player, translate(target.lang)?.error_find_home ?? "no translation");
     }
@@ -84,7 +80,7 @@ async function delhome(args: string[], player: Player, ply: Ply) {
             handleHomeRemoval(ply, home);
         } else {
             if (args.length === 3) {
-                if (player.hasTag(adminTag)) {
+                if (ply.permission <= cmd_permission.admin) {
                     let target = DB.db_player.get(args[1].replace(/[@"]/g, ""));
                     if (target !== undefined && target instanceof Ply) {
                         removeHomeForPlayer(player, target, args[2].replace(/"/g, ""));
@@ -99,7 +95,7 @@ async function delhome(args: string[], player: Player, ply: Ply) {
             }
         }
     } else {
-        if (!player.hasTag(adminTag)) return tellraw(player, translate(ply.lang)?.error_arg ?? "§cWrong Arguments");
+        if (!(ply.permission <= cmd_permission.admin)) return tellraw(player, translate(ply.lang)?.error_arg ?? "§cWrong Arguments");
         deleteHomeModal(player, await UI_find_player(player));
     }
 }
