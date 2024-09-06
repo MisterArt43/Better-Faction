@@ -16,7 +16,7 @@ addSubCommand(
 	ping
 );
 
-async function ping(args: string[], player: Player, ply: Ply) {
+function ping(args: string[], player: Player, ply: Ply) {
 	const delay = 1000; //in ms
 	const waitTime = delay / 50; //in ticks
 	const start = Date.now();
