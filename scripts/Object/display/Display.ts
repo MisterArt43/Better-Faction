@@ -155,19 +155,22 @@ export class Display {
 			for (let obj of db_display.values()) {
 				obj.remove_to_update_display();
 				let new_obj = new Display("update", "update", "title");
-				let old_key = Object.keys(obj);
-				let new_key = Object.keys(new_obj);
-				let old_value = Object.values(obj);
-
-				for (let i = 0; i < new_key.length; i++) {
-					for (let j = 0; j < old_key.length; j++) {
-						if (new_key[i] === old_key[j]) {
-							new_obj[new_key[i]] = old_value[j];
-							break;
+				
+				for (const newKey in new_obj) {
+					if (new_obj.hasOwnProperty(newKey)) {
+						if (!obj.hasOwnProperty(newKey)) {
+							obj[newKey] = new_obj[newKey];
 						}
 					}
 				}
-				//log("\n§cOld => §7" + JSON.stringify(obj) + "\n§aNew => §7" + JSON.stringify(new_obj));
+				for (const oldKey in obj) {
+					if (obj.hasOwnProperty(oldKey)) {
+						if (!new_obj.hasOwnProperty(oldKey)) {
+							delete obj[oldKey];
+						}
+					}
+				}
+
 				new_obj.add_to_update_display();
 				obj = new_obj;
 				if (counter++ % 37 === 0) await sleep(1);

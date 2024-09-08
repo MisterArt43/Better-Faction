@@ -1,10 +1,11 @@
+import { world } from "@minecraft/server";
 import { Server, getMap, hexToText, log, sleep, textToHex } from "../tool/tools";
+import { DB } from "./database";
 // Database Module for Application Preferences : DB MAP.
 
 declare global {
 	var version: string;
 	var prefix: string;
-	var adminTag: string;
 	var isLoaded: boolean;
 	var loadDatabase: {
 		player:string,
@@ -16,7 +17,7 @@ declare global {
 		refreshTime:string
 	};
 }
-globalThis.version = "2.0.5";
+globalThis.version = "2.0.6";
 globalThis.prefix = "+";
 globalThis.isLoaded = false;
 globalThis.loadDatabase = {
@@ -33,6 +34,7 @@ export let db_map: DB_Map;
 
 export async function update_db_map(new_db_map: DB_Map) {
 	db_map = new_db_map;
+	DB.db_map = db_map;
 }
 
 export class DB_Map {
@@ -134,31 +136,31 @@ export class DB_Map {
 
 	static async UpdateDB() {
 		if (db_map !== undefined && isLoaded === false) {
-			await sleep(5);
-			await Server.runCommandAsync("scoreboard objectives remove database");
-			await sleep(2);
-			await Server.runCommandAsync("scoreboard objectives add database dummy");
+			let score = world.scoreboard.getObjective("database");
+			if (!score) score = world.scoreboard.addObjective("database");
+			
+			score.removeParticipant(`$db_map(${textToHex(JSON.stringify(db_map))})`);
 			let new_obj = new DB_Map();
-			let old_key = Object.keys(db_map);
-			let new_key = Object.keys(new_obj);
-			let old_value = Object.values(db_map);
-			for (let i = 0; i < new_key.length; i++) {
-				for (let j = 0; j < old_key.length; j++) {
-					if (new_key[i] == "v") {
-						new_obj[new_key[i]] = version;
-						break;
-					}
-					else if (new_key[i] == old_key[j]) {
-						new_obj[new_key[i]] = old_value[j];
-						break;
+			
+			for (const newKey in new_obj) {
+				if (new_obj.hasOwnProperty(newKey)) {
+					if (db_map.hasOwnProperty(newKey)) {
+						new_obj[newKey] = db_map[newKey];
 					}
 				}
 			}
+	
+			new_obj.v = version;
+			update_db_map(new_obj);
+			
+			score.setScore(`$db_map(${textToHex(JSON.stringify(db_map))})`, 1);
+			//await Server.runCommandAsync("scoreboard players set \"$db_map(" + textToHex(JSON.stringify(new_obj)) + ")\" database 1");
+	
 			log("§8[MAP] §7Database Updated");
+		} else {
+			log("§c[DB] Unable to update database, db_map is undefined or already loaded.");
 		}
-		else {
-			log("cannot update database")
-		}
+		return;
 	}
 }
 
