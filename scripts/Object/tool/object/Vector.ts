@@ -48,9 +48,9 @@ export class Vector_3 extends Vector_2 {
 	}
 
 	normalize() {
-		this.x = Math.ceil(this.x + 0.0001) - 1;
-        this.y = Math.floor(this.y + 0.4999);
-        this.z = Math.ceil(this.z + 0.0001) - 1;
+		this.x = parseFloat(this.x.toFixed(1));
+        this.y = parseFloat(this.y.toFixed(1));
+        this.z = parseFloat(this.z.toFixed(1));
 		return this;
 	}
 
