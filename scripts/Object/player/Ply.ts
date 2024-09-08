@@ -51,7 +51,7 @@ export class Ply {
 		this.tpa = null;
 		this.delay = new Array;
 		this.date = date.getTime();
-		this.back = new Vector_3_Dim(location.x, location.y, location.z, dimension.id);
+		this.back = new Vector_3_Dim(location.x, location.y, location.z, dimension.id).normalize();
 		this.chat = "all";
 		this.isunban = false;
 		this.lang = DB.db_map.defaultLang ?? "en";
@@ -67,44 +67,28 @@ export class Ply {
 	}
 
 	public update_back_position(location: DimensionLocation) {
-		this.back.x = Math.ceil(location.x + 0.0001) - 1;
-		this.back.y = Math.floor(location.y + 0.4999);
-		this.back.z = Math.ceil(location.z + 0.0001) - 1;
-		this.back.dim = location.dimension.id;
+		this.back.updatePos(location).updateDim(location.dimension).normalize();
 	}
-
-	private static async async_remove_to_update_player(player: Ply) {
-        await Server.runCommandAsync(`scoreboard players reset "$db_player(${player.name})" db_player`);
-    }
-
-    private static async async_add_to_update_player(player: Ply) {
-        await Server.runCommandAsync(`scoreboard players set "$db_player(${player.name})" db_player 1`);
-    }
 
 	public static fromObject(player: Ply) : Ply {
 		const ply = new Ply({name: player.name, nameTag: player.nameTag, id: player.id, location: {x: player.back.x, y: player.back.y, z: player.back.z}, dimension: {id: player.back.dim}});
-		ply.faction_name = player.faction_name;
-		ply.money = player.money;
-		ply.homeLimit = player.homeLimit;
-		ply.warn = player.warn;
-		ply.home = player.home;
-		ply.lastMessage = player.lastMessage;
-		ply.isMute = player.isMute;
-		ply.tpa = player.tpa;
-		ply.delay = player.delay;
-		ply.date = player.date;
-		ply.chat = player.chat;
-		ply.isunban = player.isunban;
-		ply.lang = player.lang;
-		ply.UTC = player.UTC;
-		ply.cmd_module = player.cmd_module;
-		ply.deathCount = player.deathCount;
-		ply.killCount = player.killCount;
-		ply.power = player.power;
-		ply.lastPowerRegen = player.lastPowerRegen;
-		ply.timePlayed = player.timePlayed;
-		ply.lastConnect = player.lastConnect;
-		ply.permission = player.permission;
+		
+		try {
+			for (const key in player) {
+				if (player.hasOwnProperty(key)) {
+					if (key === 'back') {
+						ply[key] = Vector_3_Dim.fromObject(player[key]);
+						continue;
+					}
+					ply[key] = player[key];
+				}
+			}
+		}
+		catch (e) {
+			if (e instanceof TypeError)
+				log("§cError: " + e.message + "\n" + e.stack);
+		}
+		
 		return ply;
 	}
 
@@ -150,9 +134,9 @@ export class Ply {
 							log(`§cDuplicate player found, fixing ${player.name}`)
 							objective.removeParticipant(score.participant);
 							if (existingPlayer.timePlayed < player.timePlayed) {
-								await Ply.async_remove_to_update_player(existingPlayer);
+								existingPlayer.remove_to_update_player();
 								player = existingPlayer;
-								await Ply.async_add_to_update_player(player);
+								player.add_to_update_player();
 							}
 						} else {
 							db_player.set(player.name, player);
@@ -181,27 +165,34 @@ export class Ply {
 
 	static async UpdateDB() {
 		if (db_player.size > 0 && isLoaded === false) {
-			let counter = 1;
+			let counter = 0;
+			const progressBar = "§a[DB] §7updating db_player... §e";
+			const percentageUnit = 100 / db_player.size;
 			for (let obj of db_player.values()) {
-				obj.remove_to_update_player()
+				obj.remove_to_update_player();
 				let new_obj = new Ply({ location: { x: 0, y: 0, z: 0 }, name: "updatePlayer", nameTag: "updatePlayer", dimension : {id: "overworld"}, id:"-1"});
-				let old_key = Object.keys(obj);
-				let new_key = Object.keys(new_obj);
-				let old_value = Object.values(obj);
 
-				for (let i = 0; i < new_key.length; i++) {
-					for (let j = 0; j < old_key.length; j++) {
-						if (new_key[i] === old_key[j]) {
-							new_obj[new_key[i]] = old_value[j];
-							break;
+				for (const newKey in new_obj) {
+					if (new_obj.hasOwnProperty(newKey)) {
+						if (!obj.hasOwnProperty(newKey)) {
+							obj[newKey] = new_obj[newKey];
 						}
 					}
 				}
-				//log("\n§cOld player => §7" + JSON.stringify(obj) + "\n§aNew Player => §7" + JSON.stringify(new_obj));
-				new_obj.add_to_update_player();
-				obj = new_obj;
-				if (counter++ % 37 === 0) await sleep(1);	
-			};
+				for (const oldKey in obj) {
+					if (obj.hasOwnProperty(oldKey)) {
+						if (!new_obj.hasOwnProperty(oldKey)) {
+							delete obj[oldKey];
+						}
+					}
+				}
+
+				obj.add_to_update_player();
+				if (++counter % 37 === 0) {
+					loadDatabase.player = progressBar + (counter * percentageUnit).toFixed(2) + "%";
+					await sleep(1);
+				}
+			}
 			log("§8[Player] §7Database Updated");
 		}
 		else {
