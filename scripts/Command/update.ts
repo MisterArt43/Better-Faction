@@ -20,23 +20,23 @@ addSubCommand(
 	update
 )
 
-async function update(args : string[], player: Player, ply: Ply) {
+async function update(args: string[], player: Player, ply: Ply) {
 	world.sendMessage("§aUpdating the database..., §eAll script will be paused for a moment")
 	isLoaded = false
 
 	try {
 		await sleep(10);
-	
-		await DB_Map.UpdateDB()
-	
-		await Ply.UpdateDB()
-	
-		await Faction.UpdateDB()
-		await Chunk.UpdateDB()
-	
-		await Warp.UpdateDB()
-	
-		await Display.UpdateDB()
+
+		await DB_Map.UpdateDB();
+
+		await Ply.UpdateDB();
+
+		await Faction.UpdateDB();
+		await Chunk.UpdateDB();
+
+		await Warp.UpdateDB();
+
+		await Display.UpdateDB();
 	}
 	catch (e) {
 		if (e instanceof Error) {
