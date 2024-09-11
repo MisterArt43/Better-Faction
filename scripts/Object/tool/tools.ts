@@ -18,10 +18,8 @@ export function tellraw(selector : tellrawSelector, text : string) {
 		const rawMessage: RawMessage = {rawtext: [{text: `§r${text.replace(/"/g, "\'")}`}]};
 		selector.sendMessage(rawMessage);
 	}
-	else if (selector.match(/@a|@p|@r|@s|@e/g) !== null) {
+	else if (selector.match(/@a|@p|@r|@s|@e/g) !== null)
 		Server.runCommandAsync(`tellraw ${selector} {"rawtext":[{"text":"§r${text.replace(/"/g, "\'")}"}]}`);
-	}
-		//Server.runCommandAsync(`tellraw "${selector.name}" {"rawtext":[{"text":"§r${text.replace(/"/g, "\'")}"}]}`);
 	else
 		Server.runCommandAsync(`tellraw "${selector}" {"rawtext":[{"text":"§r${text.replace(/"/g, "\'")}"}]}`);
 }
@@ -78,7 +76,6 @@ export function sleep(ticks: number) { return new Promise<void>(resolve => syste
 /**
  * Convert Hexadecimal to string
  * @param Hexadecimal
- * @returns {String}
  */
 export function hexToText(hex: string): string {
 	return hex.split(" ").map((char) => {
@@ -88,8 +85,6 @@ export function hexToText(hex: string): string {
 
 /**
  * Convert string to Hexadecimal
- * @param {string} text
- * @returns {string}
  */
 export function textToHex(text: string): string {
 	return text.split("").map((char) => {
