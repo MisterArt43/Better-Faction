@@ -50,7 +50,7 @@ async function getFactionList(searchInOnlineFactions: boolean, searchKeyword: st
         for (const faction of DB.db_faction.keys()) {
             const factionName = faction.toLowerCase();
             if (factionName.startsWith(searchKeyword)) {
-                listFaction.push(factionName);
+                listFaction.push(faction);
                 if (listFaction.length === 100) {
                     tellraw(pl, "§cToo many results, will only return the first 100");
                     await sleep(10);
@@ -73,7 +73,7 @@ async function selectFaction(pl: Player, FactionList: string[]): Promise<Faction
         .dropdown("Select a faction", FactionList)
         .show(pl)
         .then(async (res) => {
-            if (res.canceled || !res.formValues || typeof res.formValues[0] !== "string") return undefined;
+            if (res.canceled || !res.formValues) return undefined;
             return DB.db_faction.get(FactionList[res.formValues[0] as unknown as number]);
         });
 }
