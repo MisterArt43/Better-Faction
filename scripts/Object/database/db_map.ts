@@ -17,7 +17,7 @@ declare global {
 		refreshTime:string
 	};
 }
-globalThis.version = "2.0.6";
+globalThis.version = "2.0.7";
 globalThis.prefix = "+";
 globalThis.isLoaded = false;
 globalThis.loadDatabase = {
