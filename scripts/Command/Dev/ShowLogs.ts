@@ -21,7 +21,7 @@ addSubCommand(
 function showlogs(args: string[], player: Player, ply: Ply) {
 	new BFActionFormData()
 	.title("logs history")
-	.body(logData.join("\n"))
+	.body(logData.join("§r\n"))
 	.button("Close")
 	.show(player)
 }

@@ -6,22 +6,22 @@ import { Faction } from "../../Object/faction/Faction";
 import { DB } from "../../Object/database/database";
 import { log, tellraw } from "../../Object/tool/tools";
 import { formatCreationFullDate } from "../../Object/tool/dateTools";
-import { Chunk, db_chunk } from "../../Object/chunk/Chunk";
+import { Chunk } from "../../Object/chunk/Chunk";
 import { addSubCommand } from "../CommandManager";
 import { cmd_module, cmd_permission } from "../../Object/database/db_map";
 import { haveChunk } from "./_UtilsAdmin";
 
 addSubCommand(
-	"deleteclaim",
+	"remove",
 	"Delete a claim as an admin",
-	`${globalThis.prefix}deleteclaim`,
-	["deleteclaim", "delc", "dc"],
+	`${globalThis.prefix}admin claim remove`,
+	["remove", "rm", "delete", "del", "d"],
 	cmd_module.claim,
 	cmd_permission.admin,
 	true,
 	true,
 	deleteClaim,
-	[["admin"], ["claim"]],
+	[["admin", "adm"], ["claim", "c"]],
 	haveChunk
 )
 
@@ -121,7 +121,7 @@ function deleteChunk(player: Player, ply: Ply) {
 		+ "\nClaimed by : " 
 		+ chunk.owner 
 		+ "\nClaimed at : " 
-		+ formatCreationFullDate(chunk.date) 
+		+ formatCreationFullDate(chunk.date, DB.db_map.UTC) 
 		+ "\nClaim group : "
 		+ chunk.group
 		+ "\nposition : " 
