@@ -25,7 +25,7 @@ addSubCommand(
 
 function Factionpromote(args: string[], player: Player, ply: Ply) {
 	const fac = DB.db_faction.get(ply.faction_name ?? "");
-	if (fac === undefined || (fac?.playerList.find((p) => p.name === player.name && fac.isAtLeastRank(p, factionRank.Officer)) === undefined ?? true))
+	if (fac === undefined || (fac?.playerList.find((p) => p.name === player.name && fac.isAtLeastRank(p, factionRank.Officer)) === undefined))
 		return tellraw(player, translate(ply.lang)?.error_cant_do_that ?? "no translation");
 	if (args.length >= 3) {
 		factionPromoteCmd(args, player, ply, fac);

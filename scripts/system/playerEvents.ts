@@ -59,7 +59,7 @@ world.beforeEvents.playerBreakBlock.subscribe((data) => {
 			}
 		}
 		else {
-			if (chunk?.rankPermission.length !== 0 ?? false) {
+			if (((chunk?.rankPermission.length ?? 0) !== 0)) {
 				const faction = DB.db_faction.get(player.faction_name);
 				if (faction !== undefined) {
 					const rank = faction.playerList.find((p) => p.name === player.name)!.permission;
@@ -93,7 +93,7 @@ world.beforeEvents.playerPlaceBlock.subscribe((data) => {
 			}
 		}
 		else {
-			if (chunk?.rankPermission.length !== 0 ?? false) {
+			if ((chunk?.rankPermission.length ?? 0) !== 0) {
 				const faction = DB.db_faction.get(player.faction_name);
 				if (faction !== undefined) {
 					const rank = faction.playerList.find((p) => p.name === player.name)!.permission;
@@ -127,7 +127,7 @@ world.beforeEvents.playerInteractWithBlock.subscribe((data) => {
 			}
 		}
 		else {
-			if (chunk?.rankPermission.length !== 0 ?? false) {
+			if ((chunk?.rankPermission?.length ?? 0) !== 0) {
 				const faction = DB.db_faction.get(player.faction_name);
 				if (faction !== undefined) {
 					const rank = faction.playerList.find((p) => p.name === player.name)!.permission;

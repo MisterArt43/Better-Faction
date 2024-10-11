@@ -97,7 +97,8 @@ export class Delay {
 							log("§cError: Mismatch data in db_delay, try deleting the database and restarting the server. Contact the developer.");
 							return;
 						}
-						let delay = JSON.parse(hexToText(db.join(""))) as Delay;
+						let delayObj = JSON.parse(hexToText(db.join(""))) as Delay;
+						let delay = this.fromObject(delayObj);
 						
 						// Update db_delay map
 						const existingObject = db_delay.get(delay.name);
@@ -122,6 +123,12 @@ export class Delay {
 			const end = Date.now();
 			log("§7db_delay loaded in " + ((end - start) / 1000) + " second(s)");
 		}
+	}
+
+	public static fromObject(delay: Delay) : Delay {
+		const d = new Delay(delay.name, delay.time);
+
+		return d
 	}
 
 	static async UpdateDB() {
