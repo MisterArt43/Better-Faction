@@ -3,6 +3,7 @@ import { cmd_module, cmd_permission } from "../../Object/database/db_map";
 import { Command, SubCommand, addSubCommand, commands, getSubCommandPerAlias } from "../CommandManager";
 import { Ply } from "../../Object/player/Ply";
 import { tellraw } from "../../Object/tool/tools";
+import { DB } from "../../Object/database/database";
 
 addSubCommand(
 	"help",
@@ -45,8 +46,8 @@ function recurUsageSubCommand(ply: Ply, player: Player, subCommand: SubCommand, 
 		}
 		else {
 			if (args.length == i && subCommand instanceof Map) {
-				const msg = "list of subcommands:\n" + buildCursorMessage(ply, player, subCommand);
-				tellraw(player, msg);
+				const msg = "List of commands:\n" + buildCursorMessage(ply, player, subCommand);
+				tellraw(player, msg + `\n§7§l(bf version ${globalThis.version}, db version ${DB.db_map.v})`);
 			}
 			else
 				tellraw(player, `§cUnknown command. Try ${globalThis.prefix}help for a list of commands.`);

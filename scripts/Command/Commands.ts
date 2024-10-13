@@ -4,5 +4,6 @@ export * from './Warp/Index'
 export * from './Display/Index'
 export * from './Dev/Index'
 export * from './Setting/Index'
+export * from './Admin/Index'
 
 export * from './update'

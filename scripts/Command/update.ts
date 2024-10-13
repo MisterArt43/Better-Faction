@@ -7,6 +7,7 @@ import { Ply } from "../Object/player/Ply";
 import { Warp } from "../Object/warp/Warp";
 import { addSubCommand } from "./CommandManager";
 import { log, sleep } from "../Object/tool/tools";
+import { DB } from "../Object/database/database";
 
 addSubCommand(
 	"update",
@@ -21,6 +22,7 @@ addSubCommand(
 )
 
 async function update(args: string[], player: Player, ply: Ply) {
+	if (DB.db_map.v === globalThis.version && args[1] !== "force") return player.sendMessage("§cDatabase already up to date");
 	world.sendMessage("§aUpdating the database..., §eAll script will be paused for a moment")
 	isLoaded = false
 

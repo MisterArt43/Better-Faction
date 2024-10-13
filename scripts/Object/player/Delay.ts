@@ -98,7 +98,7 @@ export class Delay {
 							return;
 						}
 						let delayObj = JSON.parse(hexToText(db.join(""))) as Delay;
-						let delay = this.fromObject(delayObj);
+						const delay = Delay.fromObject(delayObj);
 						
 						// Update db_delay map
 						const existingObject = db_delay.get(delay.name);
@@ -126,9 +126,9 @@ export class Delay {
 	}
 
 	public static fromObject(delay: Delay) : Delay {
-		const d = new Delay(delay.name, delay.time);
-
-		return d
+		const newDelay = new Delay(delay.name, delay.time);
+		
+		return newDelay;
 	}
 
 	static async UpdateDB() {

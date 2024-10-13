@@ -54,12 +54,12 @@ function removeClaimUI(player: Player, ply: Ply, fac: Faction) {
 }
 
 function removeClaimChunkOnPosition(player: Player, ply: Ply, fac: Faction) {
-	const chunk = db_chunk.get((player.location.x >> 4) + "," + (player.location.z >> 4) + player.dimension.id);
-	if (chunk === undefined) return tellraw(player, "This chunk is not claimed");
+	const key = (player.location.x >> 4) + "," + (player.location.z >> 4) + player.dimension.id;
+	if (!DB.db_chunk.has(key)) return tellraw(player, "This chunk is not claimed");
 
-	if (chunk.faction_name !== fac.name) return tellraw(player, "This chunk is not claimed by your faction");
+	if (!fac.claim.has(key)) return tellraw(player, "This chunk is not claimed by your faction");
 
-	fac.removeClaim(chunk);
+	Chunk.remove_chunk(fac.claim.get(key)!);
 }
 
 function selectChunkInGroup(player: Player, ply: Ply, fac: Faction) {

@@ -207,14 +207,20 @@ export class Chunk {
 		Server.runCommandAsync("scoreboard players set \"$db_chunk(" + textToHex(JSON.stringify(chunk)) + ")\" db_chunk 1");
 		db_chunk.set(chunk.x + "," + chunk.z + chunk.dimension, chunk); //to rework because unefficient when updating
 		db_faction.get(chunk.faction_name)!.claim.set(chunk.x + "," + chunk.z + chunk.dimension, chunk);
+		if (db_faction.get(chunk.faction_name)!.groupClaim.has(chunk.group)) db_faction.get(chunk.faction_name)!.groupClaim.get(chunk.group)!.set(chunk.x + "," + chunk.z + chunk.dimension, chunk);
+		else db_faction.get(chunk.faction_name)!.groupClaim.set(chunk.group, new Map<string, Chunk>().set(chunk.x + "," + chunk.z + chunk.dimension, chunk));
 	}
 
 	static remove_chunk(chunk: Chunk) {
 		if (!db_chunk.has(chunk.x + "," + chunk.z + chunk.dimension)) log(`§cERROR: try to remove a chunk that doesn't exist, ${chunk.x}, ${chunk.z}, possible duplication in the database`);
 
-		Server.runCommandAsync("scoreboard players reset \"$db_chunk(" + textToHex(JSON.stringify(chunk)) + ")\" db_chunk");
+		const scoreboard = world.scoreboard.getObjective("db_chunk")!;
+		scoreboard.removeParticipant(`$db_chunk(${textToHex(JSON.stringify(chunk))})`);
+		//Server.runCommandAsync("scoreboard players reset \"$db_chunk(" + textToHex(JSON.stringify(chunk)) + ")\" db_chunk");
 		db_chunk.delete(chunk.x + "," + chunk.z + chunk.dimension);
 		db_faction.get(chunk.faction_name)!.claim.delete(chunk.x + "," + chunk.z + chunk.dimension);
+		db_faction.get(chunk.faction_name)!.groupClaim.get(chunk.group)!.delete(chunk.x + "," + chunk.z + chunk.dimension);
+		log("§7[Chunk] §cChunk removed : " + chunk.x + ", " + chunk.z + " " + chunk.dimension);
 	}
 
 	add_to_update_chunk() {

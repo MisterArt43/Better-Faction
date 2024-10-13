@@ -25,9 +25,11 @@ export function tellraw(selector : tellrawSelector, text : string) {
 }
 export let logData = new Array<String>();
 export function log(text : number | string) {
-	Server.runCommandAsync(`tellraw @a[tag=log] {"rawtext":[{"text":"§7{log} §r${text.toString().replace(/"/g, "\'").replace(/\n/g, "§r\n")}"}]}`)
+	const formatedText = text.toString().replace(/"/g, "\'").replace(/\n/g, "§r\n");
+	world.getPlayers({tags: ["log"]}).forEach(player => player.sendMessage(`§7{log} §r${formatedText}`));
+	//Server.runCommandAsync(`tellraw @a[tag=log] {"rawtext":[{"text":"§7{log} §r${formatedText}"}]}`)
 	if (isLoaded) {
-		const save_text = "§7[" + formatCreationDayTime(Date.now(), DB.db_map.UTC) + "] §r" + text.toString().replace(/"/g, "\'").replace(/\n/g, "§r\n");
+		const save_text = "§7[" + formatCreationDayTime(Date.now(), DB.db_map.UTC) + "] §r" + formatedText;
 	
 		logData.push(save_text);
 		if (logData.length > 100)
