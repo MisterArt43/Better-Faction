@@ -32,6 +32,7 @@ export class Ply {
 	public power : number;
 	public lastPowerRegen : number;
 	public timePlayed : number;
+	public dateJoin : number;
 	public lastConnect : number;
 	public permission : (typeof cmd_permission[keyof typeof cmd_permission]);
 	[key: string]: any;
@@ -62,6 +63,7 @@ export class Ply {
 		this.power = 5;
 		this.lastPowerRegen = 0;
 		this.timePlayed = 0; //in seconds
+		this.dateJoin = date.getTime();
 		this.lastConnect = date.getTime();
 		this.permission = cmd_permission.member;
 	}

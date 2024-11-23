@@ -17,7 +17,7 @@ declare global {
 		refreshTime:string
 	};
 }
-globalThis.version = "2.0.7";
+globalThis.version = "2.0.8";
 globalThis.prefix = "+";
 globalThis.isLoaded = false;
 globalThis.loadDatabase = {
@@ -175,12 +175,20 @@ class rule {
 	}
 }
 
-class powerLimit {
+export class powerLimit {
 	public max: number;
 	public min: number;
 	constructor() {
-		this.max = 10;
-		this.min = -10;
+		this.max = powerLimit.getDefaultMax();
+		this.min = powerLimit.getDefaultMin();
+	}
+
+	static getDefaultMax() {
+		return 10;
+	}
+
+	static getDefaultMin() {
+		return -10;
 	}
 }
 
