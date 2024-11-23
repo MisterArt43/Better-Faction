@@ -81,7 +81,6 @@ function selectMode(player: Player, ply: Ply, fac: Faction | undefined) {
 
 function deleteAll(player: Player, ply: Ply, fac: Faction) {
 	for (const [key, value] of fac.groupClaim) {
-		log(key + "DEBUG");
 		deleteGroup(player, ply, fac, key);
 	}
 	tellraw(player, "§aAll claims of this faction has been deleted");

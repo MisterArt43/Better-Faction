@@ -16,7 +16,6 @@ export async function UI_find_player(pl: Player): Promise<Ply | undefined> {
     if (!playerList) return undefined;
 
     const selectedPlayer = await selectPlayer(pl, playerList);
-    log(selectedPlayer + "");
 
     if (!selectedPlayer) {
         tellraw(pl, "§cPlayer not found");
