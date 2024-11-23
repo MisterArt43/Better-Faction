@@ -4,7 +4,7 @@ import { BFModalFormData } from "../../Object/formQueue/formQueue";
 import { Ply } from "../../Object/player/Ply";
 import { log, Server, sleep, tellraw, textToHex } from "../../Object/tool/tools";
 import { addSubCommand } from "../CommandManager";
-import { cmd_module, cmd_permission } from "../../Object/database/db_map";
+import { cmd_module, cmd_permission, DB_Map, powerLimit } from "../../Object/database/db_map";
 
 addSubCommand(
 	"prefix",
@@ -221,7 +221,7 @@ function set_home_limit_ui(args: string[], player: Player, ply: Ply) {
 				const nb = parseInt(res.formValues![0] as string);
 				system.run(async () => {
 					let index = 0;
-					for (const player of Array.from(DB.db_player.values())) {
+					for (const player of DB.db_player.values()) {
 						if (player.homeLimit != nb) {
 							player.remove_to_update_player();
 							player.homeLimit = nb;
@@ -312,6 +312,66 @@ function set_faction_home_ui(args: string[], player: Player, ply: Ply) {
 					}
 					if (i++ % 20 == 0) await sleep(1);
 				});
+			}
+		});
+}
+
+addSubCommand(
+	"set_power_limit",
+	"Set the power limit. Current is " + DB.db_map.powerLimit.max + " for max, " + DB.db_map.powerLimit.min + " for min",
+	`${globalThis.prefix}set powerlimit`,
+	["set_power_limit", "powerlimit", "plimit", "pl"],
+	cmd_module.claim,
+	cmd_permission.admin,
+	true,
+	true,
+	set_power_limit_ui,
+	[["set", "setting"]]
+)
+
+function set_power_limit_ui(args: string[], player: Player, ply: Ply) {
+	const form = new BFModalFormData();
+		form.title("Power Limit")
+		.textField("§eMax Power", DB.db_map.powerLimit.max.toString(), DB.db_map.powerLimit.max.toString())
+		.textField("§eMin Power", DB.db_map.powerLimit.min.toString(), DB.db_map.powerLimit.min.toString())
+		.toggle("Reset Default", false)
+		.toggle("§cReset All player Power\n§7(will reset all player power to the max power)", false)
+		form.show(player).then(async res => {
+			if (res.canceled || res.formValues![0] == DB.db_map.powerLimit.max && res.formValues![1] == DB.db_map.powerLimit.min) return;
+			if (res.formValues![2]) {
+				await Server.runCommandAsync("scoreboard players reset \"$db_map(" + textToHex(JSON.stringify(DB.db_map)) + ")\" database");
+				DB.db_map.powerLimit.max = powerLimit.getDefaultMax();
+				DB.db_map.powerLimit.min = powerLimit.getDefaultMin();
+				await Server.runCommandAsync("scoreboard players set \"$db_map(" + textToHex(JSON.stringify(DB.db_map)) + ")\" database 1");
+				tellraw(ply.name, "§ePower Limit reset to default.");
+			}
+			else {
+				const max = parseInt(res.formValues![0] as string);
+				const min = parseInt(res.formValues![1] as string);
+				if (max < min) return tellraw(player.name, "§cMax Power must be greater than Min Power.");
+				if (max === DB.db_map.powerLimit.max && min === DB.db_map.powerLimit.min) return;
+				await Server.runCommandAsync("scoreboard players reset \"$db_map(" + textToHex(JSON.stringify(DB.db_map)) + ")\" database");
+				DB.db_map.powerLimit.max = max;
+				DB.db_map.powerLimit.min = min;
+				await Server.runCommandAsync("scoreboard players set \"$db_map(" + textToHex(JSON.stringify(DB.db_map)) + ")\" database 1");
+				tellraw(ply.name, "§eNew Power Limit: \n§eMax = " + max + "\n§eMin = " + min);
+			}
+			if (res.formValues![3]) {
+				system.run(async () => {
+					let index = 0;
+					for (let player of DB.db_player.values()) {
+						if (player.power != DB.db_map.powerLimit.max) {
+							player.remove_to_update_player();
+							player.power = DB.db_map.powerLimit.max;
+							player.add_to_update_player();
+						}
+						if (index % 10 === 0) {
+							await Server.runCommandAsync(`title @a[tag=log] actionbar §eEditing Player Database Progression : §a${Math.floor(index / DB.db_player.size * 100)}%`);
+							await sleep(2);
+						}
+						index++;
+					}
+				})
 			}
 		});
 }
