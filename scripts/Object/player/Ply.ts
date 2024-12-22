@@ -242,6 +242,21 @@ export class Ply {
 		db_player.delete(player.name);
 		if (db_player_online.has(player.name)) db_player_online.delete(player.name);
 	}
+
+	// ------------------------------------------ //
+	// ----------------- Setter ----------------- //
+	// ------------------------------------------ //
+
+	setPower(power: number) {
+		this.power = power;
+
+		if (this.faction_name) {
+			const fac = DB.db_faction.get(this.faction_name);
+			if (fac) {
+				fac.updatePower();
+			}
+		}
+	}
 }
 
 export class Tpa {

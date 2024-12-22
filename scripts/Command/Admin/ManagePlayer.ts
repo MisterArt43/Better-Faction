@@ -28,11 +28,12 @@ addSubCommand(
 
 async function ManagePlayer(args: string[], player: Player, ply: Ply) {
     let targetPly: Ply | undefined;
-    if (args.length === 3) {
+    // log(args.join("/"));
+    // if (args.length === 3) {
         targetPly = await UI_find_player(player);
-    } else {
-        targetPly = DB.db_player.get(concatenateArgs(args, 3, (s) => s.replace(/["@]/g, "")));
-    }
+    // } else {
+    //     targetPly = DB.db_player.get(concatenateArgs(args, 3, (s) => s.replace(/["@]/g, "")));
+    // }
 
     if (!targetPly) return tellraw(player, "§cPlayer not found");
 
@@ -250,7 +251,7 @@ function setPower(targetPly: Ply, player: Player, ply: Ply) {
         if (!canBeParseInt(res.formValues[0] as string)) return tellraw(player, "§cInvalid power");
 
         targetPly.remove_to_update_player();
-        targetPly.power = parseInt(res.formValues[0] as string);
+        targetPly.setPower(parseInt(res.formValues[0] as string));
         targetPly.add_to_update_player();
 
         tellraw(player, "§aPlayer power set to " + targetPly.power);
