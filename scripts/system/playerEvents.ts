@@ -4,6 +4,7 @@ import { log, tellraw } from "../Object/tool/tools";
 import { formatCreationDayTime } from "../Object/tool/dateTools";
 import { cmd_permission } from "../Object/database/db_map";
 import { Delay } from "../Object/player/Delay";
+import { subCommandExecuter } from "../Command/CommandManager";
 
 world.afterEvents.playerJoin.subscribe(data => {
 	const date = Date.now();
@@ -154,7 +155,7 @@ world.afterEvents.entityDie.subscribe(data => {
 		let pl = DB.db_player.get(playerKilled.name)!;
 		pl.remove_to_update_player();
 		pl.deathCount++;
-		if (pl.power > DB.db_map.powerLimit.min) pl.power--;
+		if (pl.power > DB.db_map.powerLimit.min) pl.setPower(pl.power - 1);
 		pl?.add_to_update_player();
 		if (playerKiller instanceof Player) {
 			let pl2 = DB.db_player.get(playerKiller.name)!;
@@ -176,7 +177,7 @@ world.afterEvents.entityHurt.subscribe(data => {
 			if (DB.db_delay.has(player.name)) {
 				DB.db_delay.get(player.name)?.update_time(DB.db_map.playerHurtDelay);
 			}
-			else {
+			else if (DB.db_map.playerHurtDelay > 0) {
 				new Delay(player.name, DB.db_map.playerHurtDelay);
 			}
 		}
@@ -184,7 +185,7 @@ world.afterEvents.entityHurt.subscribe(data => {
 			if (DB.db_delay.has(player.name)) {
 				DB.db_delay.get(player.name)?.update_time(DB.db_map.randomHurtDelay);
 			}
-			else {
+			else if (DB.db_map.randomHurtDelay > 0) {
 				new Delay(player.name, DB.db_map.randomHurtDelay);
 			}
 		}
@@ -197,5 +198,12 @@ world.afterEvents.playerSpawn.subscribe(data => {
 		if (DB.db_map.v != version && pl.permission <= cmd_permission.admin) {
 			tellraw(data.player.name, "§7[DB] database version is different from the current version, ask a Owner to do " + globalThis.prefix + "update");
 		}
+	}
+})
+
+world.beforeEvents.itemUse.subscribe(data => {
+	if (data.source instanceof Player && DB.db_link.has(data.itemStack.typeId)) {
+		const cmd = DB.db_link.get(data.itemStack.typeId)!.cmd;
+		subCommandExecuter(cmd.split(" "), { cancel: false, sender: data.source, message: globalThis.prefix + cmd });
 	}
 })

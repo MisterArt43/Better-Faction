@@ -14,10 +14,11 @@ declare global {
 		chunk:string,
 		warp:string,
 		display:string,
+		link:string,
 		refreshTime:string
 	};
 }
-globalThis.version = "2.0.8";
+globalThis.version = "2.0.10";
 globalThis.prefix = "+";
 globalThis.isLoaded = false;
 globalThis.loadDatabase = {
@@ -27,6 +28,7 @@ globalThis.loadDatabase = {
 	chunk:"§eloading...", 
 	warp:"§eloading...",
 	display:"§eloading...",
+	link:"§eloading...",
 	refreshTime:"0 ms"
 };
 
@@ -207,6 +209,7 @@ export const cmd_module = {
 	commoncommand: 11,
 	dev: 12,
 	display: 13,
+	link: 14
 } as const;
 
 export const cmd_permission = {

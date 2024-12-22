@@ -7,6 +7,7 @@ import { Warp, db_warp } from "../warp/Warp";
 import { Display, db_display } from "../display/Display";
 import { Delay, db_delay } from "../player/Delay";
 import { log, sleep } from "../tool/tools";
+import { CMDLinker, db_link } from "../link/CMDLinker";
 
 export class DB {
 	public static db_map : DB_Map;
@@ -17,6 +18,7 @@ export class DB {
 	public static db_warp : Map<string, Warp>;
 	public static db_display = db_display;
 	public static db_delay : Map<string, Delay>;
+	public static db_link : Map<string, CMDLinker>;
 
 	public static async initialize() {
 		const time = Date.now();
@@ -29,6 +31,7 @@ export class DB {
 		const displayPromise = Display.initDB_display();
 		const delayPromise = Delay.initDB_delay();
 		const chunkPromise = Chunk.initDB_chunk(facPromise);
+		const linkPromise = CMDLinker.initDB_link();
 
 		this.db_player = db_player;
 		this.db_player_online = db_player_online;
@@ -37,6 +40,7 @@ export class DB {
 		this.db_warp = db_warp;
 		this.db_display = db_display;
 		this.db_delay = db_delay;
+		this.db_link = db_link;
 
 		const start = Date.now();
 		log("§7§l[CMD] §r§aLoading commands...")
@@ -45,7 +49,7 @@ export class DB {
 			log("§7§l[CMD] §r§aCommands loaded in " + (end - start) + "ms");
 		});
 
-		Promise.all([plyPromise, facPromise, warpPromise, displayPromise, delayPromise, chunkPromise]).then(async () => {
+		Promise.all([plyPromise, facPromise, warpPromise, displayPromise, delayPromise, chunkPromise, linkPromise]).then(async () => {
 			const end = Date.now();
 			await sleep(1);
 			world.sendMessage("§7§l[Better Faction]§r§e loaded in §s" + ((end - time) / 1000) + "§e second(s)");
