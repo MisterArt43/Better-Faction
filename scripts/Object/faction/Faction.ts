@@ -39,7 +39,7 @@ export class Faction {
 		this.creationDate = new Date().getTime();
 		this.owner = plName;
 		this.bank = 0;
-		this.power = 5;
+		this.power = 0;
 		this.ally = new Array();
 		this.enemy = new Array();
 		this.invitList = new Array();
@@ -207,6 +207,21 @@ export class Faction {
 
 	getMembersFromRank(rank: (typeof factionRank[keyof typeof factionRank])) {
 		return this.playerList.filter(p => p.permission === rank);
+	}
+
+	updatePower() {
+		let power = 0;
+		
+		for (let member of this.playerList) {
+			const ply = DB.db_player.get(member.name)!;
+			power += ply.power;
+		}
+
+		if (power === this.power)
+			return;
+		this.remove_to_update_faction();
+		this.power = power;
+		this.add_to_update_faction();
 	}
 }
 

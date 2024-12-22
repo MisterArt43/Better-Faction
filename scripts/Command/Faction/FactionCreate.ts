@@ -42,6 +42,7 @@ function factionCreateCmd(Fname: string, player: Player, ply: Ply) {
 		if (player.dimension.id === "minecraft:overworld") {
 			FacObject.Fhome = new Vector_3(player.location).normalize();
 		}
+		FacObject.updatePower();
 		Faction.add_faction(FacObject);
 		ply.remove_to_update_player();
 		ply.faction_name = FacObject.name;

@@ -44,7 +44,7 @@ function processTags(player: Player, playerData: Ply, tags: string[]): boolean {
 			if (!isNaN(amount)) {
 				playerData.remove_to_update_player();
 				is_edit = true;
-				playerData.power = amount;
+				playerData.setPower(amount);
 			}
 			else log(`§cError Convert Tag : ${tag} for ${player.name}`);
 			player.removeTag(tag);
@@ -74,7 +74,7 @@ system.runInterval(() => {
 					p.timePlayed += 10;
 					if (p.power < DB.db_map.powerLimit.max && p.lastPowerRegen + DB.db_map.timeToRegenPower * 60 < p.timePlayed) {
 						log("power regen for " + p.name + " : " + p.power + " -> " + (p.power + 1));
-						p.power++;
+						p.setPower(p.power + 1);
 						p.lastPowerRegen = p.timePlayed;
 					}
 					else if (p.lastPowerRegen + 1 > p.timePlayed + DB.db_map.timeToRegenPower * 60) {
@@ -332,28 +332,3 @@ system.runInterval(async () => {
 	}
 	curTick++;
 }, 1)
-
-system.runInterval(() => {
-	try {
-		if (isLoaded) {
-			if (DB.db_player_online.size !== 0) {
-				for (const [key, p] of DB.db_player_online) {
-					p.remove_to_update_player();
-					p.timePlayed += 5;
-					if (p.power < DB.db_map.powerLimit.max && p.lastPowerRegen + DB.db_map.timeToRegenPower * 60 < p.timePlayed) {
-						log("power regen for " + p.name + " : " + p.power + " -> " + (p.power + 1));
-						p.power++;
-						p.lastPowerRegen = p.timePlayed;
-					}
-					else if (p.lastPowerRegen + 1 > p.timePlayed + DB.db_map.timeToRegenPower * 60) {
-						p.lastPowerRegen = p.timePlayed;
-					}
-					p.add_to_update_player();
-				}
-			}
-		}
-	} catch (er) {
-		if (er instanceof Error)
-			log("error in runInterval : " + er.toString() + "\n" + er.stack);
-	}
-}, 100)

@@ -362,7 +362,7 @@ function set_power_limit_ui(args: string[], player: Player, ply: Ply) {
 					for (let player of DB.db_player.values()) {
 						if (player.power != DB.db_map.powerLimit.max) {
 							player.remove_to_update_player();
-							player.power = DB.db_map.powerLimit.max;
+							player.setPower(DB.db_map.powerLimit.max);
 							player.add_to_update_player();
 						}
 						if (index % 10 === 0) {
