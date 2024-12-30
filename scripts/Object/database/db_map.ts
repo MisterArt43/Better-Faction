@@ -1,6 +1,7 @@
 import { world } from "@minecraft/server";
 import { Server, getMap, hexToText, log, sleep, textToHex } from "../tool/tools";
 import { DB } from "./database";
+import { PlayerShopType } from "../shop/Shop";
 // Database Module for Application Preferences : DB MAP.
 
 declare global {
@@ -67,6 +68,12 @@ export class DB_Map {
 	public defaultPower: number;
 	public timeToRegenPower: number;
 	public canClaimInOtherDimension: boolean;
+	public shopId: number;
+	public commandShopName: string;
+	public defaultPlayerShopType: PlayerShopType;
+	public shopItemLimit: number; // limit of items in a shop
+	public shopLimitPerPlayer: number;
+	public shopLimitPerFaction: number;
 	[key: string]: any;
 
 	constructor() {
@@ -96,7 +103,11 @@ export class DB_Map {
 		this.defaultPower = 5,
 		this.powerLimit = new powerLimit(),
 		this.timeToRegenPower = 60,
-		this.canClaimInOtherDimension = false
+		this.canClaimInOtherDimension = false,
+		this.shopId = 0,
+		this.shopItemLimit = 10,
+		this.shopLimitPerPlayer = 5,
+		this.shopLimitPerFaction = 10
 	}
 
 	static async initDB_map() : Promise<DB_Map> {
@@ -209,7 +220,7 @@ export const cmd_module = {
 	commoncommand: 11,
 	dev: 12,
 	display: 13,
-	link: 14
+	link: 14,
 } as const;
 
 export const cmd_permission = {
