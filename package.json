@@ -1,6 +1,11 @@
 {
   "dependencies": {
-    "@minecraft/server": "^1.17.0-beta.1.21.51-stable",
-    "@minecraft/server-ui": "^1.4.0-beta.1.21.50-stable"
+    "@minecraft/server": "2.2.0-beta.1.21.101-stable",
+    "@minecraft/server-ui": "2.1.0-beta.1.21.101-stable"
+  },
+  "overrides": {
+    "@minecraft/server-ui": {
+      "@minecraft/server": "2.2.0-beta.1.21.101-stable"
+    }
   }
 }

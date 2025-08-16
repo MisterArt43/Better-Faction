@@ -14,7 +14,7 @@ export class ExtendedMap<K, V> extends Map<K, V> {
             this.remove(key);
         }
 		this.set(key, value);
-		Server.runCommandAsync(`scoreboard players set "$${this.dbName}(${textToHex(JSON.stringify(value))})" ${this.dbName} 1`);
+		Server.runCommand(`scoreboard players set "$${this.dbName}(${textToHex(JSON.stringify(value))})" ${this.dbName} 1`);
 	}
     /**
      * Ajoute un élément à la base de données.
@@ -27,7 +27,7 @@ export class ExtendedMap<K, V> extends Map<K, V> {
 			return;
         }
         this.set(key, value);
-        Server.runCommandAsync(`scoreboard players set "$${this.dbName}(${textToHex(JSON.stringify(value))})" ${this.dbName} 1`);
+        Server.runCommand(`scoreboard players set "$${this.dbName}(${textToHex(JSON.stringify(value))})" ${this.dbName} 1`);
     }
 
     /**
@@ -38,7 +38,7 @@ export class ExtendedMap<K, V> extends Map<K, V> {
 		const toDelete = this.get(key);
         if (toDelete) {
             this.delete(key);
-			Server.runCommandAsync(`scoreboard players reset "$${this.dbName}(${textToHex(JSON.stringify(toDelete))})" ${this.dbName}`);
+			Server.runCommand(`scoreboard players reset "$${this.dbName}(${textToHex(JSON.stringify(toDelete))})" ${this.dbName}`);
         }
     }
 }
@@ -47,7 +47,7 @@ const Server = MC.world.getDimension('overworld');
 
 export async function initDB(dbName: keyof typeof database, keyName: string, dbMap: ExtendedMap<any, any>) {
 	if (dbMap.size === 0) {
-		await Server.runCommandAsync(`scoreboard objectives add ${dbName} dummy`);
+		await Server.runCommand(`scoreboard objectives add ${dbName} dummy`);
 		const start = Date.now();
 
 		try {
@@ -105,7 +105,7 @@ export async function initDB(dbName: keyof typeof database, keyName: string, dbM
 	}
 }
 
-function log(text: string) { Server.runCommandAsync(`tellraw @a[tag=log] {"rawtext":[{"text":"§7{log} §r${text.toString().replace(/"/g, "\'").replace(/\n/g, "§r\n")}"}]}`) }
+function log(text: string) { Server.runCommand(`tellraw @a[tag=log] {"rawtext":[{"text":"§7{log} §r${text.toString().replace(/"/g, "\'").replace(/\n/g, "§r\n")}"}]}`) }
 
 /**
  * Convert string to Hexadecimal
